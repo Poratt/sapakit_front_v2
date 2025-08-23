@@ -1,0 +1,351 @@
+/* in header.component.css */
+
+.header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 0 1.5rem;
+	height: var(--header-height);
+	background-color: var(--frame-bg);
+	/* border-bottom: 1px solid var(--grey-100); */
+
+	.header-left,
+	.header-right {
+		flex: 1 1 0%;
+	}
+
+	.header-center {
+		flex: 2 1 0%;
+		display: flex;
+		justify-content: center;
+	}
+
+	.header-right {
+		display: flex;
+		justify-content: flex-end;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	/* --- Insights Bell --- */
+	.today-orders,
+	.insights-bell {
+		cursor: pointer;
+		position: relative;
+
+		.pi-sparkles,
+		.pi-bell {
+			font-size: 1.5rem;
+			color: var(--grey-600);
+			transition: color 0.2s;
+		}
+
+		&:hover {
+			.pi-bell {
+				color: var(--primary-500);
+			}
+			p-badge.p-badge {
+				scale: 1.1;
+			}
+		}
+
+		p-badge.p-badge {
+			transition: 0.2s all ease-in-out;
+			font-family: Fredoka;
+			height: 16px;
+			max-width: 12px;
+			min-width: 12px !important;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 9px;
+			border-radius: 50px;
+
+			&::after {
+				content: '';
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%); /* ✅ מרכז את האפקט */
+				border-radius: 50%;
+				border: 1px solid var(--red-400); /* ✅ משתמש במשתנה צבע */
+				animation: ripple-effect 1.25s infinite;
+				pointer-events: none; /* ✅ למנוע הפרעה לקליקים */
+			}
+			&::before {
+				content: '';
+				position: absolute;
+				top: -5px;
+				left: -5px;
+				right: -5px;
+				bottom: -5px;
+				border: 2px solid var(--red-300);
+				border-radius: 50%;
+				animation: ripple 3.75s infinite;
+				opacity: 0;
+			}
+		}
+	}
+
+	/* --- User Info Dropdown --- */
+	.user-info {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.25rem 0.5rem;
+		border-radius: 20px;
+		cursor: pointer;
+		transition: background-color 0.2s;
+
+		&:hover {
+			background-color: var(--grey-100);
+		}
+
+		.user-avatar {
+			width: 32px;
+			height: 32px;
+			border-radius: 50%;
+			background-color: var(--primary-500);
+			color: white;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-weight: 600;
+			font-size: 0.9rem;
+		}
+
+		.username {
+			color: var(--grey-800);
+			font-weight: 500;
+		}
+
+		.pi-chevron-down {
+			font-size: 0.8rem;
+			color: var(--grey-500);
+		}
+	}
+}
+
+/* --- Popover Global Styles (Scoped to this component) --- */
+::ng-deep .p-popover {
+	background: linear-gradient(white, rgba(255, 255, 255, 0.6)) !important;
+	backdrop-filter: blur(8px);
+}
+::ng-deep .p-popover .p-popover-content {
+	padding: 0 0 8px 0 !important;
+	position: relative;
+}
+::ng-deep .p-popover .p-popover-content::after {
+	content: '';
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	height: 24px;
+	border-radius: 0 0 12px 12px;
+	background: linear-gradient(
+		to top,
+		rgba(255, 255, 255, 1) 0%,
+		rgba(255, 255, 255, 0.8) 50%,
+		rgba(255, 255, 255, 0) 100%
+	);
+
+	pointer-events: none;
+	z-index: 2;
+}
+
+/* --- Insights Panel --- */
+.insights-panel {
+	display: flex;
+	flex-direction: column;
+	max-width: 400px;
+	position: relative;
+
+	.pi-sparkles.gradient-icon {
+		background: linear-gradient(135deg, #e5e5e58c 0%, #edeaea30 100%);
+		-webkit-background-clip: text;
+		-webkit-text-fill-color: transparent;
+		background-clip: text;
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		font-size: 160px; /* יותר גדול */
+		line-height: 1;
+		z-index: -1; /* מאחורי התוכן */
+		pointer-events: none; /* שלא יתפוס קליקים */
+	}
+
+	.panel-header {
+		padding: 0.5rem;
+		border-bottom: 1px solid var(--grey-100);
+		display: flex;
+		width: 100%;
+		justify-content: space-between;
+		align-items: center;
+		position: relative;
+
+		h3 {
+			margin: 0;
+			font-size: 1rem;
+			font-weight: 600;
+			color: var(--grey-800);
+		}
+
+		/* &::after {
+			content: '';
+			position: absolute;
+			bottom: -25px;
+			left: 0;
+			width: calc(100% - 12px);
+			transform: translateX(6px);
+			height: 20px;
+			border-radius: 0 0 12px 12px;
+			background: linear-gradient(
+				to top,
+				rgba(255, 255, 255, 0) 0%,
+				rgba(255, 255, 255, 0.8) 50%,
+				rgba(255, 255, 255, 1) 100%
+			);
+
+			pointer-events: none;
+			z-index: 12;
+		} */
+	}
+
+	.panel-content {
+		padding: 0.5rem;
+		max-height: 400px;
+		overflow-y: auto;
+
+		.insight-wrapper {
+			display: flex;
+			flex-direction: column;
+			gap: 0.5rem;
+		}
+		.insight-item {
+			display: flex;
+			flex-direction: column;
+			margin: 6px 0;
+			padding: 4px 0;
+			transition: 0.15s all ease-in-out;
+			position: relative;
+
+			.hover-wrapper {
+				display: flex;
+				flex-direction: column;
+				border-radius: 12px;
+				padding: 8px;
+				&:hover {
+					background-color: var(--grey-20);
+				}
+			}
+
+			&:after {
+				content: '';
+				width: 100%;
+				height: 1px;
+				background-color: var(--grey-40);
+				position: absolute;
+				bottom: -3px;
+				left: 0;
+			}
+
+			.item-icon {
+				color: var(--primary-400);
+				font-size: 1.2rem;
+				margin-top: 2px;
+			}
+			.item-emoji {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-size: 1.2rem;
+				margin-top: 2px;
+				width: 24px; /* ✅ קובע רוחב אחיד */
+				height: 24px; /* ✅ קובע גובה אחיד */
+				line-height: 1; /* ✅ מבטיח שהאימוג'י יהיה ממורכז אנכית */
+			}
+
+			.item-header {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				width: 100%;
+				.item-title {
+					display: block;
+					font-weight: 600;
+					color: var(--grey-700);
+					line-height: 15px;
+				}
+			}
+			.item-text {
+				margin: 0;
+				color: var(--grey-500);
+				font-size: 12px;
+			}
+		}
+	}
+}
+
+/* --- User Panel --- */
+.user-panel {
+	padding: 0.5rem;
+
+	.action-item {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		padding: 0.75rem;
+		border-radius: 6px;
+		cursor: pointer;
+		transition: background-color 0.2s;
+		color: var(--grey-700);
+
+		&:hover {
+			background-color: var(--grey-100);
+		}
+
+		.pi {
+			font-size: 1rem;
+		}
+
+		&.logout {
+			color: var(--red-500);
+
+			&:hover {
+				background-color: var(--red-50);
+			}
+		}
+	}
+
+	.separator {
+		height: 1px;
+		background-color: var(--grey-100);
+		margin: 0.5rem 0;
+	}
+}
+
+@keyframes ripple-effect {
+	0% {
+		width: 100%;
+		height: 100%;
+		opacity: 1;
+	}
+	100% {
+		width: 300%; /* ✅ פחות קיצוני מ-2000% */
+		height: 300%;
+		opacity: 0;
+	}
+}
+
+@keyframes ripple {
+	0% {
+		transform: scale(0.8);
+		opacity: 1;
+	}
+	100% {
+		transform: scale(2.5);
+		opacity: 0;
+	}
+}

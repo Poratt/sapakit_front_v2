@@ -1,0 +1,70 @@
+<div class="calendar-container">
+    <div class="header">
+        <p-button icon="pi pi-chevron-right" styleClass="p-button-sm" [rounded]="true" [text]="true"
+            severity="secondary" tooltipPosition="top" [pTooltip]="screenSize() === 'desktop' ? 'שבוע קודם' : ''"
+            (click)="prevWeek()" [disabled]="isFetching()">
+        </p-button>
+        <h2 class="month">{{ monthDisplay() }}</h2>
+        <div class="flex items-center justify-end gap-1">
+            @if (!isCurrentWeek()) {
+            <p-button icon="pi pi-calendar-clock" styleClass="p-button-sm" [rounded]="true" [text]="true"
+                severity="secondary" tooltipPosition="top" pTooltip="חזור להיום" (click)="goToToday()">
+            </p-button>
+            }
+            <p-button icon="pi pi-chevron-left" styleClass="p-button-sm" [rounded]="true" [text]="true"
+                severity="secondary" tooltipPosition="top" [pTooltip]="screenSize() === 'desktop' ? 'שבוע הבא' : ''"
+                (click)="nextWeek()" [disabled]="isFetching()">
+            </p-button>
+
+        </div>
+    </div>
+
+    @if(screenSize() == 'mobile' || screenSize() == 'tablet'){
+    <div class="seven-days-preview">
+        @for (day of sevenDaysPreview(); track day.fullDate.getTime()) {
+        <div class="day-cube" [class.today]="day.isToday" [class.selected]="day.isSelected"
+            (click)="onPreviewDayClick(day.fullDate)">
+            <span class="day-letter">{{ day.letter }}</span>
+            <span class="day-date">{{ day.date }}</span>
+        </div>
+        }
+    </div>
+    }
+
+    <div class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-7 gap-1">
+        @for (day of displayedDays(); track day.fullDate) {
+        <div class="day" (click)="logDay(day)">
+            <div class="day-header" [class.today]="day.isToday">
+                <span class="day-letter">{{ day.letter }}</span>
+                <span class="day-date">{{ day.date }}</span>
+            </div>
+            <div class="day-content">
+                @if (day.suppliers.length > 0) {
+                <div class="suppliers-list">
+                    @for (data of day.suppliers; track data.supplier.id) {
+                    @let missed = data.displayState == 'missed';
+                    <div class="supplier-item" (click)="openOrderDialog(data, day.fullDate)"
+                        [class.missed-opportunity]="missed">
+                        <div class="flex w-full items-center justify-between">
+                            <span class="supplier-name">{{data.supplier.name}}</span>
+                            @if(data.orderStatus > 1){
+                            <app-badge @fadeIn400 [enumValue]="data.orderStatus" [dataArray]="orderStatusData"
+                                [label]="data.orderStatus | orderStatusLabel" [defaultIcon]="'pi pi-ticket'"
+                                defaultBackground="bg-primary-100 hover:bg-primary-20">
+                            </app-badge>
+                            }
+                        </div>
+                    </div>
+                    }
+
+                </div>
+                } @else {
+                <span class="no-suppliers"></span>
+                }
+            </div>
+        </div>
+        }
+    </div>
+
+
+</div>

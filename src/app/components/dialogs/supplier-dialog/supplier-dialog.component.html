@@ -1,0 +1,153 @@
+<form [formGroup]="supplierForm" (ngSubmit)="onSave()">
+    <div class="flex flex-col gap-4">
+
+        @if(id.value !== 0){
+        <div class="flex w-full justify-end">
+            <div class="toggle-switch" [class.active]="status.value === Status.Active" (click)="toggleStatus()">
+                <input type="checkbox" formControlName="status" class="absolute w-full" />
+                <label class="toggle-switch-text" [class.active]="status.value === Status.Active">פעיל</label>
+                <label class="toggle-switch-text" [class.inactive]="status.value === Status.Inactive">לא פעיל</label>
+            </div>
+        </div>
+        }
+
+
+
+        <div class="flex-wrap-wrapper">
+            <div class="flex-wrap-item">
+                <label for="name">שם*</label>
+                <input pInputText id="name" formControlName="name" />
+                @if (name.touched && name.hasError('required')) {
+                <small class="error-message">יש להזין שם הספק</small>
+                }
+            </div>
+            <div class="flex-wrap-item">
+                <label for="phone">טלפון*</label>
+                <input pInputText id="phone" formControlName="phone" />
+                @if (phone.touched && phone.hasError('required')) {
+                <small class="error-message">יש להזין טלפון</small>
+                }
+                @if (phone.touched && phone.hasError('pattern')) {
+                <small class="error-message">מספר טלפון לא תקין (10-12 ספרות)</small>
+                }
+            </div>
+        </div>
+        <div class="flex-wrap-wrapper">
+            <div class="flex-wrap-item">
+                <label for="email">אימייל</label>
+                <input pInputText id="email" formControlName="email" />
+                @if (email.touched && email.hasError('email')) {
+                <small class="error-message">כתובת אימייל לא תקינה</small>
+                }
+            </div>
+        </div>
+
+        <div class="form-field relative ">
+            <label>מועדי הזמנה*</label>
+            <mat-tab-group dir="rtl" [selectedIndex]="selectedTabIndex" class="sm soft-bg" disableRipple="true"
+                (selectedIndexChange)="onTabChange($event)">
+                <mat-tab>
+                    <ng-template mat-tab-label>
+                        <span class="material-symbols-rounded">date_range</span>
+                        לפי ימים
+                    </ng-template>
+                        <div class="flex gap-2 justify-end w-full p-2">
+                            <button type="button" class="empty xs flex items-center gap-1"
+                                (click)="toggleSelectAll('orderDays')">
+                                <span class="material-symbols-rounded">{{ isAllSelected('orderDays') ? 'close' :
+                                    'done_all' }}</span>
+                                {{ isAllSelected('orderDays') ? 'נקה הכל' : 'בחר הכל' }}
+                            </button>
+                        </div>
+
+                    <div class="grid-7" aria-label="בחירת ימים">
+                        @for (option of daysOptions; track option.value) {
+                        <button type="button" class="chip"
+                            [ngClass]="{'chip-selected': isSelected('orderDays', option.value)}"
+                            (click)="toggleSelection('orderDays', option.value)">
+                            {{ option.short }}
+                        </button>
+                        }
+                    </div>
+                </mat-tab>
+
+                <mat-tab>
+                    <ng-template mat-tab-label>
+                        <span class="material-symbols-rounded">calendar_month</span>
+                        לפי תאריכים
+                    </ng-template>
+                    @if (orderDates.length >= 10) {
+                    <div class="flex gap-2 justify-end w-full p-2">
+                        <button type="button" class="empty xs" (click)="toggleSelectAll('orderDates')">
+                        <span class="material-symbols-rounded">
+                            {{ isAllSelected('orderDates') ? '' : 'close'  }}
+                        </span>
+                        {{ isAllSelected('orderDates') ? '' : 'נקה הכל'  }}
+                        </button>
+                    </div>
+                    }
+
+                    <div class="grid-7" aria-label="בחירת תאריכים">
+                        @for (option of datesOptions; track option.value) {
+                        <button type="button" class="chip" [ngClass]="{'chip-selected': isSelected('orderDates', option.value)}"
+                            (click)="toggleSelection('orderDates', option.value)">
+                            {{ option.label }}
+                        </button>
+                        }
+                    </div>
+                </mat-tab>
+
+                
+            </mat-tab-group>
+            @if ((orderDays.touched || formSubmitted()) && supplierForm.hasError('minSelection') && orderType.value ===
+            OrderTypes.ByDay) {
+            <small class="error-message">יש לבחור לפחות יום אחד</small>
+            }
+            @if ((orderDates.touched || formSubmitted()) && supplierForm.hasError('minSelection') && orderType.value ===
+            OrderTypes.ByDate) {
+            <small class="error-message">יש לבחור לפחות תאריך אחד</small>
+            }
+        </div>
+
+
+
+        <div @fadeIn400 class="form-field expandable" [ngClass]="{'expanded': shouldShowReminderType()}">
+            <label for="reminderType">סוג תזכורת</label>
+            <p-select id="reminderType" formControlName="reminderType" [options]="reminderTypeData" optionLabel="label"
+                    optionValue="enumValue" appendTo="body" styleClass="w-full">
+                    
+                <!-- Template for selected item -->
+                <ng-template let-item pTemplate="selectedItem">
+                    <div class="flex gap-1 items-center" *ngIf="item">
+                        <span [ngClass]="[item.icon, '!text-sm']"></span>
+                        <span>{{ item.label }}</span>
+                    </div>
+                </ng-template>
+                
+                <!-- Template for dropdown items -->
+                <ng-template let-item pTemplate="item">
+                    <div class="flex flex-col">
+                        <div class="flex gap-1 items-center">
+                            <span [ngClass]="[item.icon, '!text-sm']"></span>
+                            <span>{{ item.label }}</span>
+                        </div>
+                        <span class="text-grey-xs">{{item.tooltip}}</span>
+                    </div>
+                </ng-template>
+            </p-select>
+            @if (reminderType.touched && reminderType.hasError('required')) {
+            <small class="error-message">יש להזין סוג תזכורת</small>
+            }
+        </div>
+        <div class="dialog-footer">
+            <button type="button" (click)="onCancel()" class="empty md">
+                <span class="material-symbols-rounded">cancel</span>
+                <span>ביטול</span>
+            </button>
+            <button type="submit" class="primary md">
+                <span class="material-symbols-rounded">{{ id.value == 0 ? 'add' : 'save' }}</span>
+                <span>{{ id.value == 0 ? 'הוסף' : 'שמור שינויים' }}</span>
+            </button>
+        </div>
+    </div>
+</form>

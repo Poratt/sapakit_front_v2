@@ -1,0 +1,12 @@
+.sapakit-logo-wrapper {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 10px;
+	.logo-content {
+		display: flex;
+		align-items: center;
+		max-width: 80px;
+	}
+}
+

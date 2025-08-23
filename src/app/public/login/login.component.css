@@ -1,0 +1,182 @@
+/* <img src="../../../app/assets/images/sapakit-logo-2.png" alt="Sapakit Logo" class="logo-image"> */
+/* הגדרות כלליות לדף */
+.login-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: var(--grey-50);
+  overflow: hidden;
+  position: relative;
+  font-family: 'Fredoka', sans-serif;
+  direction: rtl;
+}
+
+/* רקע דינמי עם צורות מונפשות */
+.background-shapes {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.shape {
+  position: absolute;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary-200), var(--primary-400));
+  opacity: 0.1;
+  animation: float 20s infinite ease-in-out alternate;
+}
+
+.shape1 {
+  width: 400px;
+  height: 400px;
+  top: -150px;
+  left: -100px;
+  animation-duration: 25s;
+}
+
+.shape2 {
+  width: 300px;
+  height: 300px;
+  bottom: -100px;
+  right: -120px;
+  animation-duration: 22s;
+  animation-delay: -5s;
+}
+
+.shape3 {
+  width: 150px;
+  height: 150px;
+  bottom: 20%;
+  left: 15%;
+  animation-duration: 18s;
+  animation-delay: -10s;
+}
+
+@keyframes float {
+  0% { transform: translateY(0px) translateX(0px) rotate(0deg); }
+  100% { transform: translateY(40px) translateX(-30px) rotate(180deg); }
+}
+
+/* כרטיס הלוגין המרכזי */
+.login-card {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 400px;
+  padding: 2.5rem 2rem;
+  background-color: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+  animation: fadeInDown 0.6s ease-out;
+}
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* כותרת הכרטיס */
+.card-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.logo-image {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 1rem;
+  animation: subtle-pop 0.5s ease-out 0.3s backwards;
+}
+
+.title {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: var(--grey-800);
+}
+
+.subtitle {
+  font-size: 0.9rem;
+  color: var(--grey-500);
+  margin-top: 0.5rem;
+}
+
+/* תוכן הטופס */
+.form-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-field {
+  position: relative;
+}
+
+.form-field label {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--grey-600);
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+/* מיקרו-אינטראקציה על שדות הטופס */
+:host ::ng-deep .p-inputtext:focus,
+:host ::ng-deep .p-password-input:focus {
+  transform: scale(1.02);
+}
+
+.error-message {
+  position: absolute;
+  bottom: -1.2rem;
+  right: 0;
+}
+
+/* כפתור השליחה */
+:host ::ng-deep .p-button {
+  padding: 0.8rem !important;
+  font-weight: 600 !important;
+  background: linear-gradient(135deg, var(--primary-400), var(--primary-600)) !important;
+  border: none !important;
+  transition: all 0.3s ease !important;
+}
+:host ::ng-deep .p-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 122, 230, 0.3) !important;
+}
+
+/* פוטר הכרטיס */
+.card-footer {
+  text-align: center;
+  margin-top: 2rem;
+  font-size: 0.85rem;
+  color: var(--grey-500);
+}
+
+.card-footer a {
+  color: var(--primary-500);
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.card-footer a:hover {
+  text-decoration: underline;
+  color: var(--primary-600);
+}
+
+/* טקסט תחתון בדף */
+.footer-text {
+  position: absolute;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.75rem;
+  color: var(--grey-400);
+  z-index: 2;
+}

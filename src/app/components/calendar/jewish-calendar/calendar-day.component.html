@@ -1,0 +1,122 @@
+<div class="container">
+
+    <!-- View Mode Buttons -->
+    <div class="view-modes" role="navigation" aria-label="בחירת מצב תצוגה">
+        <button class="view-btn" [class.active]="viewMode() === ViewModeEnum.Auto" (click)="setViewMode(ViewModeEnum.Auto)" aria-label="תצוגה אוטומטית">
+            <span class="material-symbols-rounded icon">check_circle</span>
+            אוטומטי
+        </button>
+        <button class="view-btn" [class.active]="viewMode() === ViewModeEnum.Day" (click)="setViewMode(ViewModeEnum.Day)" aria-label="תצוגה יומית">
+            <span class="material-symbols-rounded icon">today</span>
+            יומית
+        </button>
+        <button class="view-btn" [class.active]="viewMode() === ViewModeEnum.Week" (click)="setViewMode(ViewModeEnum.Week)" aria-label="תצוגה שבועית">
+            <span class="material-symbols-rounded icon">calendar_view_week</span>
+            שבועית
+        </button>
+        <button class="view-btn" [class.active]="viewMode() === ViewModeEnum.Month" (click)="setViewMode(ViewModeEnum.Month)" aria-label="תצוגה חודשית">
+            <span class="material-symbols-rounded icon">calendar_month</span>
+            חודשית
+        </button>
+    </div>
+
+    <!-- Navigation -->
+    <div class="navigation" role="navigation" aria-label="ניווט תאריכים">
+        <button class="nav-btn" (click)="prevDay()" aria-label="עבור ליום הקודם">
+            <span class="material-symbols-rounded icon">chevron_right</span>
+            יום קודם
+        </button>
+        @if (!isToday()) {
+            <button class="nav-btn today" (click)="resetToToday()" aria-label="חזור לתאריך של היום">
+                <span class="material-symbols-rounded icon">today</span>
+                חזרה להיום
+            </button>
+        }
+        <button class="nav-btn" (click)="nextDay()" aria-label="עבור ליום הבא">
+            יום הבא
+            <span class="material-symbols-rounded icon">chevron_left</span>
+        </button>
+    </div>
+
+    <!-- Days Grid -->
+    <div class="days-grid" [class.week-view]="viewMode() === ViewModeEnum.Week || (viewMode() === ViewModeEnum.Auto && screenSize() === ScreenSizeEnum.Desktop)">
+        @for (day of displayedDays(); track day.date) {
+            <div class="day-card" [class.current]="day.isCurrent" role="article" [attr.aria-label]="'תאריך ' + day.formatted">
+                <div class="day-header">
+                    <div class="day-letter">{{ day.letter }}</div>
+                    <h3>יום {{ day.name }}</h3>
+                </div>
+                <div class="day-date">{{ day.date | date:'dd MMMM yyyy':'he-IL' }} • {{ day.formatted }}</div>
+                
+                <div class="events">
+                    @if (day.holiday) {
+                        <div class="event holiday">
+                            <span class="material-symbols-rounded icon-sm">celebration</span>
+                            {{ day.holiday }}
+                        </div>
+                    }
+                    @if (day.parasha) {
+                        <div class="event parasha">
+                            <span class="material-symbols-rounded icon-sm">book</span>
+                            {{ day.parasha.includes('שבת') ? day.parasha : 'פרשת ' + day.parasha }}
+                        </div>
+                    }
+                    @if (day.fast) {
+                        <div class="event fast">
+                            <span class="material-symbols-rounded icon-sm">no_food</span>
+                            {{ day.fast }}
+                        </div>
+                    }
+                </div>
+
+                @if (day.shabbat) {
+                    <div class="shabbat-times">
+                        @if (day.shabbat.candleLighting) {
+                            <div class="shabbat-time">
+                                <span class="material-symbols-rounded icon-sm">light</span>
+                                כניסת שבת: {{ day.shabbat.candleLighting }}
+                            </div>
+                        }
+                        @if (day.shabbat.havdalah) {
+                            <div class="shabbat-time">
+                                <span class="material-symbols-rounded icon-sm">event</span>
+                                יציאת שבת: {{ day.shabbat.havdalah }}
+                            </div>
+                        }
+                    </div>
+                }
+
+                <div class="zmanim">
+                    <div class="zmanim-row">
+                        <div class="zmanim-label">
+                            <span class="material-symbols-rounded icon-sm">wb_twilight</span>
+                            עלות השחר
+                        </div>
+                        <span>{{ day.zmanim.alotHashachar || 'לא זמין' }}</span>
+                    </div>
+                    <div class="zmanim-row">
+                        <div class="zmanim-label">
+                            <span class="material-symbols-rounded icon-sm">wb_sunny</span>
+                            זריחה
+                        </div>
+                        <span>{{ day.zmanim.sunrise || 'לא זמין' }}</span>
+                    </div>
+                    <div class="zmanim-row">
+                        <div class="zmanim-label">
+                            <span class="material-symbols-rounded icon-sm">schedule</span>
+                            חצות
+                        </div>
+                        <span>{{ day.zmanim.chatzot || 'לא זמין' }}</span>
+                    </div>
+                    <div class="zmanim-row">
+                        <div class="zmanim-label">
+                            <span class="material-symbols-rounded icon-sm">backlight_high</span>
+                            שקיעה
+                        </div>
+                        <span>{{ day.zmanim.sunset || 'לא זמין' }}</span>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

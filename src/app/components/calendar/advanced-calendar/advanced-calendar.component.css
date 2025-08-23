@@ -1,0 +1,263 @@
+.calendar-container {
+	padding: 1rem;
+	border-radius: 12px;
+	background: white;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+	.header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 1rem;
+	}
+
+	.month {
+		font-size: 1.125rem;
+		font-weight: 500;
+		color: #334155;
+	}
+
+	.calendar-grid-container {
+		display: grid;
+		grid-template-columns: repeat(7, minmax(0, 1fr));
+		grid-auto-rows: min-content; /* גובה שורה גמיש לפי התוכן */
+		gap: 4px;
+		position: relative; /* חיוני למיקום אירועי הספקים */
+	}
+}
+
+/* --- Day Cell Styling --- */
+.day-header {
+	display: flex;
+	flex-direction: column;
+	text-align: center;
+	border-radius: 8px;
+	overflow: hidden;
+	min-height: 20px;
+	background-color: var(--grey-10);
+
+	&.holiday {
+		background-color: var(--secondary-50);
+		border: 1px solid var(--secondary-200);
+		box-shadow	: 0 0 12px 3px  var(--secondary-100);
+	}
+
+	&.today .day-date {
+		background-color: #3b82f6;
+		color: white;
+	}
+
+	.day-date {
+		border-radius: 50%;
+		width: 24px;
+		height: 24px;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		margin: 0 auto;
+		font-size: 0.875rem;
+		color: #475569;
+	}
+
+	.day-letter {
+		font-size: 0.75rem;
+		color: #64748b;
+		font-weight: 600;
+		display: block;
+		margin-bottom: 4px;
+	}
+}
+
+.events {
+	flex-grow: 1;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	gap: 4px;
+	padding: 4px 2px;
+}
+
+.event {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-wrap: wrap;
+	padding: 6px 8px;
+	border-radius: 10px;
+	gap: clamp(2px, 0.6vw, 5px);
+	font-size: clamp(10px, 0.6vw, 13px);
+	font-weight: 500;
+	white-space: wrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+
+	.material-symbols-rounded.icon-sm {
+		font-size: 16px;
+	}
+
+	&.jewish-date {
+		background: var(--grey-20);
+		color: var(--grey-600);
+		font-weight: 500;
+	}
+
+	&.holiday {
+		background: rgba(255, 59, 92, 0.1);
+		color: #ff3b5c;
+	}
+
+	&.parasha {
+		background: rgba(88, 86, 214, 0.1);
+		color: #5856d6;
+	}
+
+	&.fast {
+		background: rgba(255, 149, 0, 0.1);
+		color: #ff9500;
+	}
+
+	&.shabbat-time {
+		background: rgba(88, 86, 214, 0.05);
+		color: #5856d6;
+	}
+}
+
+/* Zmanim Box */
+.zmanim {
+	background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+	border-radius: 10px;
+	padding: 0.75rem;
+	border: 1px solid #e2e8f0;
+
+	.zmanim-row {
+		display: flex;
+		justify-content: space-between;
+		gap: 4px;
+		align-items: center;
+
+		@media (max-width: 800px) {
+			flex-direction: column;
+		}
+
+		padding: 4px 0;
+		font-size: clamp(10px, 0.5vw, 12px);
+		color: #64748b;
+
+		&:not(:last-child) {
+			border-bottom: 1px solid rgba(226, 232, 240, 0.7);
+		}
+
+		.zmanim-label {
+			display: flex;
+			align-items: center;
+			gap: 4px;
+			font-weight: 500;
+		}
+		.material-symbols-rounded.icon-sm {
+			font-size: 14px;
+			color: #3b82f6;
+		}
+	}
+}
+
+/* --- Supplier Event Bars Styling --- */
+.supplier-event {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: clamp(4px, 1vw, 8px);
+	background-color: #f1f5f9;
+	border: 1px solid #e2e8f0;
+	border-radius: 6px;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	overflow: hidden;
+	white-space: nowrap;
+	font-size: clamp(10px, 0.75vw, 13px);
+	color: #334155;
+	grid-row-start: 2;
+	@media (max-width: 600px) {
+		justify-content: center;
+	}
+
+	&:hover:not(.supplier-event.missed) {
+		transform: translateY(-2px);
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+		z-index: 10;
+	}
+	.supplier-name {
+		font-weight: 500;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	
+	/* Event states styling */
+	.status-icon {
+		@media (max-width: 600px) {
+			display: none; /* Hide on small screens */
+			
+		}
+	}
+	&.empty {
+		background-color: var(--grey-50);
+		border-color: var(--grey-200);
+		color: var(--grey-400);
+		cursor: default;
+		opacity: 0.8;
+	}
+
+	&.draft {
+		background-color: var(--yellow-100);
+		border-color: var(--yellow-300);
+		color: var(--yellow-800);
+	}
+
+	&.sent {
+		background-color: var(--green-100);
+		border-color: var(--green-300);
+		color: var(--green-800);
+	}
+
+	&.today {
+		background-color: var(--primary-100);
+		border-color: var(--primary-300);
+		color: var(--primary-800);
+
+		i {
+			animation: ring 1.5s ease-in-out infinite;
+		}
+	}
+
+	&.future {
+		background-color: hsl(200, 50%, 95%); /* צבע תכלת עדין */
+		border-color: hsl(200, 50%, 85%);
+		color: hsl(200, 50%, 40%);
+	}
+}
+
+@keyframes ring {
+	0% {
+		transform: rotate(0);
+	}
+	10% {
+		transform: rotate(18deg);
+	}
+	20% {
+		transform: rotate(-12deg);
+	}
+	30% {
+		transform: rotate(8deg);
+	}
+	40% {
+		transform: rotate(-4deg);
+	}
+	50% {
+		transform: rotate(2deg);
+	}
+	60% {
+		transform: rotate(0);
+	}
+	100% {
+		transform: rotate(0);
+	}
+}

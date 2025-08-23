@@ -1,0 +1,20 @@
+<app-header></app-header>
+
+<div class="page flex w-full">
+    <!-- <div class="flex w-full h-full"> -->
+        @if (isMobileMenuOpen()) {
+        <div @fadeIn400 class="overlay" (click)="closeMenus()"></div>
+        }
+
+        <div class="menu-wrapper" [ngClass]="{'active': isMobileMenuOpen()}">
+            <app-side-menu></app-side-menu>
+        </div>
+        <div class="page-container">
+            <router-outlet class=""></router-outlet>
+        </div>
+    <!-- </div> -->
+    
+    
+</div>
+
+<p-toast position="bottom-left" ></p-toast> 

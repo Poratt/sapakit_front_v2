@@ -1,0 +1,159 @@
+<div class="page-height p-responsive overflow-scroll" #dragZone>
+  @switch (pageState()) {
+  @case(PageStates.Loading) {
+  <app-loader></app-loader>
+  }
+  @case(PageStates.Error) {
+  <div @fadeIn400 class="error-card-container">
+    <div class="error-card">
+      <div class="error-icon-wrapper">
+        <span class="material-symbols-rounded">cloud_off</span>
+      </div>
+      <h3 class="error-title">אופס, משהו השתבש</h3>
+      <!-- <button (click)="refreshData()" class="primary md retry-button">
+        <span class="material-symbols-rounded">refresh</span>
+        <span>נסה שוב</span>
+      </button> -->
+    </div>
+  </div>
+  }
+  @case(PageStates.Ready) {
+  <div @fadeIn400 class="flex flex-col gap-4 w-full h-full">
+    <!-- Header -->
+    <div class="flex gap-2 items-center">
+      <p-button tooltipPosition="top" pTooltip="עריכה" icon="pi pi-arrow-right" [routerLink]="['/suppliers']" size="small" [rounded]="true" severity="secondary"></p-button>
+      <span class="main-title">ניהול מוצרים | {{ supplier()?.name }}</span>
+      <p-button tooltipPosition="top" pTooltip="עריכה" icon="pi pi-pen-to-square" (click)="editSupplier()" size="small" [rounded]="true" severity="secondary"></p-button>
+    </div>
+
+    @if (hasProducts()) {
+    <!-- Actions Bar -->
+    <div @fadeIn400 class="actions-bar">
+      <span class="search-box">
+        <i class="pi pi-search"></i>
+        <input pInputText type="text" placeholder="חיפוש מוצרים..." class="w-full" [ngModel]="searchQuery()"
+          (ngModelChange)="searchQuery.set($event)" />
+      </span>
+      <!-- <p-button label="הוסף מוצר" icon="pi pi-plus" severity="primary" size="small" (onClick)="addProduct()"></p-button> -->
+        <button class="primary md" (click)="addProduct()">
+          <span class="material-symbols-rounded">add</span>
+          <span>הוספת מוצר</span>
+        </button>
+
+    </div>
+
+    <!-- Main Drag & Drop Container -->
+    <div @fadeIn400 class="categories-grid">
+      <div class="category-list-container"
+        cdkDropList
+        cdkDropListGroup
+        cdkDropListOrientation="mixed"
+        [cdkDropListData]="groupedProducts()"
+        (cdkDropListDropped)="dropCategory($event)"
+        [class.single-category]="groupedProducts().length === 1" 
+        >
+
+        @for (group of groupedProducts(); track group.categoryName; let i = $index) {
+        
+        @if(group.products.length){
+        <div class="category-drag-container" cdkDrag [cdkDragData]="group" (cdkDragMoved)="onDragMoved($event)"
+          (cdkDragReleased)="onDragReleased()" [cdkDragDisabled]="categories().length <= 1">
+          <!-- Actual Category Content -->
+          <div class="category-wrapper">
+            <div class="category-header">
+              <div class="flex gap-2 items-center">
+                <button class="material-symbols-rounded handle-icon" cdkDragHandle>drag_indicator</button>
+                <span>{{ group.categoryName }}</span>
+              </div>
+              <p-button icon="pi pi-plus" styleClass="p-button-sm" [rounded]="true" [text]="true" severity="secondary"
+                (click)="addProductToCategory(group.categoryId, group.categoryName)" pTooltip="הוסף מוצר לקטגוריה"
+                tooltipPosition="top">
+              </p-button>
+
+
+            </div>
+
+            <!-- Table-like header for products -->
+            <div class="products-header">
+              <span class="text-responsive-sm header-name pr-2">שם המוצר</span>
+              <span class="text-responsive-sm header-package">אריזה</span>
+              <span class="text-responsive-sm header-cost leading-2.5"> מחיר קניה</span>
+              <span class="text-responsive-sm header-price leading-2.5"> מחיר מכירה</span>
+              <span class="text-responsive-sm header-status">סטטוס</span>
+              <span class="header-actions w-16"></span>
+            </div>
+
+            <!-- Products Drop List for this category -->
+            <div class="products-container" cdkDropList [id]="group.id" [cdkDropListData]="group.products"
+              [cdkDropListConnectedTo]="productListIds()" (cdkDropListDropped)="dropProduct($event)">
+
+              @for (product of group.products; track product.id) {
+              <div class="product-row" cdkDrag [cdkDragData]="product" (cdkDragMoved)="onDragMoved($event)"
+                (cdkDragReleased)="onDragReleased()">
+                <!-- Product Content -->
+
+                <div class="product-content" [ngClass]="{'item-to-delete' : itemToDelete() == product.id}"
+                  [ngClass]="{'item-to-delete' : itemToDelete() == product.id}">
+                  <div class="product-cell-name">
+                    <button class="material-symbols-rounded handle-icon" cdkDragHandle>drag_indicator</button>
+                    <span class="text-responsive-sm leading-2.5">{{ product.name }}</span>
+                    @if (product.imageUrl) {
+                    <img [src]="product.imageUrl" [alt]="product.name" class="table-image" />
+                    }
+                  </div>
+                  <!-- <div class="product-cell-package">
+                   <app-badge [enumValue]="product.package" [dataArray]="packageData" size="sm"></app-badge>
+                  </div> -->
+                  <span class="text-responsive-sm text-right">{{product.package | packageLabel}}</span>
+                  <div class="text-responsive-sm text-right">
+                    {{ product.cost ? (product.cost | currency: 'ILS') : '-' }}
+                  </div>
+                  <div class="font-responsive-sm text-right" [class.pr-4]="product.price == 0">
+                    {{ product.price > 0 ? (product.price | currency: 'ILS') : '-' }}
+                  </div>
+                  <div class="product-cell-status text-right">
+                    <app-badge [enumValue]="product.status" [dataArray]="statusData" size="sm"></app-badge>
+                  </div>
+                  <div class="product-cell-actions">
+                    <p-button tooltipPosition="top" pTooltip="עריכה" icon="pi pi-pen-to-square"
+                      (click)="editProduct(product)" size="small" [rounded]="true" severity="secondary"></p-button>
+                    <p-button tooltipPosition="top" pTooltip="מחיקה" icon="pi pi-trash" class="delete-btn"
+                      (click)="confirmDelete(product)" size="small" [rounded]="true" severity="danger"></p-button>
+                  </div>
+                </div>
+              </div>
+              }
+              <!-- Placeholder for empty category -->
+              @if (group.products.length === 0) {
+              <div class="empty-category-placeholder">
+                גרור מוצרים לכאן
+              </div>
+              }
+            </div>
+          </div>
+        </div>
+      }
+      
+    }
+    <div *cdkDragPlaceholder class="product-placeholder"></div>
+    <div *cdkDragPlaceholder class="category-placeholder"></div>
+      </div>
+    </div>
+    } @else {
+    <!-- Empty State for Supplier with no products -->
+    <div class="empty-state">
+      <i class="pi pi-box"></i>
+      <p>אין מוצרים זמינים עבור ספק זה.</p>
+      <p-button label="הוסף מוצר ראשון" (onClick)="addProduct()"></p-button>
+    </div>
+    }
+  </div>
+  }
+  }
+
+</div>
+
+
+
+
+

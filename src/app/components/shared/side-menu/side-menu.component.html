@@ -1,0 +1,110 @@
+@if(isMenuExpanded !== undefined) {
+<div class="menu-content" [ngClass]="{'shrink': !isMenuExpanded()}" role="navigation">
+
+
+    <p-panelmenu [model]="items" styleClass="w-full" [multiple]="false" (onItemToggle)="onMenuItemToggle($event)">
+        <ng-template #item let-item>
+            @if (item.separator) {
+            <div class="menu-separator" aria-hidden="true"></div>
+            }
+            @else{
+            <div [ngClass]="item.styleClass" [routerLinkActive]="'active-link'"
+                [routerLink]="item.routerLink || undefined" [queryParams]="item.queryParams || {}"
+                [routerLinkActiveOptions]="{exact: item.routerLinkActiveOptions}"
+                [queryParamsHandling]="item.queryParams ? 'merge' : undefined"
+                [pTooltip]="isMenuExpanded() ? '' : item.matTooltip" tooltipPosition="left">
+
+                <div class="flex items-center justify-between gap-2 w-full">
+                    <div class="flex items-center gap-2 w-full px-2 py-2.5">
+                        <span class="material-symbols-rounded icon"
+                            [ngClass]="{'rotatable': item.key === 'shrinkExpand', 'flip': isMenuExpanded()}">{{item.icon}}</span>
+                        <span class="label">{{ item.label }}</span>
+                    </div>
+                    @if (item.items?.length > 0) {
+                    <span class="material-symbols-rounded submenu-toggle">keyboard_arrow_down</span>
+                    }
+                </div>
+            </div>
+            }
+
+
+
+        </ng-template>
+    </p-panelmenu>
+
+    <div class="sapakit-logo-wrapper">
+        <a routerLink="/" class="logo-content">
+            <img src="../../../../app/assets/images/sapakit-logo-2.png" alt="Sapakit Logo" class="header-logo">
+        </a>
+    </div>
+
+    <!-- 
+    <div
+        class="bg-white rounded-xl shadow-sm p-6 mb-4 relative overflow-hidden transition-all duration-300 hover:shadow-md hover:-translate-y-0.5">
+
+        <div class="flex flex-col gap-2 items-center w-full text-center py-4 absolute inset-0 transform transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
+            [ngClass]="{
+                'opacity-0 scale-90 -translate-y-4 rotate-[2deg] pointer-events-none': !isMenuExpanded(),
+                'opacity-100 scale-100 translate-y-0 rotate-0': isMenuExpanded()
+            }">
+            <span
+                class="font-semibold text-lg tracking-tight text-gray-900 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                Porat Amrami
+            </span>
+            <div class="flex items-center justify-center gap-2 mt-1">
+                <span class="material-symbols-rounded text-indigo-500 text-lg animate-pulse">
+                    terminal
+                </span>
+                <span
+                    class="text-gray-600 text-sm font-medium whitespace-nowrap transition-colors duration-300 hover:text-indigo-700">
+                    Web Developer
+                </span>
+            </div>
+
+            <div class="absolute -bottom-2 -right-2 w-16 h-16 rounded-full bg-indigo-100 opacity-30 transform scale-0 transition-transform duration-700"
+                [ngClass]="{'scale-100': isMenuExpanded()}">
+            </div>
+        </div>
+
+        <div class="flex flex-col gap-1 items-center w-full text-center py-4 transform transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
+            [ngClass]="{
+                'opacity-0 scale-110 translate-y-4 rotate-[-2deg] pointer-events-none': isMenuExpanded(),
+                'opacity-100 scale-100 translate-y-0 rotate-0': !isMenuExpanded()
+            }">
+            <div class="relative">
+                <span class="font-semibold text-lg tracking-tight text-gray-900">
+                    P.A
+                </span>
+                <span class="absolute -top-1 -right-2 w-2 h-2 rounded-full bg-green-400 animate-ping opacity-75"></span>
+            </div>
+            <div class="flex items-center justify-center gap-1 mt-1" [ngClass]="{'flex-col': !isMenuExpanded()}">
+                <span class="material-symbols-rounded text-indigo-500 text-lg">
+                    code
+                </span>
+                <span class="text-gray-500 text-xs font-medium transition-colors duration-300 hover:text-indigo-600">
+                    Dev
+                </span>
+            </div>
+
+            <div class="absolute bottom-2 w-6 h-1 rounded-full bg-indigo-300 opacity-0 transition-opacity duration-300"
+                [ngClass]="{'opacity-100': !isMenuExpanded()}"></div>
+        </div>
+
+    </div> -->
+
+</div>
+}
+
+
+
+
+
+
+
+
+
+
+
+<!-- <img [src]="(user$ | async)?.logoUrl ?? '../../../assets/images/quickdev_q_logo.png'" alt="client's logo" class="logo"> -->
+<!-- <span class="label font-semibold ">{{ (user$ | async)?.client?.name}}</span> -->
+<!-- <span class="label text-sm leading-3">{{ (user$ | async)?.email}}</span> -->

@@ -1,0 +1,161 @@
+<div class="calendar-container">
+	<!-- Header for Navigation -->
+	<div class="header">
+		<div class="flex gap-1">
+			<p-button icon="pi pi-chevron-right" styleClass="p-button-sm" [rounded]="true" [text]="true"
+				severity="secondary" (click)="prevWeek()">
+			</p-button>
+			<p-button icon="pi pi-stopwatch" styleClass="p-button-sm" [rounded]="true" [text]="true"
+				severity="secondary" [pTooltip]="showHebrewCal() ? 'הסתר לוח שנה עיברי' :'הרחב לוח שנה עיברי'"
+				(click)="toggleHebrewCal()">
+			</p-button>
+		</div>
+		<h2 class="month">{{ monthDisplay() }}</h2>
+		<div class="flex items-center justify-end gap-1">
+			@if (displayedDays() | hasHoliday) {
+			<div class="event holiday">
+				<span class="material-symbols-rounded icon-sm">celebration</span>
+				@for (part of (displayedDays() | findHoliday) | textSplit; track part) {
+				<span>{{ part }}</span>
+				}
+			</div>
+			}
+			@if (!isCurrentWeek()) {
+			<p-button icon="pi pi-calendar-clock" styleClass="p-button-sm" [rounded]="true" [text]="true"
+				severity="secondary" (click)="goToToday()" pTooltip="חזור להיום">
+			</p-button>
+			}
+			<p-button icon="pi pi-chevron-left" styleClass="p-button-sm" [rounded]="true" [text]="true"
+				severity="secondary" (click)="nextWeek()">
+			</p-button>
+		</div>
+	</div>
+
+	<!-- Main Grid for Display -->
+	<div class="calendar-grid-container" [style.grid-template-rows]="gridTemplateRowsStyle()">
+		<!-- 1. Day Headers (Top Row) -->
+		@for (day of displayedDays(); track day.fullDate) {
+		<div class="day-header" [ngClass]="{
+			'today' : day.isToday,
+			'holiday': day.holiday && !day.fast && !day.shabbat || (day.holiday && day.shabbat),
+			
+		}">
+			<span class="day-letter">{{ day.letter }}</span>
+			<span class="day-date">{{ day.date }}</span>
+
+
+
+			<div class="events expandable" [class.expanded]="showHebrewCal()">
+
+
+				<div class="events">
+					<div class="flex flex-col gap-1">
+						@if (day.formatted) {
+						<div class="event jewish-date">
+							@for (part of day.formatted | textSplit; track part) {
+							{{ part }}
+							}
+						</div>
+						}
+						@if (day.holiday && day.holiday !== day.fast) {
+						<div class="event holiday">
+							<span class="material-symbols-rounded icon-sm">celebration</span>
+							@for (part of day.holiday | textSplit; track part) {
+							<span>{{ part }}</span>
+							}
+						</div>
+						}
+						@if (day.fast) {
+						<div class="event fast">
+							<span class="material-symbols-rounded icon-sm">no_food</span>
+							@for (part of day.fast | textSplit; track part) {
+							<span>{{ part }}</span>
+							}
+						</div>
+						}
+						@if (day.parasha) {
+						<div class="event parasha">
+							<span class="material-symbols-rounded icon-sm">book</span>
+							@for (part of day.parasha | textSplit; track part) {
+							<span>{{ part }}</span>
+							}
+						</div>
+						}
+						@if (day.shabbat) {
+						@if (day.shabbat.candleLighting) {
+						<div class="event shabbat-time">
+							<span class="material-symbols-rounded icon-sm">light</span>
+							@for (part of ('כניסת שבת: ' + day.shabbat.candleLighting) | textSplit; track part) {
+							<span>{{ part }}</span>
+							}
+						</div>
+						}
+						@if (day.shabbat.havdalah) {
+						<div class="event shabbat-time">
+							<span class="material-symbols-rounded icon-sm">event</span>
+							@for (part of ('יציאת שבת: ' + day.shabbat.havdalah) | textSplit; track part) {
+							<span>{{ part }}</span>
+							}
+						</div>
+						}
+						}
+					</div>
+				</div>
+
+				<div class="zmanim">
+					<div class="zmanim-row">
+						<span class="material-symbols-rounded icon-sm">wb_twilight</span>
+						<span class="zmanim-label">עלות השחר</span>
+						<span>{{ day.zmanim.alotHashachar || 'לא זמין' }}</span>
+					</div>
+					<div class="zmanim-row">
+						<span class="material-symbols-rounded icon-sm">wb_sunny</span>
+						<span class="zmanim-label">זריחה</span>
+						<span>{{ day.zmanim.sunrise || 'לא זמין' }}</span>
+					</div>
+					<div class="zmanim-row">
+						<span class="material-symbols-rounded icon-sm">schedule</span>
+						<span class="zmanim-label">חצות</span>
+						<span>{{ day.zmanim.chatzot || 'לא זמין' }}</span>
+					</div>
+					<div class="zmanim-row">
+						<span class="material-symbols-rounded icon-sm">backlight_high</span>
+						<span class="zmanim-label">שקיעה</span>
+						<span>{{ day.zmanim.sunset || 'לא זמין' }}</span>
+					</div>
+				</div>
+			</div>
+
+
+		</div>
+
+		}
+
+		<!-- 2. Event Bars placed on the grid -->
+		@for (event of calendarEvents(); track event.id) {
+		<div class="supplier-event"
+			[style.grid-column]="(event.startDate.getDay() + 1) + ' / span ' + event.durationInDays"
+			[style.grid-row]="event.row + 1" [ngClass]="event.displayState" (click)="openOrderDialog(event)"
+			[pTooltip]="event.displayState == 'empty' ? '' : event.supplier.name" tooltipPosition="top">
+
+			<span class="supplier-name">{{ event.supplier.name }}</span>
+
+			<!-- <app-badge [enumValue]="event.status" [dataArray]="orderStatusData"
+			[label]="event.status | orderStatusLabel">
+		</app-badge> -->
+
+			<!-- {{'status' + event.status}} -->
+
+
+			@switch (event.displayState) {
+			@case ('sent') { <i class="pi pi-check-circle status-icon sent-icon"></i> }
+			@case ('draft') { <i class="pi pi-file-edit status-icon draft-icon"></i> }
+			@case ('today') { <i class="pi pi-bell status-icon today-icon"></i> }
+			@case ('future') { <i class="pi pi-clock status-icon future-icon"></i> }
+			<!-- @case ('empty') { <i class="pi pi-times-circle status-icon empty-icon"></i> } -->
+			@case ('empty') { }
+			}
+		</div>
+		}
+	</div>
+</div>

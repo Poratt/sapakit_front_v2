@@ -1,0 +1,40 @@
+<div class="category-management">
+    <div class="flex items-center gap-2 py-3">
+
+        <p-iconfield class="w-full">
+            <input #inputRef pInputText [(ngModel)]="newCategoryName" [ngModelOptions]="{ standalone: true }" [autofocus]="editingCategoryId() ? true : false" placeholder="שם קטגוריה חדשה" class="w-full" pSize="small" id="newCategoryName" />
+            @if(!newCategoryName()){}
+            <p-inputicon class="pi pi-times cursor-pointer" (click)="cancelEdit()"/>
+        </p-iconfield>
+            <button (click)="!editingCategoryId() ? addCategory() : saveEditedCategory()" class="primary md">
+            <span class="material-symbols-rounded">{{ !editingCategoryId() ? 'add' : 'save' }}</span>
+            <span>{{ !editingCategoryId() ? 'הוספה' : 'שמירה' }}</span>
+        </button>
+
+    </div>
+    <p-table [value]="categories()" size="small" [rowHover]="true" *ngIf="categories().length">
+        <ng-template pTemplate="header" let-category>
+            <tr>
+                <th pSortableColumn="name">שם הקטגוריה
+                    <p-sortIcon field="name"></p-sortIcon>
+                </th>
+                <th style="width: 100px;"></th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-category>
+            <tr>
+                <td>{{ category.name }}</td>
+                <td>
+                    <div class="actions-cell">
+                        <p-button tooltipPosition="top" pTooltip="עריכה" icon="pi pi-pen-to-square"
+                            (click)="editCategory(category)" size="small" [rounded]="true"
+                            severity="secondary"></p-button>
+                        <p-button tooltipPosition="top" pTooltip="מחיקה" icon="pi pi-trash" class="delete-btn"
+                            (click)="confirmDelete(category)" size="small" [rounded]="true"
+                            severity="danger"></p-button>
+                    </div>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div>

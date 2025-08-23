@@ -1,0 +1,45 @@
+.grid-7 {
+	/* /* grid grid-cols-7 gap-2 p-2 min-h-44 */
+	display: grid;
+	grid-template-columns: repeat(7, minmax(0, 1fr));
+	/* height: 200px; */
+	transition: all 0.4s ease-in-out;
+	place-items: center;
+	row-gap: 8px;
+	column-gap: 8px;
+	overflow: hidden;
+	padding: 8px 2px;
+}
+
+.soft-bg{
+	padding: 8px;
+	background-color: var(--grey-20);
+	border-radius: 6px;
+	overflow: hidden!important;
+	max-width: 400px;
+	transition: all 1s ease-in-out;
+	
+}
+
+
+/* 
+::ng-deep .mat-mdc-tab-body-content {
+    visibility: visible;
+    overflow: hidden!important;
+} */
+
+::ng-deep .sm .mat-mdc-tab .mdc-tab__text-label{
+	font-size: 10px;
+	gap: 8px
+	
+}
+::ng-deep .sm .material-symbols-rounded{
+	font-size: 18px!important;
+}
+::ng-deep .sm .mdc-tab__ripple{
+	display: none!important;
+}
+
+::ng-deep .mat-tab-body-wrapper {
+  transition: height 0.4s ease-in-out;
+}

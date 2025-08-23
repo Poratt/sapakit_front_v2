@@ -1,0 +1,231 @@
+<div class="dialog-content no-padding" #dialogContent>
+  <p-confirmDialog [style]="{width: '350px'}" [baseZIndex]="10000" rejectButtonStyleClass="p-button-text"></p-confirmDialog>
+  
+  @switch (pageState()) {
+    @case (PageStates().Loading) {
+      <app-loader></app-loader>
+    }
+    @case(PageStates().Error) {
+  <div @fadeIn400 class="error-card-container">
+    <div class="error-card">
+      <div class="error-icon-wrapper">
+        <span class="material-symbols-rounded">cloud_off</span>
+      </div>
+      <h3 class="error-title">אופס, משהו השתבש</h3>
+      <button class="primary md retry-button">
+        <!--  (click)="refreshData()" -->
+        <span class="material-symbols-rounded">refresh</span>
+        <span>נסה שוב</span>
+      </button>
+    </div>
+  </div>
+  }
+    @case (PageStates().Ready) {
+      <div class="flex flex-col gap-2 w-full h-full">
+        @if (supplier && date) {
+          <div class="flex flex-col gap-1">
+            <div class="flex flex-col gap-0">
+              <div class="flex items-center justify-between gap-2">
+                <div class="flex items-center gap-1">
+                  @if (groupedProducts().length != 0 && pageState() !== PageStates().Loading) {
+                  <p-button icon="pi pi-external-link pt-1" size="small" [rounded]="true" [text]="true" severity="secondary" tooltipPosition="top" [pTooltip]="'לדף הספק'" (click)="navigateToSupplier()"></p-button>
+                  }
+                    <div class="flex items-baseline gap-1">
+                      <span class="dialog-header">{{ supplier.name }} </span>
+                      @if (groupedProducts().length != 0 && pageState() !== PageStates().Loading) {
+                        |<span class="text-xs"> {{ date | date: 'dd/MM/yyyy' }}</span>
+                        @if (existingOrder?.status) {                      
+                        | <app-badge [enumValue]="existingOrder ? existingOrder.status : orderStatus" [dataArray]="orderStatusData" [size]="'md'" class="status-badge"></app-badge>
+                        }
+                      }
+                    </div>
+                </div>
+                <p-button icon="pi pi-times" size="small" [rounded]="true" [text]="true" severity="secondary" tooltipPosition="top" [pTooltip]="'סגירה'" (click)="onClose()"></p-button>
+              </div>
+                <p class="text-grey-xs text-left">{{ existingOrder && existingOrder.status === OrderStatus.Sent ? 'ההזמנה נשלחה ואינה ניתנת לעריכה.' : ''}}</p>
+            </div>
+          </div>
+  
+          <div class="grid grid-cols-2 gap-0" 
+            cdkDropList 
+            cdkDropListGroup
+            cdkDropListOrientation="mixed"
+            [cdkDropListData]="groupedProducts()" 
+            (cdkDropListDropped)="dropCategory($event)" 
+            >
+            @for (group of groupedProducts(); track group.categoryName; let i = $index) {
+              <div class="category-drag-container" cdkDrag [cdkDragDisabled]="!dragAndDropEnable()" (cdkDragMoved)="onDragMoved($event)">
+                <div class="category-wrapper">
+                  <h3 class="text-sm font-semibold mb-1 category-header" cdkDragHandle>
+                    @if(dragAndDropEnable()){<i class="pi pi-arrows-alt handle-icon"></i>}
+                    {{ group.categoryName }}
+                  </h3>
+
+
+                  <div class="products-container" cdkDropList [cdkDropListData]="group.products"
+                    (cdkDropListDropped)="dropProduct($event)" [id]="group.categoryName + i" [cdkDropListDisabled]="!dragAndDropEnable()">
+                    @for (product of group.products; track product.id) {
+                      
+                      
+                      <div class="product-wrapper" cdkDrag [cdkDragDisabled]="!dragAndDropEnable()" (cdkDragMoved)="onDragMoved($event)" 
+                        [ngClass]="{
+                          'with-quantity': getProductQuantity(product.id) > 0,
+                          'not-in-order': isDisabled() && getProductQuantity(product.id) == 0
+                        }"
+                        >
+  
+                        <div class="grid grid-cols-4 pt-1">
+                          <div class="h-full flex items-center">
+                            <button class="quantity-btn" [disabled]="!canDecrement(product.id)" (click)="decrementQuantity(product.id)" type="button">
+                                <i class="pi pi-chevron-down"></i>
+                            </button>
+                            <div class="min-w-5  w-full justify-center flex">
+                              <span class="quantity-number" [class.with-value]="getProductQuantity(product.id) > 0">{{ getProductQuantity(product.id) }}</span>
+                            </div>
+                          </div>
+  
+                          <div class="flex flex-col items-center gap-1 col-span-2">
+                            <span class="product-name">{{ product.name }}</span>
+
+                            <div class="flex items-center">
+
+                              <app-badge class="flex" [enumValue]="product.package" [dataArray]="packageData" [size]="'sm'"></app-badge>
+
+                            </div>
+
+                          </div>
+
+                          
+                          <div class="flex w-full items-center justify-end">
+                            <div class="flex gap-1 justify-end px-1 w-full expandable" [ngClass]="{ 'expanded': getProductTotalCost(product) }">                          
+                              <span class="total-cost">{{ getProductTotalCost(product) | currency: 'ILS' }}</span>
+                            </div>
+                            <button class="quantity-btn " [disabled]="!canIncrement(product.id)" (click)="incrementQuantity(product.id)" type="button">
+                              <i class="pi pi-chevron-up"></i>
+                            </button>
+                          </div>
+                        </div>
+
+
+                        <!-- @if (product.imageUrl) {
+                          <img [src]="product.imageUrl" [alt]="product.name" class="w-10 h-10 object-cover rounded" />
+                          } -->
+
+
+                            
+
+                      </div>
+                    } @if (group.products.length === 0) {
+                      <div class="empty-category-placeholder">
+                        <i class="pi pi-box text-2xl"></i>
+                        <p>אין מוצרים בקטגוריה</p>
+                      </div>
+                    }
+                  </div>
+                </div>
+                <div *cdkDragPlaceholder class="product-placeholder"></div>
+                <div *cdkDragPlaceholder class="category-placeholder"></div>
+              </div>
+            }
+          </div>
+          @if (groupedProducts().length === 0 && pageState() !== PageStates().Loading) {
+            <div class="flex flex-col mx-auto items-center gap-4">
+              <p class="text-gray-500 col-span-2 text-center">אין מוצרים זמינים עבור ספק זה.</p>
+              <button class="primary sm" tooltipPosition="top" [pTooltip]="'לדף הספק'" (click)="navigateToSupplier()">
+              <span class="material-symbols-rounded">open_in_new</span>
+              לדף הספק
+            </button>
+
+            </div>
+
+          }
+  
+          @if (groupedProducts().length != 0 && pageState() !== PageStates().Loading) {      
+          <div class="form-field">
+            <label for="notes" class="form-label">הערות</label>
+            <textarea id="notes" pTextarea [(ngModel)]="notes" rows="4" [style]="{ width: '100%' }" [disabled]="isDisabled()"
+              [placeholder]="isDisabled() ? '' : 'הוסף הערות (אופציונלי)'"></textarea>
+          </div>
+          }
+
+          
+          <div class="flex w-full justify-end expandable" [ngClass]="{ 'expanded': orderHasProducts() }">
+            <span class="text-sm font-semibold text-gray-700">
+              סה"כ: 
+              <count-up [to]="getSelectedProductsTotalCost()" [decimals]="2" size="small"></count-up>
+              ₪
+            </span>            
+          </div>
+  
+          <!-- Action buttons with individual disabling logic -->
+          <div class="flex w-full justify-between items-center">
+            <div class="flex gap-1 items-center">
+              <p-toggleswitch class="flex scale-75" [(ngModel)]="dragAndDropEnable" (onChange)="dragAndDropEnable.set($event.checked)" [disabled]="!isAdmin()"/>
+              <p-button 
+                  pTooltip="הדבק הזמנה מלוח ההעתקה" 
+                  tooltipPosition="top"
+                  icon="pi pi-clipboard" 
+                  (click)="pasteFromClipboard()" 
+                  size="small" 
+                  [rounded]="true" 
+                  severity="secondary" 
+                  [disabled]="isDisabled()">
+              </p-button>
+              
+              <!-- *** כפתור דילוג חדש *** -->
+              <!-- <p-button 
+                  pTooltip="דלג על הזמנה זו" 
+                  tooltipPosition="top"
+                  icon="pi pi-forward" 
+                  (click)="skipOrder()" 
+                  size="small" 
+                  [rounded]="true" 
+                  severity="secondary" 
+                  [disabled]="isDisabled()">
+              </p-button> -->
+          </div>
+
+              
+            <div class="flex items-center gap-2">
+              @if (canUserDelete()) {
+                <p-button [pTooltip]="orderStatus === OrderStatus.Draft ? 'מחק טיוטה' : 'מחק הזמנה'" icon="pi pi-trash" (click)="confirmRemove()" size="small" [rounded]="true" severity="danger"></p-button>
+                <span class="divider"></span>
+              }
+              <p-splitButton 
+                label="מילוי אוטומטי" 
+                icon="pi pi-sparkles" 
+                (onClick)="fetchSuggestions('general')" 
+                [model]="suggestionItems()"
+                [disabled]="isSuggesting()"
+                size="small"
+                severity="secondary"
+
+                styleClass="p-button-sm p-button-outlined"
+                [disabled]="isDisabled()">
+              </p-splitButton>
+              <p-button pTooltip="אפס שינויים" icon="pi pi-undo" (click)="resetForm()" size="small" [rounded]="true" severity="secondary" [disabled]="!orderChanged()"></p-button>
+              <p-button pTooltip="הדפס רשימה" icon="pi pi-print" (click)="printOrder()" size="small" [rounded]="true" severity="secondary" [disabled]="!orderHasProducts() && !notes().trim()"></p-button>
+              <p-button pTooltip="שמור טיוטה" icon="pi pi-save" (click)="saveOrder()" size="small" [rounded]="true" severity="secondary" [disabled]="!orderChanged()"></p-button>
+              <p-button 
+                  pTooltip="שלח בווטסאפ" 
+                  icon="pi pi-whatsapp" 
+                  (click)="sendOrderViaWhatsApp()" 
+                  size="small" 
+                  [rounded]="true" 
+                  severity="secondary" 
+                  [disabled]="!orderHasProducts() && !notes().trim()">
+              </p-button>
+              </div>
+          </div>
+
+        }
+
+
+        
+      </div>
+      
+    }
+    
+  }
+
+</div>

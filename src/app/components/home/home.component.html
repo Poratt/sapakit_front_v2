@@ -1,0 +1,164 @@
+<div class="p-responsive">
+  @switch (pageState()) {
+  @case(PageStates.Loading) {
+  <app-loader></app-loader>
+  }
+
+  @case(PageStates.Error) {
+  <div @fadeIn400 class="error-card-container">
+    <div class="error-card">
+      <div class="error-icon-wrapper">
+        <span class="material-symbols-rounded">cloud_off</span>
+      </div>
+      <h3 class="error-title">אופס, משהו השתבש</h3>
+      <button (click)="refreshDashboard()" class="primary md retry-button">
+        <span class="material-symbols-rounded">refresh</span>
+        <span>נסה שוב</span>
+      </button>
+    </div>
+  </div>
+  }
+
+  @case(PageStates.Ready) {
+  <div @fadeIn400 class="dashboard-container">
+    <!-- Calendar Component -->
+    <!-- <app-calendar></app-calendar> -->
+    <app-advanced-calendar></app-advanced-calendar>
+    <!-- <app-calendar-day></app-calendar-day> -->
+
+
+    @if (suppliers().length) {
+    <!-- Main Statistics Section -->
+    <div class="stats-grid">
+
+      <!-- Due Today Card -->
+      <div class="card-content" pAnimateOnScroll
+        enterClass="animate-enter slide-in-from-bottom fade-in scale-in rotate-in"
+        leaveClass="animate-leave slide-out-to-top fade-out scale-out rotate-out" [once]="true">
+        <div class="flex gap-3 items-center">
+          <span class="card-icon icon-today" aria-hidden="true"></span>
+          <p>הזמנות להיום</p>
+        </div>
+        <div class="card-info">
+          <count-up theme="gradient" [to]="stats().dueToday"></count-up>
+          <div class="flex w-full justify-end mt-2">
+            <button class="primary sm" (click)="showOrdersListDialog(OrderStatus.Today)">
+              <span class="material-symbols-rounded">checkbook</span>
+              הצג
+            </button>
+          </div>
+          <small class="card-explanation">
+            <span class="material-symbols-rounded">alarm</span>
+            הזמנות שמתוכננות להתבצע היום
+          </small>
+        </div>
+      </div>
+
+      <!-- Open Orders Card -->
+      <div class="card-content" pAnimateOnScroll
+        enterClass="animate-enter slide-in-from-bottom fade-in scale-in rotate-in"
+        leaveClass="animate-leave slide-out-to-top fade-out scale-out rotate-out" [once]="true">
+        <div class="flex gap-3 items-center">
+          <span class="card-icon icon-orders" aria-hidden="true"></span>
+          <p>הזמנות טיוטה</p>
+        </div>
+        <div class="card-info">
+          <count-up theme="gradient" [to]="stats().openOrders"></count-up>
+          <div class="flex w-full justify-end mt-2">
+            <button class="primary sm" (click)="showOrdersListDialog(OrderStatus.Draft)">
+              <span class="material-symbols-rounded">checkbook</span>
+              הצג
+            </button>
+          </div>
+          <small class="card-explanation">
+            <span class="material-symbols-rounded">info</span>
+            מספר ההזמנות הפעילות שטרם הושלמו
+          </small>
+        </div>
+      </div>
+
+      <!-- Monthly Cost Card -->
+      <div class="card-content">
+        <div class="flex gap-3 items-center">
+          <span class="card-icon icon-cost" aria-hidden="true"></span>
+          <p>עלות כוללת (החודש)</p>
+        </div>
+        <div class="card-info">
+          <div class="flex gap-1 w-full justify-center items-center flex-col">
+            <count-up theme="gradient" prefix="₪" [to]="stats().monthlyCost"></count-up>
+            @if (stats().costChangePercentage !== null) {
+            <div class="comparison" [ngClass]="{
+                  'positive': (stats().costChangePercentage) > 0,
+                  'negative': (stats().costChangePercentage) < 0
+                  }">
+              <span class="material-symbols-rounded">
+                {{ (stats().costChangePercentage) >= 0 ? 'arrow_upward' : 'arrow_downward' }}
+              </span>
+              <div class="flex flex-wrap justify-center text-center">
+                <span class="percentage-value" dir="ltr">
+                  <span>{{ stats().costChangePercentage | number: '1.0-1' }}</span>
+                  <span>%</span>
+                </span>
+                <span class="text">מהחודש הקודם ({{ stats().prevMonthlyCost | currency:'ILS' }})</span>
+              </div>
+            </div>
+            } @else {
+            <div class="comparison neutral">
+              <span>אין נתונים להשוואה</span>
+            </div>
+            }
+
+          </div>
+
+
+          <small class="card-explanation">
+            <span class="material-symbols-rounded">money</span>
+            סך כל ההוצאות על הזמנות בחודש הנוכחי
+          </small>
+        </div>
+      </div>
+
+      <!-- Active Suppliers Card -->
+      <div class="card-content" pAnimateOnScroll
+        enterClass="animate-enter slide-in-from-bottom fade-in scale-in rotate-in"
+        leaveClass="animate-leave slide-out-to-top fade-out scale-out rotate-out" [once]="true">
+        <div class="flex gap-3 items-center">
+          <span class="card-icon icon-suppliers" aria-hidden="true"></span>
+          <p>ספקים פעילים</p>
+        </div>
+        <div class="card-info">
+          <count-up theme="gradient" [to]="activeSuppliers()"></count-up>
+          <div class="flex w-full justify-end mt-2">
+            <button class="primary sm" (click)="addSupplier()">
+              <span class="material-symbols-rounded">add</span>
+              הוסף ספק
+            </button>
+          </div>
+          <small class="card-explanation">
+            <span class="material-symbols-rounded">people</span>
+            מספר הספקים עם פעילות נוכחית
+          </small>
+        </div>
+      </div>
+
+
+
+    </div>
+
+
+    } @else {
+    <!-- Empty State -->
+    <div @fadeIn400 class="empty-state" role="region" aria-label="מצב ריק">
+      <i class="pi pi-inbox" aria-hidden="true"></i>
+      <p><strong>אין ספקים פעילים כרגע</strong></p>
+      <p>התחל על ידי הוספת ספק חדש כדי לנהל מוצרים וקטגוריות</p>
+      <p>זה יעזור לך לארגן את המלאי ולעקוב אחר ההזמנות</p>
+      <p-button label="הוסף ספק חדש" icon="pi pi-plus" styleClass="p-button-lg p-button-rounded"
+        (onClick)="addSupplier()" ariaLabel="הוסף ספק חדש למערכת">
+      </p-button>
+    </div>
+    }
+  </div>
+  }
+  }
+</div>

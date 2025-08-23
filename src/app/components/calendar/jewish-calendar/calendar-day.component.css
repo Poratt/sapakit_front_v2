@@ -1,0 +1,303 @@
+.container {
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: 20px;
+}
+
+
+/* View Mode Buttons */
+.view-modes {
+	display: flex;
+	justify-content: center;
+	gap: 4px;
+	margin-bottom: 24px;
+	background: rgb(255, 255, 255);
+	backdrop-filter: blur(10px);
+	border-radius: 16px;
+	padding: 4px;
+	width: fit-content;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.view-btn {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	padding: 10px 16px;
+	border: none;
+	border-radius: 12px;
+	background: transparent;
+	color: var(--grey-600);
+	font-size: 14px;
+	font-weight: 500;
+	cursor: pointer;
+	transition: all 0.3s ease;
+}
+
+.view-btn:hover {
+	background: var(--primary-100);
+	color: var(--primary-500);
+}
+
+.view-btn.active {
+	background: var(--primary-200);
+	color: var(--primary-700);
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Navigation */
+.navigation {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap: 16px;
+	margin-bottom: 32px;
+}
+
+.nav-btn {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 12px 20px;
+	border: none;
+	border-radius: 12px;
+	background: rgba(255, 255, 255, 0.9);
+	color: #333;
+	font-size: 14px;
+	font-weight: 500;
+	cursor: pointer;
+	transition: all 0.3s ease;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.nav-btn:hover {
+	background: white;
+	transform: translateY(-2px);
+	box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.nav-btn.today {
+	background: #007aff;
+	color: white;
+}
+
+.nav-btn.today:hover {
+	background: #0056cc;
+}
+
+/* Days Grid */
+.days-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+	gap: 16px;
+	max-width: 100%;
+}
+
+@media (min-width: 768px) {
+	.days-grid {
+		grid-template-columns: repeat(3, 1fr);
+	}
+}
+
+@media (min-width: 1024px) {
+	.days-grid.week-view {
+		grid-template-columns: repeat(7, 1fr);
+	}
+}
+
+/* Day Card */
+.day-card {
+	background: rgba(255, 255, 255, 0.95);
+	backdrop-filter: blur(20px);
+	border-radius: 20px;
+	padding: 20px;
+	box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+	transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+	border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.day-card:hover {
+	transform: translateY(-4px);
+	box-shadow: 0 12px 48px rgba(0, 0, 0, 0.15);
+}
+
+.day-card.current {
+	color: var(--primary-600);
+	border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.day-card.current .day-header h3,
+.day-card.current .day-date {
+	color: white;
+	color: var(--primary-600);
+}
+
+/* Day Header */
+.day-header {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	margin-bottom: 16px;
+}
+
+.day-letter {
+	width: 40px;
+	height: 40px;
+	border-radius: 12px;
+	background: linear-gradient(135deg, #ff6b6b 0%, #ff8e8e 100%);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: white;
+	font-weight: 600;
+	font-size: 18px;
+	box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+}
+
+.day-card.current .day-letter {
+	background: linear-gradient(135deg, #007aff 0%, #5856d6 100%);
+	box-shadow: 0 4px 12px rgba(67, 98, 240, 0.664);
+	backdrop-filter: blur(10px);
+}
+
+.day-header h3 {
+	font-size: 18px;
+	font-weight: 600;
+	color: #333;
+}
+
+.day-date {
+	font-size: 14px;
+	color: #666;
+	margin-bottom: 16px;
+}
+
+/* Events */
+.events {
+	margin-bottom: 16px;
+}
+
+.event {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 8px 12px;
+	border-radius: 10px;
+	margin-bottom: 6px;
+	font-size: 13px;
+	font-weight: 500;
+}
+
+.event.holiday {
+	background: rgba(255, 59, 92, 0.1);
+	color: #ff3b5c;
+}
+
+.event.parasha {
+	background: rgba(88, 86, 214, 0.1);
+	color: #5856d6;
+}
+
+.event.fast {
+	background: rgba(255, 149, 0, 0.1);
+	color: #ff9500;
+}
+
+.day-card.current .event {
+	background: rgba(255, 255, 255, 0.15);
+	color: white;
+}
+
+/* Shabbat Times */
+.shabbat-times {
+	background: rgba(88, 86, 214, 0.05);
+	border-radius: 12px;
+	padding: 12px;
+	margin-bottom: 12px;
+}
+
+.day-card.current .shabbat-times {
+	background: rgba(255, 255, 255, 0.1);
+}
+
+.shabbat-time {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	font-size: 12px;
+	color: #5856d6;
+	margin-bottom: 4px;
+}
+
+.day-card.current .shabbat-time {
+	color: rgba(255, 255, 255, 0.9);
+}
+
+.shabbat-time:last-child {
+	margin-bottom: 0;
+}
+
+/* Zmanim */
+.zmanim {
+	background: rgba(0, 0, 0, 0.03);
+	border-radius: 12px;
+	padding: 12px;
+}
+
+.day-card.current .zmanim {
+	background: rgba(255, 255, 255, 0.1);
+}
+
+.zmanim-row {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	font-size: 11px;
+	color: #666;
+	margin-bottom: 4px;
+	
+	&:last-child {
+		margin-bottom: 0;
+	}
+	
+	.zmanim-label {
+		display: flex;
+		align-items: center;
+		gap: 4px;
+	}
+}
+
+
+/* Icons */
+.icon {
+	width: 16px;
+	height: 16px;
+	fill: currentColor;
+}
+
+.icon-sm {
+	font-size: 14px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+	.container {
+		padding: 16px;
+	}
+
+	.days-grid {
+		grid-template-columns: 1fr;
+	}
+
+	.view-modes {
+		flex-wrap: wrap;
+		gap: 8px;
+	}
+
+	.navigation {
+		flex-wrap: wrap;
+		gap: 8px;
+	}
+}

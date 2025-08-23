@@ -1,0 +1,130 @@
+<div class="p-responsive">
+    @switch (pageState()) {
+    @case(PageStates.Loading) {
+    <app-loader></app-loader>
+    }
+
+    @case(PageStates.Error) {
+    <div @fadeIn400 class="error-card-container">
+        <div class="error-card">
+            <div class="error-icon-wrapper">
+                <span class="material-symbols-rounded">cloud_off</span>
+            </div>
+            <h3 class="error-title">אופס, משהו השתבש</h3>
+            <button (click)="refreshData()" class="primary md retry-button">
+                <span class="material-symbols-rounded">refresh</span>
+                <span>נסה שוב</span>
+            </button>
+        </div>
+    </div>
+    }
+
+    @case(PageStates.Ready) {
+    <div @fadeIn400 class="flex flex-col gap-4 w-full h-full">
+        <h1 class="main-title">ניהול משתמשים</h1>
+
+
+        @if (filteredUsers().length > 0) {
+        <div class="actions-bar">
+            <span class="search-box">
+                <i class="pi pi-search"></i>
+                <input pInputText type="text" placeholder="חיפוש משתמשים..." [(ngModel)]="searchQuery">
+            </span>
+            <div class="flex gap-2">
+                <button type="button" (click)="exportUsers()" class="empty md" [disabled]="filteredUsers().length === 0"
+                    pTooltip="ייצוא רשימת המשתמשים לקובץ אקסל" tooltipPosition="top">
+                    <span class="material-symbols-rounded">download</span>
+                    <span>ייצוא לאקסל</span>
+                </button>
+
+                <button type="button" (click)="addUser()" class="primary md">
+                    <span class="material-symbols-rounded">add</span>
+                    <span>הוסף משתמש</span>
+                </button>
+
+            </div>
+        </div>
+        <p-table @fadeIn400 [value]="filteredUsers()" responsiveLayout="stack" [breakpoint]="'768px'" [rowHover]="true">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th pSortableColumn="username">שם <p-sortIcon field="username"></p-sortIcon></th>
+                    <th pSortableColumn="email">אימייל <p-sortIcon field="email"></p-sortIcon></th>
+                    <th pSortableColumn="role">תפקיד <p-sortIcon field="role"></p-sortIcon></th>
+                    <th pSortableColumn="phone">טלפון <p-sortIcon field="phone"></p-sortIcon></th>
+                    <th></th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-user>
+                <tr [ngClass]="{'item-to-delete' : itemToDelete() == user.id}">
+                    <td data-label="שם">
+                        <div class="flex gap-1 items-center">
+                            @if (user.image) {
+                            <img [src]="getImageUrl(user.image)" alt="{{ user.name }}" class="table-image"
+                                *ngIf="user.image" />
+                            }
+                            @else{
+                            <div class="no-image">
+                                <i class="material-symbols-rounded">account_circle</i>
+                            </div>
+                            }
+                            {{ user.username }}
+                        </div>
+                    </td>
+                    <td data-label="אימייל">{{ user.email }}</td>
+                    <td data-label="תפקיד">
+                        <app-badge [enumValue]="user.role" [dataArray]="userRoleData"></app-badge>
+
+                    </td>
+                    <td data-label="טלפון">{{ user.phone }}</td>
+                    <td data-label="">
+                        <div class="actions-cell">
+                            <p-button tooltipPosition="top" pTooltip="עריכה" icon="pi pi-pen-to-square"
+                                (click)="editUser(user)" size="small" [rounded]="true" severity="secondary"></p-button>
+                            <p-button tooltipPosition="top" pTooltip="מחיקה" icon="pi pi-trash" class="delete-btn"
+                                (click)="confirmDelete(user)" size="small" [rounded]="true"
+                                severity="danger"></p-button>
+                        </div>
+
+                        <!-- <div class="actions-cell">
+                            <div class="delete-confirmation" [class.show]="deleteConfirmation() === user.id">
+                                <div>האם אתה בטוח?</div>
+                                <div class="confirmation-actions">
+                                    <button class="confirm-btn" (click)="confirmDelete(user)">
+                                        מחק
+                                    </button>
+                                    <button class="cancel-btn" (click)="cancelDelete()">
+                                        ביטול
+                                    </button>
+                                </div>
+                            </div>
+                        </div> -->
+                    </td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td colspan="4" class="empty-message">לא נמצאו תוצאות</td>
+                </tr>
+            </ng-template>
+        </p-table>
+        }
+        @else {
+        <div class="empty-state">
+            <i class="pi pi-box"></i>
+            <p>אין משתמשים זמינים</p>
+            <p-button label="הוסף משתמש חדש" (onClick)="addUser()"></p-button>
+        </div>
+        }
+    </div>
+    }
+    }
+    <p-confirmdialog header="אישור מחיקה" icon="pi pi-exclamation-triangle" [acceptLabel]="'מחק'"
+        [rejectLabel]="'ביטול'" [acceptButtonStyleClass]="'p-button-danger'" [rejectButtonStyleClass]="'p-button-text'">
+        <ng-template #message let-message>
+            <div class="flex flex-col items-center w-full gap-4">
+                <i [ngClass]="message.icon" class="!text-6xl text-primary-500"></i>
+                <p>{{ message.message }}</p>
+            </div>
+        </ng-template>
+    </p-confirmdialog>
+</div>

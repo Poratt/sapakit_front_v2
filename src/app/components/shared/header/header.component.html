@@ -1,0 +1,146 @@
+<!-- in header.component.html -->
+
+<div class="header">
+  <div class="header-left">
+    <div [class.active]="isMobileMenuOpen()" (click)="toggleMobileMenu()" [ngClass]="{ opened: isMobileMenuOpen() }"
+      aria-label="פתח/סגור תפריט" class="menu-btn">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+
+  <!-- <div class="header-center">
+    <a routerLink="/" class="logo-link">
+      <img src="assets/images/sapakit-logo-2.png" alt="Sapakit Logo" class="header-logo">
+    </a>
+  </div> -->
+
+  <div class="header-right">
+    <!-- פעמון תובנות AI -->
+    <div class="insights-bell" (click)="insightsPopover.toggle($event)">
+      <i class="pi pi-sparkles p-overlay-badge">
+        @if (insightStore.hasUnread()) {
+        <p-badge size="small" [value]="insightStore.unreadCount().toString()" severity="danger"></p-badge>
+        }
+      </i>
+    </div>
+
+    <!-- פעמון הזמנות להיום -->
+    <div class="today-orders" (click)="todayOrdersPopup.toggle($event)">
+      <i class="pi pi-bell p-overlay-badge">
+        @if (stats().dueToday > 0) {
+        <p-badge size="small" [value]="stats().dueToday.toString()" severity="danger"></p-badge>
+        }
+      </i>
+    </div>
+
+    <!-- פופאובר תובנות -->
+    <p-popover #insightsPopover appendTo="body" styleClass="insights-popover">
+      <ng-template pTemplate="content">
+        <div class="insights-panel">
+          <i class="pi pi-sparkles gradient-icon"></i>
+          <div class="panel-header">
+            <h3>תובנות AI חדשות</h3>
+            <p-button class="material-symbols-rounded" size="small" [rounded]="true" severity="secondary"
+              (click)="generateInsights()" pTooltip="צור תובנות">add_chart</p-button>
+          </div>
+          <div class="panel-content">
+            @if (insightStore.hasUnread()) {
+            @for (insight of insightStore.insights(); track insight.id) {
+            <div class="insight-item">
+              <div class="hover-wrapper">
+                <div class="item-header">
+                  <div class="flex items-center gap-2">
+                    <!-- <i class="item-icon pi pi-info-circle"></i> -->
+                    <span class="item-emoji">{{ insight.emoji }}</span>
+                    <strong class="item-title">{{ insight.title }}</strong>
+                  </div>
+                  <p-button icon="pi pi-check" size="small" [rounded]="true" severity="secondary"
+                    (click)="markAsRead(insight)" pTooltip="סמן כנקרא"></p-button>
+                </div>
+                <p class="item-text">{{ insight.content }}</p>
+              </div>
+            </div>
+            }
+            } @else {
+            <div class="empty-message">
+              <i class="pi pi-check-circle"></i>
+              <p>הכל מעודכן!</p>
+              <span>אין תובנות חדשות כרגע.</span>
+            </div>
+            }
+          </div>
+        </div>
+      </ng-template>
+    </p-popover>
+
+    <!-- פופאובר הזמנות להיום -->
+    <p-popover #todayOrdersPopup appendTo="body" styleClass="today-orders-popover">
+      <ng-template pTemplate="content">
+        <div class="insights-panel">
+          <div class="panel-header">
+            <h3>הזמנות לביצוע היום</h3>
+          </div>
+          <div class="panel-content">
+            @if (stats().dueToday && stats().dueToday > 0) {
+            <p-table [value]="orders()" [scrollable]="true" scrollHeight="400px" size="small">
+              <ng-template pTemplate="header">
+                <tr>
+                  <th>ספק</th>
+                  <th>תאריך הזמנה</th>
+                  <th>סטטוס</th>
+                  <th></th>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-order>
+                <tr [class.virtual-order]="order.status === OrderStatus.Today">
+                  <td>{{ order.supplierName }}</td>
+                  <td>{{ order.date | hebrewDate }}</td>
+                  <td>
+                    <app-badge [enumValue]="order.status" [dataArray]="orderStatusData"
+                      [label]="order.status | orderStatusLabel">
+                    </app-badge>
+                  </td>
+                  <td>
+                    <div class="actions-cell">
+                      <p-button [pTooltip]="order.id ? 'צפייה / עריכה' : 'צור הזמנה'" tooltipPosition="top"
+                        [icon]="order.id ? 'pi pi-pen-to-square' : 'pi pi-expand'" (click)="viewOrder(order, todayOrdersPopup)"
+                        size="small" [rounded]="true" severity="secondary">
+                      </p-button>
+
+                    </div>
+                  </td>
+                </tr>
+              </ng-template>
+            </p-table>
+            } @else {
+            <div class="empty-message">
+              <i class="pi pi-check-circle"></i>
+              <p>אין הזמנות לביצוע להיום!</p>
+            </div>
+            }
+          </div>
+        </div>
+      </ng-template>
+    </p-popover>
+
+    <!-- מידע משתמש -->
+    @if (!isGuest() && username()) {
+    <div class="user-info" (click)="userPopover.toggle($event)">
+      <div class="user-avatar">{{ username() ? username()![0].toUpperCase() : '' }}</div>
+      <span class="username hide-max-sm">{{ username() }}</span>
+      <i class="pi pi-chevron-down"></i>
+    </div>
+    <p-popover #userPopover appendTo="body" styleClass="user-popover">
+      <ng-template pTemplate="content">
+        <div class="user-panel">
+          <div class="action-item" (click)="userPopover.hide()"><i class="pi pi-user"></i><span>פרופיל</span></div>
+          <div class="action-item" (click)="userPopover.hide()"><i class="pi pi-cog"></i><span>הגדרות</span></div>
+          <div class="separator"></div>
+          <div class="action-item logout" (click)="logout(); userPopover.hide()"><i
+              class="pi pi-sign-out"></i><span>יציאה</span></div>
+        </div>
+      </ng-template>
+    </p-popover>
+    }
+  </div>
+</div>

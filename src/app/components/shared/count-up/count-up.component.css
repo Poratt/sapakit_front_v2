@@ -1,0 +1,224 @@
+.count-up {
+	display: inline-block;
+	font-variant-numeric: tabular-nums;
+	font-feature-settings: 'tnum';
+	transition: all 0.3s ease;
+	position: relative;
+	font-weight: 600;
+	white-space: nowrap;
+}
+
+/* אנימציית כניסה - רק בטעינה ראשונה */
+.count-up.first-load {
+	animation: fadeInUp 0.5s ease-out;
+}
+
+@keyframes fadeInUp {
+	from {
+		opacity: 0;
+		transform: translateY(20px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+/* גדלים שונים */
+.count-up[data-size='small'] {
+	font-size: 0.875rem;
+	line-height: 1.25rem;
+}
+
+.count-up[data-size='medium'] {
+	font-size: 1.5rem;
+	line-height: 2rem;
+}
+
+.count-up[data-size='large'] {
+	font-size: 2.25rem;
+	line-height: 2.5rem;
+}
+
+.count-up[data-size='xl'] {
+	font-size: 3rem;
+	line-height: 1;
+}
+
+/* נושאים/תמות */
+.count-up[data-theme='default'] {
+	color: #1f2937;
+}
+
+.count-up[data-theme='primary'] {
+	color: #3b82f6;
+	text-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
+}
+
+.count-up[data-theme='success'] {
+	color: #10b981;
+	text-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+}
+
+.count-up[data-theme='warning'] {
+	color: #f59e0b;
+	text-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+}
+
+.count-up[data-theme='danger'] {
+	color: #ef4444;
+	text-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+}
+
+.count-up[data-theme='gradient'] {
+	background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+}
+
+.count-up[data-theme='neon'] {
+	color: #00ffff;
+	text-shadow:
+		0 0 5px #00ffff,
+		0 0 10px #00ffff,
+		0 0 15px #00ffff,
+		0 0 20px #00ffff;
+	animation: neon-pulse 2s infinite alternate;
+}
+
+@keyframes neon-pulse {
+	from {
+		text-shadow:
+			0 0 5px #00ffff,
+			0 0 10px #00ffff,
+			0 0 15px #00ffff,
+			0 0 20px #00ffff;
+	}
+	to {
+		text-shadow:
+			0 0 2px #00ffff,
+			0 0 5px #00ffff,
+			0 0 8px #00ffff,
+			0 0 12px #00ffff;
+	}
+}
+
+/* אנימציות במהלך הספירה */
+.count-up.counting {
+	transform: scale(1.05);
+}
+
+.count-up.counting[data-theme='primary'] {
+	animation: counting-pulse 0.5s ease-in-out infinite alternate;
+}
+
+.count-up.counting[data-theme='success'] {
+	animation: counting-glow 0.8s ease-in-out infinite alternate;
+}
+
+@keyframes counting-pulse {
+	from {
+		transform: scale(1.05);
+		opacity: 0.9;
+	}
+	to {
+		transform: scale(1.1);
+		opacity: 1;
+	}
+}
+
+@keyframes counting-glow {
+	from {
+		filter: brightness(1);
+	}
+	to {
+		filter: brightness(1.2);
+	}
+}
+
+/* אנימציה כשהספירה מסתיימת */
+.count-up.completed {
+	animation: completion-bounce 0.6s ease-out;
+}
+
+@keyframes completion-bounce {
+	0% {
+		transform: scale(1);
+	}
+	50% {
+		transform: scale(1.15);
+	}
+	100% {
+		transform: scale(1);
+	}
+}
+
+/* הוספת אפקט צל */
+.count-up[data-theme='shadow'] {
+	color: #1f2937;
+	text-shadow:
+		0 1px 0 #ccc,
+		0 2px 0 #c9c9c9,
+		0 3px 0 #bbb,
+		0 4px 0 #b9b9b9,
+		0 5px 0 #aaa,
+		0 6px 1px rgba(0, 0, 0, 0.1),
+		0 0 5px rgba(0, 0, 0, 0.1),
+		0 1px 3px rgba(0, 0, 0, 0.3),
+		0 3px 5px rgba(0, 0, 0, 0.2),
+		0 5px 10px rgba(0, 0, 0, 0.25);
+}
+
+/* מצב כהה */
+.count-up[data-theme='dark'] {
+	color: #f8fafc;
+	text-shadow: 0 0 10px rgba(248, 250, 252, 0.5);
+}
+
+/* אפקט מטריקס */
+.count-up[data-theme='matrix'] {
+	color: #00ff00;
+	font-family: 'Courier New', monospace;
+	text-shadow: 0 0 10px #00ff00;
+	animation: matrix-flicker 0.15s infinite linear;
+}
+
+@keyframes matrix-flicker {
+	0%,
+	100% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0.8;
+	}
+}
+
+/* responsive */
+@media (max-width: 768px) {
+	.count-up[data-size='large'] {
+		font-size: 1.875rem;
+		line-height: 2.25rem;
+	}
+
+	.count-up[data-size='xl'] {
+		font-size: 2.25rem;
+		line-height: 2.5rem;
+	}
+}
+
+/* אפקט loading */
+.count-up.loading {
+	opacity: 0.6;
+	animation: loading-pulse 1s infinite;
+}
+
+@keyframes loading-pulse {
+	0%,
+	100% {
+		opacity: 0.6;
+	}
+	50% {
+		opacity: 1;
+	}
+}

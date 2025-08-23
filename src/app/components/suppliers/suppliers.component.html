@@ -1,0 +1,114 @@
+<div class="p-responsive">
+    @switch (pageState()) {
+    @case(PageStates().Loading) {
+    <app-loader></app-loader>
+    }
+
+    @case(PageStates().Error) {
+    <div @fadeIn400 class="error-card-container">
+        <div class="error-card">
+            <div class="error-icon-wrapper">
+                <span class="material-symbols-rounded">cloud_off</span>
+            </div>
+            <h3 class="error-title">אופס, משהו השתבש</h3>
+            <button (click)="refreshData()" class="primary md retry-button">
+                <span class="material-symbols-rounded">refresh</span>
+                <span>נסה שוב</span>
+            </button>
+        </div>
+    </div>
+    }
+
+    @case(PageStates().Ready) {
+    <div @fadeIn400 class="flex flex-col gap-4 w-full h-full">
+        <h1 class="main-title">ניהול ספקים</h1>
+
+
+        @if (filteredSuppliers().length > 0) {
+        <div class="actions-bar">
+            <span class="search-box">
+                <i class="pi pi-search"></i>
+                <input pInputText type="text" placeholder="חיפוש ספקים..." [(ngModel)]="searchQuery">
+            </span>
+            <div class="flex gap-2">
+                <button type="button" (click)="exportSuppliers()" class="empty md"
+                    [disabled]="filteredSuppliers().length === 0" pTooltip="ייצוא רשימת הספקים לקובץ אקסל"
+                    tooltipPosition="top">
+                    <span class="material-symbols-rounded">download</span>
+                    <span>ייצוא לאקסל</span>
+                </button>
+
+                <button type="button" (click)="addSupplier()" class="primary md">
+                    <span class="material-symbols-rounded">add</span>
+                    <span>הוסף ספק</span>
+                </button>
+            </div>
+        </div>
+        <p-table @fadeIn400 [value]="filteredSuppliers()" responsiveLayout="stack" [breakpoint]="'768px'"
+            [rowHover]="true">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th pSortableColumn="name">שם <p-sortIcon field="name"></p-sortIcon></th>
+                    <th pSortableColumn="status">סטטוס <p-sortIcon field="status"></p-sortIcon></th>
+                    <th pSortableColumn="phone">טלפון <p-sortIcon field="phone"></p-sortIcon></th>
+                    <th pSortableColumn="orderType">סוג הזמנה <p-sortIcon field="orderType"></p-sortIcon></th>
+                    <th>מועדי הזמנה</th>
+                    <th pSortableColumn="reminderType">תזכורת <p-sortIcon field="reminderType"></p-sortIcon></th>
+                    <th></th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-supplier>
+                <tr [routerLink]="['/suppliers', supplier.id]">
+                    <td class="name" data-label="שם">{{ supplier.name }}</td>
+                    <td data-label="סטטוס">
+                        <app-badge [enumValue]="supplier.status" [dataArray]="statusData"></app-badge>
+                    </td>
+                    <td data-label="טלפון">{{ supplier.phone }}</td>
+                    <td data-label="סוג הזמנה">
+                        <app-badge [enumValue]="supplier.orderType" [dataArray]="orderTypeData"></app-badge>
+                    </td>
+                    <td data-label="מועדי הזמנה">
+                        @for (day of supplier.orderDays; track day) {
+                        <span class="day-chip">{{ day | hebrewDay }}</span>
+                        }
+                        @for (day of supplier.orderDates; track day) {
+                        <span class="day-chip">{{ day | number : '2.0' }}</span>
+                        }
+                    </td>
+                    <td data-label="תזכורת">
+                        <app-badge [enumValue]="supplier.reminderType" [dataArray]="reminderTypeData"></app-badge>
+                    </td>
+                    <td data-label="">
+                        <div class="actions-cell">
+                            <p-button tooltipPosition="top" pTooltip="לדף הספק" icon="pi pi-external-link"
+                                [routerLink]="['/suppliers', supplier.id]" size="small" [rounded]="true"
+                                severity="secondary"></p-button>
+                            <p-button tooltipPosition="top" pTooltip="עריכה" icon="pi pi-pen-to-square"
+                                (click)="editSupplier(supplier)" size="small" [rounded]="true"
+                                severity="secondary"></p-button>
+                            <p-button tooltipPosition="top" pTooltip="מחיקה" icon="pi pi-trash" class="delete-btn"
+                                (click)="confirmDelete(supplier)" size="small" [rounded]="true"
+                                severity="danger"></p-button>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td colspan="7" class="empty-message">לא נמצאו תוצאות</td>
+                </tr>
+            </ng-template>
+        </p-table>
+        }
+        @else {
+        <div class="empty-state">
+            <i class="pi pi-box"></i>
+            <p>אין ספקים זמינים</p>
+            <p-button label="הוסף ספק חדש" (onClick)="addSupplier()"></p-button>
+        </div>
+        }
+    </div>
+    }
+    }
+
+</div>

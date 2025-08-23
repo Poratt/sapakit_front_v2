@@ -1,0 +1,70 @@
+.actions-cell {
+	/* max-width: 120px; */
+	overflow: visible; /* זה הפתרון! */
+	position: relative;
+}
+
+.action-buttons {
+	display: flex;
+	gap: 8px;
+	transition: transform 0.3s ease;
+}
+
+.delete-confirmation {
+	position: absolute;
+	top: 50%;
+	left: 0;
+	right: 0;
+	transform: translateY(-50%) translateX(100%);
+	background: #fff;
+	border: 1px solid #e0e0e0;
+	border-radius: 4px;
+	padding: 8px 12px;
+	white-space: nowrap;
+	font-size: 12px;
+	color: #666;
+	transition: transform 0.3s ease;
+	box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+	z-index: 10;
+}
+
+.delete-confirmation.show {
+	transform: translateY(-50%) translateX(0);
+}
+
+.delete-confirmation.show ~ .action-buttons {
+	transform: translateX(100%);
+}
+
+.confirmation-actions {
+	display: flex;
+	gap: 8px;
+	margin-top: 8px;
+}
+
+.confirm-btn, .cancel-btn {
+	padding: 4px 8px;
+	border: none;
+	border-radius: 3px;
+	cursor: pointer;
+	font-size: 11px;
+	transition: background-color 0.2s ease;
+}
+
+.confirm-btn {
+	background: #dc3545;
+	color: white;
+}
+
+.confirm-btn:hover {
+	background: #c82333;
+}
+
+.cancel-btn {
+	background: #6c757d;
+	color: white;
+}
+
+.cancel-btn:hover {
+	background: #5a6268;
+}

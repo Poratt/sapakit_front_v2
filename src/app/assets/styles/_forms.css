@@ -1,0 +1,226 @@
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+    padding: 4px;
+
+
+}
+
+.flex-wrap-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    min-width: 0;
+    gap: 12px;
+    width: 100%;
+    min-height: 45px;
+}
+
+.flex-wrap-item {
+    flex-grow: 1;
+    min-width: 10px;
+    width: 180px;
+    position: relative;
+    margin-bottom: 0.35rem;
+    display: flex;
+    flex-direction: column;
+
+    &.half-width {
+        width: calc(50% - 12px);
+    }
+
+    >input,
+    >.p-select {
+        width: 100%;
+    }
+}
+
+/* .form-field {
+    position: relative;
+    margin-bottom: 0.35rem;
+    display: flex;
+    flex-direction: column;
+
+    &.full-width {
+        grid-column: span 2;
+    }
+} */
+
+label {
+    display: block;
+    margin-bottom: 2px;
+    font-weight: 500;
+    color: var(--grey-800);
+    font-size: 0.75rem;
+}
+
+.error-message {
+    @starting-style {
+        opacity: 0;
+        width: 0;
+    }
+
+    overflow: hidden;
+    white-space: nowrap;
+    width: 100%;
+    transition: 1s ease-in-out all;
+    color: var(--red-500);
+    font-size: 0.65rem;
+    position: absolute;
+    bottom: -16px;
+    right: 4px;
+}
+
+.search-box {
+    display: flex;
+    align-items: center;
+    background: var(--grey-10);
+    padding: 0 0.5rem;
+    border: 1px solid var(--grey-200);
+    width: 100%;
+    max-width: 250px;
+    border-radius: 24px !important;
+    &:focus-within,
+    &:active{
+        border-color: var(--primary-200) !important;
+        box-shadow: 0 4px 12px var(--primary-50) !important;
+        i {
+            color: var(--primary-300);
+            margin-left: 0.25rem;
+            transform: rotateZ(90deg)
+        }
+    }
+    
+    i {
+        transition: all 0.2s ease-in-out !important;
+        color: var(--grey-500);
+        margin-left: 0.25rem;
+    }
+
+    input {
+        border: none;
+        outline: none;
+        background: transparent;
+        width: 100%;
+    }
+
+    .p-inputtext {
+        box-shadow: none !important;
+        border: none !important;
+        background: transparent !important;
+    }
+}
+
+
+
+
+
+
+.p-inputnumber {
+    /* Container styling */
+    display: inline-flex;
+    position: relative;
+    font-family: inherit;
+    height: 100%;
+}
+
+.p-inputnumber-input {
+    /* Input field styling */
+    border: 1px solid var(--grey-300);
+    border-radius: 8px;
+    padding: 0.6rem 0.8rem;
+    text-align: center;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    min-width: 3rem;
+    /* background: var(--white, #ffffff); */
+    color: var(--grey-800);
+    outline: none;
+    position: relative;
+
+    /* Modern focus state */
+    &:focus {
+        border-color: var(--primary-500);
+        box-shadow: 0 0 0 2px rgba(var(--primary-500-rgb), 0.15);
+    }
+
+    /* Hover state */
+    &:hover:not(:focus) {
+        border-color: var(--grey-400);
+    }
+
+    .p-inputnumber-stacked.p-inputnumber-button-group {
+        width: 100%;
+    }
+
+    .p-inputnumber-stacked.p-inputnumber-increment-button {
+        position: absolute;
+        left: 0;
+    }
+
+    .p-inputnumber-stacked.p-inputnumber-decrement-button {
+        position: absolute;
+        right: 0;
+    }
+}
+
+.p-inputnumber-button {
+    /* Button styling */
+    background: var(--primary-50);
+    border: 1px solid var(--primary-100);
+    border-radius: 8px;
+    color: var(--primary-700);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    margin: 0 0.25rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    /* Modern hover state */
+    &:hover {
+        background: var(--primary-100);
+        color: var(--primary-800);
+    }
+
+    /* Active state with subtle feedback */
+    &:active {
+        transform: scale(0.92);
+        background: var(--primary-200);
+    }
+}
+
+/* Animation for value changes */
+@keyframes subtle-pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(var(--primary-500-rgb), 0.3);
+    }
+
+    70% {
+        box-shadow: 0 0 0 6px rgba(var(--primary-500-rgb), 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(var(--primary-500-rgb), 0);
+    }
+}
+
+.p-inputnumber.ng-dirty .p-inputnumber-input {
+    animation: subtle-pulse 0.5s ease;
+}
+
+/* Classic touch with subtle texture */
+.p-inputnumber::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: linear-gradient(to bottom,
+            rgba(255, 255, 255, 0.03),
+            rgba(0, 0, 0, 0.02));
+    border-radius: 8px;
+    z-index: 1;
+}

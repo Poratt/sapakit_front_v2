@@ -1,0 +1,79 @@
+<div class="login-page">
+    <!-- רקע דינמי זהה -->
+    <div class="background-shapes">
+        <div class="shape shape1"></div>
+        <div class="shape shape2"></div>
+        <div class="shape shape3"></div>
+    </div>
+
+    <!-- כרטיס הרשמה -->
+    <div class="card register-card">
+        <div class="card-header">
+            <img src="../../../app/assets/images/sapakit-logo-2.png" alt="Sapakit Logo" class="logo-image">
+            <h1 class="title">יצירת חשבון חדש</h1>
+            <p class="subtitle">הצטרף ל-Sapakit והתחל לנהל את ההזמנות שלך בחכמה</p>
+        </div>
+
+        <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+            <div class="form-content">
+                <div class="form-field">
+                    <label for="name">שם מלא</label>
+                    <span class="p-input-icon-left w-full">
+                        <i class="pi pi-user"></i>
+                        <input pInputText id="name" formControlName="name" placeholder="ישראל ישראלי" />
+                    </span>
+                    @if (name.touched && name.hasError('required')) {
+                    <small class="error-message">יש להזין שם מלא</small>
+                    }
+                </div>
+
+                <div class="form-field">
+                    <label for="email">כתובת אימייל</label>
+                    <span class="p-input-icon-left w-full">
+                        <i class="pi pi-envelope"></i>
+                        <input pInputText id="email" formControlName="email" placeholder="you@example.com" />
+                    </span>
+                    @if (email.touched && email.invalid) {
+                    <small class="error-message">
+                        @if (email.hasError('required')) { יש להזין כתובת אימייל }
+                        @if (email.hasError('email')) { כתובת האימייל אינה תקינה }
+                    </small>
+                    }
+                </div>
+
+                <div class="form-field">
+                    <label for="password">סיסמה</label>
+                    <p-password id="password" formControlName="password" [feedback]="true" [toggleMask]="true"
+                        placeholder="לפחות 6 תווים"></p-password>
+                    @if (password.touched && password.invalid) {
+                    <small class="error-message">
+                        @if (password.hasError('required')) { יש להזין סיסמה }
+                        @if (password.hasError('minlength')) { הסיסמה חייבת להכיל לפחות 6 תווים }
+                    </small>
+                    }
+                </div>
+
+                <div class="form-field">
+                    <label for="confirmPassword">אימות סיסמה</label>
+                    <p-password id="confirmPassword" formControlName="confirmPassword" [feedback]="false"
+                        [toggleMask]="true" placeholder="הקלד שוב את הסיסמה"></p-password>
+                    @if (registerForm.hasError('mismatch') && confirmPassword.touched) {
+                    <small class="error-message">הסיסמאות אינן תואמות</small>
+                    }
+                </div>
+
+                <button pButton type="submit" [loading]="loading()" class="w-full justify-center mt-2">
+                    <span class="p-button-label">יצירת חשבון</span>
+                </button>
+            </div>
+        </form>
+
+        <div class="card-footer">
+            <p>כבר יש לך חשבון? <a routerLink="/login">התחבר</a></p>
+        </div>
+    </div>
+
+    <div class="footer-text" dir="ltr">
+        &copy; {{ currentYear }} Sapakit. All rights reserved.
+    </div>
+</div>

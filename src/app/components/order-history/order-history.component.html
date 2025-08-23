@@ -1,0 +1,287 @@
+<div class="p-responsive">
+  @switch (pageState()) {
+  @case (PageStates().Loading) {
+  <app-loader></app-loader>
+  }
+  @case (PageStates().Error) {
+  <div @fadeIn400 class="error-card-container">
+    <div class="error-card">
+      <div class="error-icon-wrapper">
+        <span class="material-symbols-rounded">cloud_off</span>
+      </div>
+      <h3 class="error-title">אופס, משהו השתבש</h3>
+      <button (click)="refreshData()" class="primary md retry-button">
+        <span class="material-symbols-rounded">refresh</span>
+        <span>נסה שוב</span>
+      </button>
+    </div>
+  </div>
+  }
+  @case (PageStates().Ready) {
+  <div @fadeIn400 class="flex flex-col gap-4 w-full h-full">
+    <div class="flex gap-2 items-center">
+      <i class="pi pi-history text-xl"></i>
+      <span class="main-title">היסטורית הזמנות</span>
+    </div>
+    <div class="flex flex-col gap-1">
+
+      <div class="actions-bar">
+        <div class="desktop-row">
+          <span class="supplier-select">
+            <p-select id="supplierId" [ngModel]="supplierId()" (ngModelChange)="supplierId.set($event)"
+              [options]="suppliers()" optionLabel="name" optionValue="id" styleClass="w-full md:w-64"
+              placeholder="בחר ספק" [appendTo]="'body'" [showClear]="true" [filter]="suppliers().length > 10">
+            </p-select>
+          </span>
+          <div class="flex gap-2 items-center select-buttons-desktop">
+            <p-selectButton class="custom sm" [options]="tabOptions" [ngModel]="selectedTab()"
+              (ngModelChange)="selectedTab.set($event)" optionLabel="label" optionValue="value" [allowEmpty]="false"
+              size="small">
+              <ng-template let-item pTemplate="item">
+                <div class="flex flex-col  items-center gap-0.5">
+                  <span class="material-symbols-rounded">{{ item.icon }}</span>
+                  <span class="text-[10px] leading-2 text-center">{{ item.label }}</span>
+                </div>
+              </ng-template>
+            </p-selectButton>
+            <p-selectButton class="custom sm" [options]="chartMetricOptions" [ngModel]="selectedChartMetric()"
+              (ngModelChange)="selectedChartMetric.set($event)" optionLabel="label" optionValue="value"
+              [allowEmpty]="false" size="small">
+              <ng-template let-item pTemplate="item">
+                <div class="flex flex-col  items-center gap-0.5">
+                  <span class="material-symbols-rounded">{{ item.icon }}</span>
+                  <span class="text-[10px] leading-2 text-center">{{ item.label }}</span>
+                </div>
+              </ng-template>
+            </p-selectButton>
+            <p-selectButton class="custom sm" [options]="viewPropsOptions" [ngModel]="viewProps()"
+              (ngModelChange)="viewProps.set($event)" optionLabel="label" optionValue="value" [allowEmpty]="false">
+              <ng-template let-item pTemplate="item">
+                <div class="flex flex-col  items-center gap-0.5">
+                  <span class="material-symbols-rounded">{{ item.icon }}</span>
+                  <span class="text-[10px] leading-2 text-center">{{ item.label }}</span>
+                </div>
+              </ng-template>
+            </p-selectButton>
+            <p-selectButton class="custom sm" [options]="viewModeOptions" [ngModel]="viewMode()"
+              (ngModelChange)="viewMode.set($event)" optionLabel="label" optionValue="value" [allowEmpty]="false">
+              <ng-template let-item pTemplate="item">
+                <div class="flex flex-col  items-center gap-0.5">
+                  <span class="material-symbols-rounded">{{ item.icon }}</span>
+                  <span class="text-[10px] leading-2 text-center">{{ item.label }}</span>
+                </div>
+              </ng-template>
+            </p-selectButton>
+          </div>
+
+          <div class="flex gap-0.5 items-center justify-center pb-1">
+            <p-button icon="pi pi-chevron-right" class="p-button-xs" [rounded]="true" [text]="true" severity="secondary"
+              tooltipPosition="top" [pTooltip]="viewMode() === 'weekly' ? 'שבוע קודם' : 'חודש קודם'"
+              (onClick)="prevPeriod()" [disabled]="isFetching()">
+            </p-button>
+            <span class="text-xs pt-1 font-medium text-gray-600 whitespace-nowrap">
+              {{ formatDisplayDate(startDate()) }} - {{ formatDisplayDate(endDate()) }}
+            </span>
+            <p-button icon="pi pi-chevron-left" class="p-button-xs" [rounded]="true" [text]="true" severity="secondary"
+              tooltipPosition="top" [pTooltip]="viewMode() === 'weekly' ? 'שבוע הבא' : 'חודש הבא'"
+              (onClick)="nextPeriod()" [disabled]="isFetching()">
+            </p-button>
+          </div>
+        </div>
+        <div class="mobile-row">
+          <div class="flex gap-2 items-center select-buttons-mobile">
+            <p-selectButton class="custom sm" [options]="tabOptions" [ngModel]="selectedTab()"
+              (ngModelChange)="selectedTab.set($event)" optionLabel="label" optionValue="value" [allowEmpty]="false"
+              size="small">
+              <ng-template let-item pTemplate="item">
+                <div class="flex flex-col  items-center gap-0.5">
+                  <span class="material-symbols-rounded">{{ item.icon }}</span>
+                  <span class="text-[10px] leading-2 text-center">{{ item.label }}</span>
+                </div>
+              </ng-template>
+            </p-selectButton>
+            <p-selectButton class="custom sm" [options]="chartMetricOptions" [ngModel]="selectedChartMetric()"
+              (ngModelChange)="selectedChartMetric.set($event)" optionLabel="label" optionValue="value"
+              [allowEmpty]="false" size="small">
+              <ng-template let-item pTemplate="item">
+                <div class="flex flex-col  items-center gap-0.5">
+                  <span class="material-symbols-rounded">{{ item.icon }}</span>
+                  <span class="text-[10px] leading-2 text-center">{{ item.label }}</span>
+                </div>
+              </ng-template>
+            </p-selectButton>
+            <p-selectButton class="custom sm" [options]="viewPropsOptions" [ngModel]="viewProps()"
+              (ngModelChange)="viewProps.set($event)" optionLabel="label" optionValue="value" [allowEmpty]="false">
+              <ng-template let-item pTemplate="item">
+                <div class="flex flex-col  items-center gap-0.5">
+                  <span class="material-symbols-rounded">{{ item.icon }}</span>
+                  <span class="text-[10px] leading-2 text-center">{{ item.label }}</span>
+                </div>
+              </ng-template>
+            </p-selectButton>
+            <p-selectButton class="custom sm" [options]="viewModeOptions" [ngModel]="viewMode()"
+              (ngModelChange)="viewMode.set($event)" optionLabel="label" optionValue="value" [allowEmpty]="false">
+              <ng-template let-item pTemplate="item">
+                <div class="flex flex-col  items-center gap-0.5">
+                  <span class="material-symbols-rounded">{{ item.icon }}</span>
+                  <span class="text-[10px] leading-2 text-center">{{ item.label }}</span>
+                </div>
+              </ng-template>
+            </p-selectButton>
+          </div>
+        </div>
+      </div>
+
+      <mat-tab-group dir="rtl" class="no-labels" disableRipple="true"
+        [selectedIndex]="selectedTab() === 'table' ? 0 : 1">
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <span class="material-symbols-rounded">table</span>
+            תצוגת טבלה
+          </ng-template>
+          <div class="p-2">
+            @if (isFetching() && products().length === 0) {
+            <app-loader></app-loader>
+            }
+            @else if (!supplierId() && suppliers().length > 0) {
+            <div class="empty-state">
+              <i class="pi pi-info-circle text-primary-500"></i>
+              <p>אנא בחר ספק להצגת היסטוריה.</p>
+            </div>
+            }
+            @else if (products().length === 0) {
+            <div class="empty-state border border-dashed border-gray-300 rounded-md p-8">
+              <i class="pi pi-search text-3xl text-gray-400"></i>
+              <p class="text-lg text-gray-600 mt-2">אין הזמנות להצגה עבור התקופה והספק הנבחרים.</p>
+              <p class="text-sm text-gray-500">נסה לשנות תאריכים או לבחור ספק אחר.</p>
+            </div>
+            }
+            @else {
+            <p-table [value]="products()" responsiveLayout="scroll" scrollHeight="400px" size="small" class="min-h-80">
+              <ng-template pTemplate="header">
+                <tr>
+                  <th class="product-name">מוצר</th>
+                  @for (date of dates(); track date.date) {
+                  <th [ngClass]="{
+                            'today-column': date.isToday,
+                            'week-odd': date.weekNumber % 2 !== 0,
+                            'week-even': date.weekNumber % 2 === 0
+                          }" class="text-center w-20">
+                    <div class="flex gap-1 items-baseline ">
+                      <p class="text-xs font-normal">{{ date.hebrewDay }}</p>
+                      <p class="text-[10px]">{{ date.date | date : 'dd.MM' }}</p>
+                    </div>
+                  </th>
+                  }
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="body" let-product>
+                <tr>
+                  <td data-label="מוצר" class="product-name">{{ product.name }}</td>
+                  @for (date of dates(); track date.date) {
+                  <td [ngClass]="{
+                            'today-column td': date.isToday,
+                            'week-odd': date.weekNumber % 2 !== 0,
+                            'week-even': date.weekNumber % 2 === 0
+                          }" class="text-center"
+                    [attr.data-label]="date.date | date : 'dd.MM' + ' (' + date.hebrewDay + ')'">
+                    {{ getTableCellValue(product, date) }}
+                  </td>
+                  }
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="footer">
+                <tr>
+                  <td class="product-name">סה"כ</td>
+                  @for (date of dates(); track date.date) {
+                  <td [ngClass]="{
+                            'today-column td': date.isToday,
+                            'week-odd': date.weekNumber % 2 !== 0,
+                            'week-even': date.weekNumber % 2 === 0
+                          }" class="text-center">{{ getTotalForDate(date) }}</td>
+                  }
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="emptymessage">
+                <tr>
+                  <td [attr.colspan]="(dates().length || 0) + 1" class="empty-message text-center py-4">
+                    לא נמצאו פריטים בהזמנות עבור התקופה והספק הנבחרים.
+                  </td>
+                </tr>
+              </ng-template>
+            </p-table>
+            }
+          </div>
+        </mat-tab>
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <span class="material-symbols-rounded">bar_chart</span>
+            תצוגת גרף
+          </ng-template>
+          <div class="p-2">
+            @let data = chartData();
+            @if (isFetching() && products().length === 0) {
+            <app-loader></app-loader>
+            }
+            @else if (!supplierId() && suppliers().length > 0) {
+            <div class="empty-state">
+              <i class="pi pi-info-circle text-primary-500"></i>
+              <p>אנא בחר ספק להצגת היסטוריה.</p>
+            </div>
+            }
+            @else if (products().length === 0) {
+            <div class="empty-state border border-dashed border-gray-300 rounded-md p-8">
+              <i class="pi pi-search text-3xl text-gray-400"></i>
+              <p class="text-lg text-gray-600 mt-2">אין הזמנות להצגה עבור התקופה והספק הנבחרים.</p>
+              <p class="text-sm text-gray-500">נסה לשנות תאריכים או לבחור ספק אחר.</p>
+            </div>
+            }
+            @else if (data) {
+            <div class="card ">
+              <div class="flex justify-between items-start">
+                <p-selectButton class="custom sm" [options]="splitChartOptions()" [ngModel]="splitChartByProp()"
+                  (ngModelChange)="splitChartByProp.set($event)" optionLabel="label" optionValue="value"
+                  [allowEmpty]="false">
+                  <ng-template let-item pTemplate="item">
+                    <div class="flex flex-col  items-center gap-0.5">
+                      <span class="material-symbols-rounded text-xs">{{ item.icon }}</span>
+                      <span class="text-[10px] leading-2 text-center">{{ item.label }}</span>
+                    </div>
+                  </ng-template>
+                </p-selectButton>
+                <div class="flex flex-col items-end gap-2">
+                  <p-selectButton class="custom sm" [options]="chartTypeOptionsComputed()"
+                    [ngModel]="selectedChartType()" (ngModelChange)="onChartTypeChange($event)" optionLabel="label"
+                    optionValue="value" optionDisabled="disabled" [allowEmpty]="false" size="small">
+                    <ng-template let-item pTemplate="item">
+                      <div class="flex flex-col  items-center gap-0.5" [class.opacity-50]="item.disabled"
+                        [pTooltip]="item.tooltip" [tooltipPosition]="'top'" [showDelay]="300">
+                        <span class="material-symbols-rounded">{{ item.icon }}</span>
+                        <span class="text-[10px] leading-2 text-center">{{ item.label }}</span>
+                      </div>
+                    </ng-template>
+                  </p-selectButton>
+                  <div *ngIf="!isCurrentSelectionValid()"
+                    class="flex items-center gap-1 text-xs text-amber-600 bg-amber-50 px-2 py-1 rounded-md">
+                    <span class="material-symbols-rounded text-sm">info</span>
+                    <span>עבר לגרף חלופי</span>
+                  </div>
+                </div>
+              </div>
+              <p-chart [type]="selectedChartType()" [data]="data" [options]="chartOptions()"></p-chart>
+            </div>
+            }
+            @else {
+            <div class="empty-state p-4 mt-4 text-sm">
+              <i class="pi pi-chart-line text-gray-400"></i>
+              <p>אין נתונים להצגה בגרף עבור בחירה זו.</p>
+            </div>
+            }
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    </div>
+  </div>
+  }
+  }
+</div>

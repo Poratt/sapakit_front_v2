@@ -1,0 +1,56 @@
+<div class="login-page">
+    <!-- רקע דינמי -->
+    <div class="background-shapes">
+        <div class="shape shape1"></div>
+        <div class="shape shape2"></div>
+        <div class="shape shape3"></div>
+    </div>
+
+    <!-- כרטיס הלוגין -->
+    <div class="card login-card">
+        <div class="card-header">
+            <img src="../../../app/assets/images/sapakit-logo-2.png" alt="Sapakit Logo" class="logo-image">
+            <h1 class="title">ברוכים הבאים ל-Sapakit</h1>
+            <p class="subtitle">הזן את פרטיך כדי להיכנס למערכת הניהול החכמה</p>
+        </div>
+
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+            <div class="form-content">
+                <div class="form-field">
+                    <label for="email">כתובת אימייל</label>
+                    <span class="p-input-icon-left w-full">
+                        <i class="pi pi-envelope"></i>
+                        <input pInputText id="email" formControlName="email" placeholder="you@example.com" />
+                    </span>
+                    @if (email.touched && email.invalid) {
+                    <small class="error-message">
+                        @if (email.hasError('required')) { יש להזין כתובת אימייל }
+                        @if (email.hasError('email')) { כתובת האימייל אינה תקינה }
+                    </small>
+                    }
+                </div>
+
+                <div class="form-field">
+                    <label for="password">סיסמה</label>
+                    <p-password id="password" formControlName="password" [feedback]="false" [toggleMask]="true"
+                        placeholder="••••••••"></p-password>
+                    @if (password.touched && password.hasError('required')) {
+                    <small class="error-message">יש להזין סיסמה</small>
+                    }
+                </div>
+
+                <button pButton type="submit" [loading]="loading()" class="w-full justify-center">
+                    <span class="p-button-label">התחברות</span>
+                </button>
+            </div>
+        </form>
+
+        <div class="card-footer">
+            <p>אין לך חשבון? <a routerLink="/register">הירשם עכשיו</a></p>
+        </div>
+    </div>
+
+    <div class="footer-text" dir="ltr">
+        &copy; {{ currentYear }} Sapakit. All rights reserved.
+    </div>
+</div>

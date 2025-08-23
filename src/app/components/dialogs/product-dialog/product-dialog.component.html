@@ -1,0 +1,90 @@
+<form [formGroup]="productForm" (ngSubmit)="onSave()">
+    <div class="flex flex-col gap-4">
+        
+        @if(f['id'].value !== 0){
+            <div class="flex w-full justify-end">
+                <div class="toggle-switch" [class.active]="f['status'].value === Status.Active" (click)="toggleStatus()">
+                    <input type="checkbox" formControlName="status" class="absolute w-full" />
+                    <label class="toggle-switch-text" [class.active]="f['status'].value === Status.Active">פעיל</label>
+                    <label class="toggle-switch-text" [class.inactive]="f['status'].value === Status.Inactive">לא פעיל</label>
+                </div>
+            </div>
+            }
+            
+        <div class="flex-wrap-wrapper">
+            <div class="flex-wrap-item half-width">
+                <label for="name">שם</label>
+                <input pInputText id="name" formControlName="name" />
+                @if (f['name'].touched && f['name'].hasError('required')) {
+                <small class="error-message">יש להזין שם המוצר</small>
+                }
+            </div>
+            <div class="flex-wrap-item half-width">
+                <label for="categoryId">קטגוריה</label>
+                <div class="flex items-center gap-2">
+                    <p-select id="categoryId" formControlName="categoryId" [options]="categories()" optionLabel="name"
+                        optionValue="id" styleClass="w-full" placeholder="בחר קטגוריה" [appendTo]="'body'">
+                        <ng-template #header>
+                            <div class="flex pt-1 px-1">
+                                <button class="custom-select-button" (click)="openCategoryDialog()" aria-label="ניהול קטגוריות">
+                                    <span class="pi pi-list"></span>
+                                    {{categories().length ? 'ניהול קטגוריות' : 'הוסף קטגוריה'}}
+                                </button>
+                            </div>
+                        </ng-template>
+                        <ng-template #empty>
+                            <div class="flex items-center justify-center gap-1">
+                                <span class="material-symbols-rounded !text-base">report</span>
+                                <span class="text-xs">טרם הוזנו קטגוריות</span>
+                            </div>
+                        </ng-template>
+                    </p-select>
+                </div>
+                @if (f['categoryId'].touched && f['categoryId'].hasError('required')) {
+                <small class="error-message">יש לבחור קטגוריה</small>
+                }
+            </div>
+        </div>
+        <div class="flex-wrap-wrapper">
+                <label for="package">אריזה</label>
+                <p-select id="package" formControlName="package" [options]="packageData" optionLabel="label"
+                    optionValue="enumValue" styleClass="w-full"></p-select>
+        </div>
+        <div class="flex-wrap-wrapper">
+            <div class="flex-wrap-item half-width">
+                <label for="cost">מחיר קניה</label>
+                <p-inputNumber id="cost" formControlName="cost" mode="currency" currency="ILS" locale="he-IL"
+                    [min]="0" placeholder="0" [showButtons]="true"></p-inputNumber>
+                @if (f['cost'].touched && f['cost'].hasError('min')) {
+                <small class="error-message">המחיר חייב להיות 0 או יותר</small>
+                }
+            </div>
+            <div class="flex-wrap-item half-width">
+                <label for="price">מחיר מכירה</label>
+                <p-inputNumber id="price" formControlName="price" mode="currency" currency="ILS" locale="he-IL"
+                    [min]="0" placeholder="0" [showButtons]="true"></p-inputNumber>
+                @if (f['price'].touched && f['price'].hasError('min')) {
+                <small class="error-message">המחיר חייב להיות 0 או יותר</small>
+                }
+            </div>
+        </div>
+        <div class="">
+            <label for="imageUrl">כתובת תמונה</label>
+            <input pInputText id="imageUrl" formControlName="imageUrl" />
+        </div>
+        <div class="">
+            <label for="comment">הערות</label>
+            <textarea class="w-full !px-6 !py-4" pTextarea id="comment" formControlName="comment" rows="4"></textarea>
+        </div>
+    </div>
+    <div class="dialog-footer">
+        <button type="button" (click)="onCancel()" class="empty md">
+                <span class="material-symbols-rounded">cancel</span>
+                <span>ביטול</span>
+            </button>
+            <button type="submit" class="primary md">
+                <span class="material-symbols-rounded">{{ f['id'].value == 0 ? 'add' : 'save' }}</span>
+                <span>{{ f['id'].value == 0 ? 'הוסף' : 'שמור שינויים' }}</span>
+            </button>
+    </div>
+</form>

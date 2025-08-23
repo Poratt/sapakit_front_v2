@@ -1,0 +1,136 @@
+<form [formGroup]="userForm" (ngSubmit)="onSave()">
+    <div class="flex flex-col gap-4">
+        @if(id.value !== 0){
+        <div class="flex w-full justify-end">
+            <div class="toggle-switch" [class.active]="status.value === Status.Active" (click)="toggleStatus()">
+                <input type="checkbox" formControlName="status" class="absolute w-full" />
+                <label class="toggle-switch-text" [class.active]="status.value === Status.Active">פעיל</label>
+                <label class="toggle-switch-text" [class.inactive]="status.value === Status.Inactive">לא פעיל</label>
+            </div>
+        </div>
+        }
+
+        <div class="flex flex-col relative">
+            <label for="email">אימייל*</label>
+            <input pInputText id="email" formControlName="email" #emailRef />
+            @if (email.touched && email.hasError('required')) {
+            <small class="error-message">יש להזין כתובת אימייל</small>
+            }
+            @if (email.touched && email.hasError('email')) {
+            <small class="error-message">כתובת אימייל לא תקינה</small>
+            }
+        </div>
+
+        <div class="flex-wrap-wrapper">
+            <div class="flex-wrap-item">
+                <label for="username">שם*</label>
+                <input pInputText id="username" formControlName="username" />
+                @if (username.touched && username.hasError('required')) {
+                <small class="error-message">יש להזין שם משתמש</small>
+                }
+            </div>
+            <div class="flex-wrap-item">
+                <label for="phone">טלפון</label>
+                <input pInputText id="phone" formControlName="phone" />
+                @if (phone.touched && phone.hasError('pattern')) {
+                <small class="error-message">מספר טלפון לא תקין (10-12 ספרות)</small>
+                }
+            </div>
+        </div>
+        <div class="flex-wrap-wrapper">
+            @if (id.value === 0) {
+            <div class="flex-wrap-item">
+                <label for="password">סיסמה* (מינימום 6 תווים)</label>
+                <p-password id="password" formControlName="password" [feedback]="true" [toggleMask]="true"></p-password>
+                @if (password.touched && password.hasError('required')) {
+                <small class="error-message">יש להזין סיסמה</small>
+                }
+                @if (password.touched && password.hasError('minlength')) {
+                <small class="error-message">הסיסמה חייבת להכיל לפחות 6 תווים</small>
+                }
+            </div>
+            }
+            <div class="flex-wrap-item">
+                <label for="role">תפקיד*</label>
+                <p-select id="role" formControlName="role" [options]="userRoleData" optionLabel="label"
+                    optionValue="enumValue" appendTo="body" styleClass="w-full">
+                    <ng-template #selectedItem let-selectedOption>
+                        <div class="flex items-center gap-2 text-xs" *ngIf="selectedOption">
+                            <span class="" [ngClass]="selectedOption.icon"></span>
+                            <span>{{ selectedOption.label }}</span>
+                        </div>
+                    </ng-template>
+                    <ng-template let-role #item>
+                        <div class="flex items-center gap-2 text-xs">
+                            <span class="" [ngClass]="role.icon"></span>
+                            <span>{{ role.label }}</span>
+                        </div>
+                    </ng-template>
+                </p-select>
+                @if (role.touched && role.hasError('required')) {
+                <small class="error-message">יש לבחור תפקיד</small>
+                }
+            </div>
+        </div>
+
+
+        <div class="flex  w-full justify-between">
+            <label for="image">תמונת פרופיל</label>
+            <div class="image-upload-container">
+                <!-- Drop Or Select image-->
+                @if (!imagePreview() && !isImageLoading()) {
+                <div class="image-dropzone fade-in" [class.dragging-over]="isDraggingOver()"
+                    (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)" (drop)="onDrop($event)">
+                    <i class="pi pi-image upload-icon"></i>
+                    <p class="upload-text">גרור תמונה לכאן או לחץ לבחירה</p>
+                    <p class="upload-hint">PNG, JPG או GIF</p>
+                    <p class="upload-hint">(עד 5MB)</p>
+                    <input type="file" id="image" class="file-input" accept="image/*"
+                        (change)="onImageUpload($event)" />
+                </div>
+                }
+
+                <!-- Loader -->
+                @if (isImageLoading()) {
+                <div class="image-loading fade-in">
+                    <p-progressSpinner strokeWidth="4" [style]="{ width: '50px', height: '50px' }"></p-progressSpinner>
+                </div>
+                }
+
+                <!-- Preview -->
+                @if (imagePreview() && !isImageLoading()) {
+                <div class="image-preview-container fade-in">
+                    <div class="image-preview-wrapper">
+                        <div class="image-preview">
+                            <img [src]="imagePreview()" alt="תמונת פרופיל" class="image" />
+                        </div>
+                        <div class="preview-info">
+                            <div class="file-details">
+                                <span class="file-name">{{ image.value?.name || 'תמונת פרופיל' }}</span>
+                                <span class="file-size">{{ image.value ? formatSize(image.value.size) : '' }}</span>
+                            </div>
+                            <div class="preview-actions">
+                                <button type="button" class="remove-button" (click)="onRemoveFile()">
+                                    <i class="pi pi-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                }
+            </div>
+        </div>
+
+
+        <div class="dialog-footer">
+            <button type="button" (click)="onCancel()" class="empty md">
+                <span class="material-symbols-rounded">cancel</span>
+                <span>ביטול</span>
+            </button>
+            <button type="submit" class="primary md">
+                <span class="material-symbols-rounded">{{ id.value == 0 ? 'add' : 'save' }}</span>
+                <span>{{ id.value == 0 ? 'הוסף' : 'שמור שינויים' }}</span>
+            </button>
+        </div>
+    </div>
+</form>

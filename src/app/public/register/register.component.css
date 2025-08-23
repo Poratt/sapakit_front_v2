@@ -1,0 +1,25 @@
+/* ייבא את הסגנון המשותף מדף הלוגין */
+@import '../login/login.component.css';
+
+/* כאן נוסיף רק את הדריסות הקטנות והייחודיות לדף ההרשמה, אם צריך */
+
+.register-card {
+  /* אם נרצה שהכרטיס יהיה קצת יותר רחב, למשל */
+  max-width: 420px; 
+  z-index: 2;
+}
+
+/* אפשר להוסיף אנימציה קצת שונה אם רוצים */
+.register-card {
+    animation: fadeInUp 0.7s ease-out;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* הפוך את תוכן הטופס לקצת יותר מרווח */
+.form-content {
+    gap: 1.25rem;
+}

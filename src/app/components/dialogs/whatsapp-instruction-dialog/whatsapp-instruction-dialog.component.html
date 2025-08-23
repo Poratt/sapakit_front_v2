@@ -1,0 +1,79 @@
+<!-- in whatsapp-instruction-dialog.component.html -->
+<div class="instruction-card" @fadeIn>
+
+	<!-- Header -->
+	<div class="instruction-header" [ngClass]="'header-' + config.data.method">
+		<div class="icon-wrapper">
+			@switch (config.data.method) {
+			@case ('whatsapp') { <i class="pi pi-whatsapp icon whatsapp-icon"></i> }
+			@case ('clipboard') { <i class="pi pi-copy icon clipboard-icon"></i> }
+			@case ('failed') { <i class="pi pi-times-circle icon error-icon"></i> }
+			}
+		</div>
+		<h3 class="instruction-title">
+			@switch (config.data.method) {
+			@case ('whatsapp') { <span>WhatsApp נפתח</span> }
+			@case ('clipboard') { <span>ההזמנה הועתקה</span> }
+			@case ('failed') { <span>שגיאה בשליחה</span> }
+			}
+		</h3>
+	</div>
+
+	<!-- Content -->
+	<div class="instruction-content">
+		@switch (config.data.method) {
+		@case ('whatsapp') {
+		<p class="main-instruction">
+			ההזמנה מוכנה לשליחה לספק <strong>{{config.data.supplierName || 'הספק'}}</strong>.
+		</p>
+		<ol class="steps">
+			<li class="step">
+				<span class="step-number">1</span>
+				<span>בדוק את פרטי ההזמנה בחלון שנפתח.</span>
+			</li>
+			<li class="step">
+				<span class="step-number">2</span>
+				<span>לחץ על כפתור <strong>השליחה</strong> ב-WhatsApp.</span>
+			</li>
+		</ol>
+		}
+		@case ('clipboard') {
+		<p class="main-instruction">
+			לא הצלחנו לפתוח את WhatsApp, אז ההזמנה <strong>הועתקה ללוח</strong>.
+		</p>
+		<ol class="steps">
+			<li class="step">
+				<span class="step-number">1</span>
+				<span>פתח את WhatsApp וחפש את <strong>{{config.data.supplierName || 'הספק'}}</strong>.</span>
+			</li>
+			<li class="step">
+				<span class="step-number">2</span>
+				<span>הדבק את ההודעה בשדה הטקסט ושלח.</span>
+			</li>
+		</ol>
+		}
+		@case ('failed') {
+		<p class="main-instruction error-text">
+			אירעה שגיאה ולא ניתן היה לפתוח את WhatsApp או להעתיק את ההודעה.
+		</p>
+		<p class="secondary-text">
+			אנא נסה שוב, או פתח את האפליקציה באופן ידני.
+		</p>
+		}
+		}
+	</div>
+
+	<!-- Actions -->
+	<div class="instruction-actions">
+		@if (config.data.method === 'failed') {
+		<button (click)="onRetry()" class="empty md">
+			<span class="material-symbols-rounded">refresh</span>
+			<span>נסה שוב</span>
+		</button>
+		}
+		<button (click)="onClose()" class="primary md">
+			<span class="material-symbols-rounded">check</span>
+			<span>הבנתי</span>
+		</button>
+	</div>
+</div>

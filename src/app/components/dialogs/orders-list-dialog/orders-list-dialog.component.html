@@ -1,0 +1,49 @@
+<div class="orders-list-container">
+	@if (isLoading()) {
+	<div class="p-4 text-center">טוען רשימת הזמנות...</div>
+	} @else if (orders().length > 0) {
+	<p-table [value]="orders()" [scrollable]="true" scrollHeight="400px" size="small">
+		<ng-template pTemplate="header">
+			<tr>
+				<th>ספק</th>
+				<th>תאריך הזמנה</th>
+				<th>סטטוס</th>
+				<th></th>
+			</tr>
+		</ng-template>
+		<ng-template pTemplate="body" let-order>
+			<tr [class.virtual-order]="order.status === OrderStatus.Today">
+				<td>{{ order.supplierName }}</td>
+				<td>{{ order.date | hebrewDate }}</td>
+				<td>
+					<app-badge [enumValue]="order.status" [dataArray]="orderStatusData"
+						[label]="order.status | orderStatusLabel">
+					</app-badge>
+				</td>
+				<td>
+					<div class="actions-cell"  >
+						<p-button
+						[pTooltip]="order.id ? 'צפייה / עריכה' : 'צור הזמנה'"
+						tooltipPosition="top"
+						[icon]="order.id ? 'pi pi-pen-to-square' : 'pi pi-expand'"
+						(click)="viewOrder(order)"
+						size="small"
+						[rounded]="true"
+						severity="secondary"
+						>
+						</p-button>
+
+					</div>
+				</td>
+			</tr>
+		</ng-template>
+	</p-table>
+	}
+	@else
+	{
+	<div class="empty-state">
+		<i class="pi pi-check-circle text-2xl text-green-500"></i>
+		<p>אין הזמנות מתאימות להצגה.</p>
+	</div>
+	}
+</div>
