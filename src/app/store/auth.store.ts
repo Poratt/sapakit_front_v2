@@ -1,3 +1,6 @@
+import { InsightStore } from './insight.store';
+import { ProductStore } from './product.store';
+import { CategoryStore } from './category.store';
 // src/app/store/auth.store.ts
 import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
 import { computed, inject } from '@angular/core';
@@ -7,6 +10,10 @@ import { catchError, firstValueFrom, of, pipe, switchMap, tap } from 'rxjs';
 import { UserRole } from '../common/enums/userRole.enum';
 import { NotificationService } from '../services/notification.service'; // ✅ ייבוא חסר
 import { User } from '../common/models/user';
+import { OrderStore } from './order.store';
+import { SupplierStore } from './supplier.store';
+import { UserStore } from './user.store';
+import { StatsStore } from './stats.store';
 
 // ✅ הגדרת ה-interface החסר
 interface LoginCredentials {
@@ -33,6 +40,7 @@ export const AuthStore = signalStore(
 		isAuthenticated: computed(() => !!user()),
 		isGuest: computed(() => !user()),
 		userRole: computed(() => user()?.role ?? UserRole.User),
+		isAdmin: computed(() => user()?.role == UserRole.Admin),
 	})),
 	withMethods(
 		(
@@ -40,6 +48,13 @@ export const AuthStore = signalStore(
 			// ✅ הזרקת כל השירותים הנדרשים
 			authService = inject(AuthService),
 			notificationService = inject(NotificationService),
+			supplierStore = inject(SupplierStore),
+			userStore = inject(UserStore),
+			orderStore = inject(OrderStore),
+			categoryStore = inject(CategoryStore),
+			productStore = inject(ProductStore),
+			statsStore = inject(StatsStore),
+			insightStore = inject(InsightStore),
 		) => {
 			// --- מתודות אסינכרוניות ---
 
@@ -68,14 +83,14 @@ export const AuthStore = signalStore(
 					try {
 						const user = await firstValueFrom(authService.getCurrentUser());
 						patchState(store, { user: user || null, isLoading: false });
-						if (user) {
-							console.log('APP_INITIALIZER: User session restored.');
-						} else {
-							console.log('APP_INITIALIZER: No active session.');
+					} catch (error: any) {
+						// ✅ הוסף הצגת הודעה כאן
+						const errorMessage = error.message || 'Error restoring session.';
+						patchState(store, { user: null, isLoading: false, error: errorMessage });
+						// הצג הודעה רק אם זו שגיאת רשת
+						if (error.message.includes('לא ניתן להתחבר לשרת')) {
+							notificationService.toast({ severity: 'error', detail: errorMessage });
 						}
-					} catch (error) {
-						patchState(store, { user: null, isLoading: false });
-						console.log('APP_INITIALIZER: Error restoring session.');
 					}
 				},
 
@@ -88,7 +103,14 @@ export const AuthStore = signalStore(
 							authService.logout().pipe(
 								tap({
 									next: () => {
-										patchState(store, initialState);
+										supplierStore.reset(),
+											userStore.reset(),
+											orderStore.reset(),
+											categoryStore.reset(),
+											productStore.reset(),
+											statsStore.reset(),
+											insightStore.reset(),
+											patchState(store, initialState);
 									},
 									error: (err) => {
 										patchState(store, { isLoading: false, error: err.message });

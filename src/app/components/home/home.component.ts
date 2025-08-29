@@ -82,6 +82,7 @@ export class HomeComponent {
 	// --- User Actions ---
 	addSupplier(): void {
 		const ref = this.dialogService.open(SupplierDialogComponent, {
+			
 			...DialogConfig,
 			header: 'הוספת ספק חדש',
 			data: { suppliers: this.suppliers() },
@@ -95,6 +96,7 @@ export class HomeComponent {
 	}
 
 	showOrdersListDialog(status: OrderStatus): void {
+		
 		const ref = this.dialogService.open(OrdersListDialogComponent, {
 			...DialogConfig,
 			header: status === OrderStatus.Draft ? 'הזמנות טיוטה | פתוחות' : 'הזמנות לביצוע היום',

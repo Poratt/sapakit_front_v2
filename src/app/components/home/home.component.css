@@ -20,11 +20,11 @@
 	gap: 12px;
 	padding: 12px;
 	position: relative;
-	border-radius: calc(var(--border-radius) * 3);
-	backdrop-filter: blur(10px);
+	border-radius: calc(var(--border-radius) * 2);
+	/* backdrop-filter: blur(10px); */
 	box-shadow: var(--box-shadow);
 	transition: all 0.3s ease;
-	border: 1px solid var(--grey-100);
+	border: 1px solid var(--grey-50);
 	min-width: calc(50% - 4px);
 	background-color: white;
 

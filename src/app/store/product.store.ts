@@ -2,12 +2,11 @@ import { patchState, signalStore, withComputed, withMethods, withState } from '@
 import { computed, inject } from '@angular/core';
 import { catchError, filter, of, pipe, switchMap, tap } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
-
-import { Product } from '../models/product';
 import { ApiService } from '../services/api.service';
 import { NotificationService } from '../services/notification.service';
-import { ServiceResultContainer } from '../models/serviceResultContainer';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
+import { Product } from '../common/models/product';
+import { ServiceResultContainer } from '../common/models/serviceResultContainer';
 
 // Interface לעדכון אצווה, כדאי שיהיה מוגדר במקום מרכזי
 export interface ProductBatchUpdatePayload {
@@ -72,6 +71,9 @@ export const ProductStore = signalStore(
 					patchState(store, (state) => ({
 						products: state.products.filter((p) => p.id !== productId),
 					}));
+				},
+				reset(): void {
+					patchState(store, initialState);
 				},
 			};
 

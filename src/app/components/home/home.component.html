@@ -20,7 +20,7 @@
   }
 
   @case(PageStates.Ready) {
-  <div @fadeIn400 class="dashboard-container">
+  <div @fadeIn400 class="flex flex-col gap-4">
     <!-- Calendar Component -->
     <!-- <app-calendar></app-calendar> -->
     <app-advanced-calendar></app-advanced-calendar>
@@ -153,9 +153,10 @@
       <p><strong>אין ספקים פעילים כרגע</strong></p>
       <p>התחל על ידי הוספת ספק חדש כדי לנהל מוצרים וקטגוריות</p>
       <p>זה יעזור לך לארגן את המלאי ולעקוב אחר ההזמנות</p>
-      <p-button label="הוסף ספק חדש" icon="pi pi-plus" styleClass="p-button-lg p-button-rounded"
-        (onClick)="addSupplier()" ariaLabel="הוסף ספק חדש למערכת">
-      </p-button>
+      <button label="הוסף ספק חדש" class="primary md round" (click)="addSupplier()" ariaLabel="הוסף ספק חדש למערכת">
+        <span class="material-symbols-rounded">add</span>
+        הוסף ספק חדש
+      </button>
     </div>
     }
   </div>

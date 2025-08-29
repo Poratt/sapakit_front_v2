@@ -4,7 +4,7 @@ import { computed, inject } from '@angular/core';
 import { catchError, filter, of, pipe, switchMap, tap } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ApiService } from '../services/api.service';
-import { NotificationService } from '../services/notification.service';import { rxMethod } from '@ngrx/signals/rxjs-interop';
+import { NotificationService } from '../services/notification.service'; import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { ServiceResultContainer } from '../common/models/serviceResultContainer';
 import { User } from '../common/models/user';
 
@@ -48,6 +48,9 @@ export const UserStore = signalStore(
 				patchState(store, (state) => ({
 					users: state.users.filter((u) => u.id !== userId),
 				}));
+			},
+			reset(): void {
+				patchState(store, initialState);
 			},
 		};
 

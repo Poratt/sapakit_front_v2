@@ -24,7 +24,7 @@
 		display: flex;
 		justify-content: flex-end;
 		align-items: center;
-		gap: 0.5rem;
+		gap: 12px;
 	}
 
 	/* --- Insights Bell --- */
@@ -39,22 +39,26 @@
 			color: var(--grey-600);
 			transition: color 0.2s;
 		}
+		p-badge.custom-badge.p-badge.p-badge-circle.p-component.ng-star-inserted {
+			background:var(--secondary-500);
+		}
 
 		&:hover {
+			.pi-sparkles,
 			.pi-bell {
-				color: var(--primary-500);
+				color: var(--secondary-400);
 			}
 			p-badge.p-badge {
 				scale: 1.1;
 			}
 		}
+		
 
 		p-badge.p-badge {
 			transition: 0.2s all ease-in-out;
 			font-family: Fredoka;
 			height: 16px;
-			max-width: 12px;
-			min-width: 12px !important;
+			min-width: 16px !important;
 			display: flex;
 			align-items: center;
 			justify-content: center;
@@ -68,7 +72,7 @@
 				left: 50%;
 				transform: translate(-50%, -50%); /* ✅ מרכז את האפקט */
 				border-radius: 50%;
-				border: 1px solid var(--red-400); /* ✅ משתמש במשתנה צבע */
+				border: 1px solid var(--secondary-300); /* ✅ משתמש במשתנה צבע */
 				animation: ripple-effect 1.25s infinite;
 				pointer-events: none; /* ✅ למנוע הפרעה לקליקים */
 			}
@@ -79,7 +83,7 @@
 				left: -5px;
 				right: -5px;
 				bottom: -5px;
-				border: 2px solid var(--red-300);
+				border: 2px solid var(--secondary-300);
 				border-radius: 50%;
 				animation: ripple 3.75s infinite;
 				opacity: 0;
@@ -105,7 +109,7 @@
 			width: 32px;
 			height: 32px;
 			border-radius: 50%;
-			background-color: var(--primary-500);
+			background-color: var(--secondary-300);
 			color: white;
 			display: flex;
 			align-items: center;
@@ -228,16 +232,19 @@
 			flex-direction: column;
 			margin: 6px 0;
 			padding: 4px 0;
-			transition: 0.15s all ease-in-out;
 			position: relative;
-
+			
 			.hover-wrapper {
 				display: flex;
 				flex-direction: column;
 				border-radius: 12px;
 				padding: 8px;
+				border: 1px solid transparent;
+				transition: 0.15s all ease-in-out; 
+				
 				&:hover {
-					background-color: var(--grey-20);
+					background-color: hsl(210deg 8% 98% / 41%);
+					border: 1px solid hsl(210deg 8% 98% / 41%);
 				}
 			}
 

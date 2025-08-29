@@ -60,7 +60,7 @@ export const SupplierStore = signalStore(
 			},
 
 			updateSupplier(updatedSupplier: Supplier): void {
-				                console.log('%cSupplierStore: Updating supplier in state:', 'color: green;', updatedSupplier); // DEBUG LOG
+				console.log('%cSupplierStore: Updating supplier in state:', 'color: green;', updatedSupplier); // DEBUG LOG
 
 				patchState(store, (state) => ({
 					suppliers: state.suppliers.map(s => s.id === updatedSupplier.id ? updatedSupplier : s),
@@ -76,13 +76,16 @@ export const SupplierStore = signalStore(
 			getSupplierById(id: number): Supplier | undefined {
 				return store.suppliers().length > 0 ? store.suppliers().find(s => s.id === id) : undefined;
 			},
+			reset(): void {
+				patchState(store, initialState);
+			},
 		};
 		const asyncMethods = {
 			loadSuppliers: rxMethod<{ force?: boolean }>(
 				pipe(
 					filter(({ force }) => force || store.suppliers().length === 0),
 					tap((res) => {
-						
+
 						patchState(store, { isLoading: true, error: null })
 					}),
 					switchMap(() =>

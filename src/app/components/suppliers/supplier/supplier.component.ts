@@ -30,6 +30,8 @@ import { Category } from '../../../common/models/category';
 import { PageStates } from '../../../common/models/pageStates';
 import { Product } from '../../../common/models/product';
 import { Supplier } from '../../../common/models/supplier';
+import { AuthStore } from '../../../store/auth.store';
+import { FileUploadModule } from 'primeng/fileupload';
 
 export interface CategoryGroup {
 	categoryId: number;
@@ -44,7 +46,7 @@ export interface CategoryGroup {
 	imports: [
 		CommonModule, ButtonModule, DialogModule, ConfirmDialogModule, RouterModule, TooltipModule,
 		InputTextModule, LoaderComponent, MessageModule, FormsModule, BadgeComponent, DragDropModule, TableModule,
-		ReminderTypePipe
+		ReminderTypePipe, FileUploadModule
 	],
 	templateUrl: './supplier.component.html',
 	styleUrls: ['./supplier.component.css'],
@@ -71,7 +73,7 @@ export class SupplierComponent {
 	pageState = signal(PageStates.Loading);
 	supplier = signal<Supplier | undefined>(undefined);
 	searchQuery = signal('');
-	
+
 	private readonly rawProducts = signal<Product[]>([]);
 	public readonly categories = signal<Category[]>([]);
 	public itemToDelete = signal<number | undefined>(undefined);
@@ -84,7 +86,7 @@ export class SupplierComponent {
 
 		const productsByCat = new Map<number, Product[]>();
 		products.forEach(p => {
-            const catId = p.categoryId ?? -1;
+			const catId = p.categoryId ?? -1;
 			if (!productsByCat.has(catId)) productsByCat.set(catId, []);
 			productsByCat.get(catId)!.push(p);
 		});
@@ -124,7 +126,7 @@ export class SupplierComponent {
 					const categories = supplier.categories || [];
 					categories.sort((a, b) => a.position - b.position);
 					console.log(products);
-					
+
 					this.rawProducts.set(products);
 					this.categories.set(categories);
 					this.supplier.set(supplier);
@@ -144,8 +146,8 @@ export class SupplierComponent {
 		this.pageState.set(PageStates.Error);
 		this.notificationService.toast({ severity: 'error', detail: message });
 	}
-    
-    addProduct(): void {
+
+	addProduct(): void {
 		const supplierId = this.supplier()?.id;
 		if (!supplierId) return;
 
@@ -225,7 +227,7 @@ export class SupplierComponent {
 		ref.onClose.subscribe((updatedSupplier: Supplier | undefined) => {
 			if (updatedSupplier) {
 				this.supplierStore.updateSupplier(updatedSupplier);
-                this.supplier.set(updatedSupplier);
+				this.supplier.set(updatedSupplier);
 			}
 		});
 	}
@@ -272,21 +274,21 @@ export class SupplierComponent {
 			next: (response) => {
 				if (!response.success) {
 					this.notificationService.toast({ severity: 'error', detail: response.message });
-                    this.loadInitialData(this.supplier()!.id);
+					this.loadInitialData(this.supplier()!.id);
 				} else {
-                    this.notificationService.toast({ severity: 'success', detail: response.message });
-                }
+					this.notificationService.toast({ severity: 'success', detail: response.message });
+				}
 			},
 			error: (err) => {
-                this.notificationService.toast({ severity: 'error', detail: err.error?.message });
-                this.loadInitialData(this.supplier()!.id);
-            }
+				this.notificationService.toast({ severity: 'error', detail: err.error?.message });
+				this.loadInitialData(this.supplier()!.id);
+			}
 		});
 	}
 
 	dropCategory(event: CdkDragDrop<CategoryGroup[]>): void {
 		if (event.previousIndex === event.currentIndex) return;
-        
+
 		const supplierId = this.supplier()?.id;
 		if (!supplierId) return;
 
@@ -306,7 +308,7 @@ export class SupplierComponent {
 			next: (response) => {
 				if (response.success && response.result) {
 					this.notificationService.toast({ severity: 'success', detail: response.message });
-                    this.categories.set(response.result);
+					this.categories.set(response.result);
 				} else {
 					this.notificationService.toast({ severity: 'error', detail: response.message });
 					this.categories.set(previousOrder);
@@ -318,9 +320,9 @@ export class SupplierComponent {
 			}
 		});
 	}
-    
-	
-    onDragMoved(event: CdkDragMove): void { this.scrollService.onDragMoved(event, this.dragZone); }
-    onDragReleased(): void { this.scrollService.stopAutoScroll(); }
+
+
+	onDragMoved(event: CdkDragMove): void { this.scrollService.onDragMoved(event, this.dragZone); }
+	onDragReleased(): void { this.scrollService.stopAutoScroll(); }
 	
 }

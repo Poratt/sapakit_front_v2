@@ -14,6 +14,7 @@ import { ReminderType } from '../common/enums/reminderType';
 import { Order } from '../common/models/order';
 import { Supplier } from '../common/models/supplier';
 import { formatDateToYYYYMMDD, parseDateStringAsLocal } from '../common/utils/date.utils';
+import { Status } from '../common/enums/status.enum';
 
 
 // --- Helper Functions (Module-level for reusability) ---
@@ -61,13 +62,15 @@ export const OrderStore = signalStore(
 		ordersCount: computed(() => orders().length),
 		sentOrders: computed(() => orders().filter(o => o.status === OrderStatus.Sent)),
 		draftOrdersList: computed(() => orders().filter(s => s.status === OrderStatus.Draft)),
-		todayOrdersComputed: computed(() => {
-			// Create today's date in local time
-			const today = new Date();
-			today.setHours(0, 0, 0, 0); // Set to midnight local time
-			const todayString = formatDateToYYYYMMDD(today); // Get YYYY-MM-DD in local time
 
-			const allSuppliers = supplierStore.suppliers();
+		todayOrdersComputed: computed(() => {
+			const today = new Date();
+			today.setHours(0, 0, 0, 0);
+			const todayString = formatDateToYYYYMMDD(today);
+
+			// ✅ שלב 1: סנן את הספקים *קודם*
+			const activeSuppliers = supplierStore.suppliers().filter(s => s.status === Status.Active);
+
 			const allOrders = orders();
 			const ordersMap = new Map<string, Order>(
 				allOrders.map((o) => [`${o.supplierId}-${o.date}`, o])
@@ -75,18 +78,22 @@ export const OrderStore = signalStore(
 
 			const dueToday: Order[] = [];
 
-			for (const supplier of allSuppliers) {
+			// ✅ שלב 2: עכשיו הלולאה רצה רק על הספקים הפעילים
+			for (const supplier of activeSuppliers) {
 				if (_isOrderDayForSupplier(supplier, today)) {
-					const orderKey = `${supplier.id}-${todayString}`; // Use local date string
+					const orderKey = `${supplier.id}-${todayString}`;
 					const existingOrder = ordersMap.get(orderKey);
 
 					if (existingOrder) {
-						// Add supplierName to existing order
-						dueToday.push({
-							...existingOrder,
-							supplierName: supplier.name, // Ensure supplierName is set
-						});
+						// רק אם זו טיוטה. אם ההזמנה כבר נשלחה, לא צריך להציג אותה כ"הזמנה להיום".
+						if (existingOrder.status === OrderStatus.Draft) {
+							dueToday.push({
+								...existingOrder,
+								supplierName: supplier.name,
+							});
+						}
 					} else {
+						// כל הלוגיקה של reminderType נשארת זהה
 						if (supplier.reminderType === ReminderType.UntilOrderDone) {
 							const weekStart = _getStartOfWeek(today);
 							const weekEnd = new Date(weekStart);
@@ -95,7 +102,7 @@ export const OrderStore = signalStore(
 							let hasSentOrderThisWeek = false;
 							for (const order of allOrders) {
 								if (order.supplierId === supplier.id && order.status === OrderStatus.Sent) {
-									const orderDate = parseDateStringAsLocal(order.date); // Parse as local date
+									const orderDate = parseDateStringAsLocal(order.date);
 									if (orderDate >= weekStart && orderDate <= weekEnd) {
 										hasSentOrderThisWeek = true;
 										break;
@@ -107,22 +114,22 @@ export const OrderStore = signalStore(
 									supplierId: supplier.id,
 									date: todayString,
 									status: OrderStatus.Today,
-									supplierName: supplier.name, // Already included
-								} as Partial<Order> as Order);
+									supplierName: supplier.name,
+								} as Order);
 							}
-						} else {
+						} else { // ReminderType.EachTime
 							dueToday.push({
 								supplierId: supplier.id,
 								date: todayString,
 								status: OrderStatus.Today,
-								supplierName: supplier.name, // Already included
-							} as Partial<Order> as Order);
+								supplierName: supplier.name,
+							} as Order);
 						}
 					}
 				}
 			}
-			return dueToday.filter(order => order.status !== OrderStatus.Sent);
-
+			// הסינון בסוף כבר לא נחוץ, כי טיפלנו בזה קודם
+			return dueToday;
 		})
 	})),
 
@@ -134,6 +141,9 @@ export const OrderStore = signalStore(
 		supplierStore = inject(SupplierStore)
 	) => {
 		const methods = {
+			reset(): void {
+				patchState(store, initialState);
+			},
 			loadDraftOrders: rxMethod<void>(
 				pipe(
 					tap(() => patchState(store, { isLoading: true })),
@@ -141,6 +151,8 @@ export const OrderStore = signalStore(
 						apiService.findOrdersByStatus([OrderStatus.Draft]).pipe(
 							tap(response => {
 								if (response.success && response.result) {
+									console.log('Draft orders:', response.result);
+
 									patchState(store, { openOrders: response.result, isLoading: false });
 								}
 							}),

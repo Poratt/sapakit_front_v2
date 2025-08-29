@@ -9,11 +9,9 @@ export const DialogConfig = {
 	appendTo: 'body',
 	// מאפייני נגישות
 	a11yCloseLabel: 'סגור',
-	focusOnShow: false,
+	focusOnShow: true,
 	autofocus: true,
 	
-
-	// חוויית משתמש משופרת
 	closeOnEscape: true,
 	baseZIndex: 1000,
 	showHeader: true,
@@ -34,7 +32,8 @@ export const DialogConfig = {
 
 	style: {
 		'max-width': '400px',
-		'min-width': '300px'
+		'min-width': '300px',
+		
 	},
 
 	// אנימציה (תלוי בגרסה)

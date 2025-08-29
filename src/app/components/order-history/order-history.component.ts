@@ -1,4 +1,4 @@
-import { Component, Input, signal, effect, inject, AfterViewInit, OnInit, computed } from '@angular/core';
+import { Component, Input, signal, effect, inject, AfterViewInit, OnInit, computed, HostListener } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
@@ -23,6 +23,7 @@ import { Category } from '../../common/models/category';
 import { Order } from '../../common/models/order';
 import { PageStates } from '../../common/models/pageStates';
 import { Product } from '../../common/models/product';
+import { AuthStore } from '../../store/auth.store';
 
 // Interfaces
 interface ProductSummary {
@@ -63,11 +64,14 @@ export class OrderHistoryComponent implements OnInit, AfterViewInit {
 	private notificationService = inject(NotificationService);
 
 	private readonly supplierStore = inject(SupplierStore);
+	private readonly authStore = inject(AuthStore);
 
 	PageStates = signal(PageStates);
 	pageState = signal(PageStates.Loading);
 	isFetching = signal<boolean>(false);
 	isViewInitialized = signal(false);
+	readonly isAdmin = this.authStore.isAdmin;
+
 
 	@Input() supplierId = signal<number | null>(null);
 	viewMode = signal<'weekly' | 'monthly'>('monthly');
@@ -123,9 +127,16 @@ export class OrderHistoryComponent implements OnInit, AfterViewInit {
 	lastFetchedSupplierId = signal<number | null>(null);
 	private fetchTimeout: ReturnType<typeof setTimeout> | null = null;
 
-	constructor() {
-		console.log('CONSTRUCTOR: Component initialized');
 
+	windowHeight = signal(window.innerHeight);
+	scrollHeight = computed(() => String(this.windowHeight() - 80 - 12 - 12 - 34 - 136 ) + 'px' );
+
+
+	constructor() {
+
+		window.addEventListener('resize', () => {
+			this.windowHeight.set(window.innerHeight);
+		});
 		// Effect 1: Update date range when viewMode changes.
 		effect(() => {
 			this.viewMode();
@@ -521,57 +532,57 @@ export class OrderHistoryComponent implements OnInit, AfterViewInit {
 	}
 
 	private updateDynamicChartOptions(type: ChartType, chartMetric: ChartMetric = this.selectedChartMetric()) {
-	if (!this.baseChartOptionsInternal) return;
-	const newOptions = JSON.parse(JSON.stringify(this.baseChartOptionsInternal)); // Deep copy
-	const currentMetricOption = this.chartMetricOptions.find(option => option.value === chartMetric);
-	const yAxisTitle = currentMetricOption?.yAxis || 'ערך';
+		if (!this.baseChartOptionsInternal) return;
+		const newOptions = JSON.parse(JSON.stringify(this.baseChartOptionsInternal)); // Deep copy
+		const currentMetricOption = this.chartMetricOptions.find(option => option.value === chartMetric);
+		const yAxisTitle = currentMetricOption?.yAxis || 'ערך';
 
-	const titleMap: Record<ChartType, string> = {
-		line: 'היסטורית הזמנות', bar: 'היסטורית הזמנות',
-		doughnut: 'התפלגות כוללת',
-	};
-	newOptions.plugins.title.text = titleMap[type] || 'היסטורית הזמנות';
-	
-	// תיקון ה-tooltip callback
-	newOptions.plugins.tooltip = {
-		...TooltipChart,
-		callbacks: {
-			label: (context: any) => {
-				// וודא שהלייבל הוא מחרוזת
-				const label = String(context.dataset.label || '');
-				const rawValue = context.parsed.y !== undefined ? context.parsed.y : context.parsed;
-				// וודא שהערך הוא מספר תקין
-				const value = typeof rawValue === 'number' && !isNaN(rawValue) ? rawValue : 0;
-				const metric = this.selectedChartMetric();
-				const formattedValue = (metric === 'cost' || metric === 'price') ? `${value.toFixed(2)} ₪` : value.toString();
-				return `${label}: ${formattedValue}`;
-			},
-			title: (context: any) => {
-				// וודא שגם הכותרת היא מחרוזת
-				if (context && context.length > 0) {
-					return String(context[0].label || '');
+		const titleMap: Record<ChartType, string> = {
+			line: 'היסטורית הזמנות', bar: 'היסטורית הזמנות',
+			doughnut: 'התפלגות כוללת',
+		};
+		newOptions.plugins.title.text = titleMap[type] || 'היסטורית הזמנות';
+
+		// תיקון ה-tooltip callback
+		newOptions.plugins.tooltip = {
+			...TooltipChart,
+			callbacks: {
+				label: (context: any) => {
+					// וודא שהלייבל הוא מחרוזת
+					const label = String(context.dataset.label || '');
+					const rawValue = context.parsed.y !== undefined ? context.parsed.y : context.parsed;
+					// וודא שהערך הוא מספר תקין
+					const value = typeof rawValue === 'number' && !isNaN(rawValue) ? rawValue : 0;
+					const metric = this.selectedChartMetric();
+					const formattedValue = (metric === 'cost' || metric === 'price') ? `${value.toFixed(2)} ₪` : value.toString();
+					return `${label}: ${formattedValue}`;
+				},
+				title: (context: any) => {
+					// וודא שגם הכותרת היא מחרוזת
+					if (context && context.length > 0) {
+						return String(context[0].label || '');
+					}
+					return '';
 				}
-				return '';
-			}
-		},
-	}
-	
-	if (newOptions.scales) {
-		newOptions.scales.y.title.text = yAxisTitle;
-		newOptions.scales.x.stacked = type === 'bar' && this.splitChartByProp();
-		newOptions.scales.y.stacked = type === 'bar' && this.splitChartByProp();
-	}
+			},
+		}
 
-	if (type === 'doughnut') {
-		newOptions.scales = undefined; // No axes for doughnut chart
-		newOptions.plugins.legend.position = 'right';
-		newOptions.plugins.tooltip.mode = 'point';
-	} else {
-		newOptions.plugins.legend.position = 'top';
-		newOptions.plugins.tooltip.mode = 'index';
+		if (newOptions.scales) {
+			newOptions.scales.y.title.text = yAxisTitle;
+			newOptions.scales.x.stacked = type === 'bar' && this.splitChartByProp();
+			newOptions.scales.y.stacked = type === 'bar' && this.splitChartByProp();
+		}
+
+		if (type === 'doughnut') {
+			newOptions.scales = undefined; // No axes for doughnut chart
+			newOptions.plugins.legend.position = 'right';
+			newOptions.plugins.tooltip.mode = 'point';
+		} else {
+			newOptions.plugins.legend.position = 'top';
+			newOptions.plugins.tooltip.mode = 'index';
+		}
+		this.chartOptions.set(newOptions);
 	}
-	this.chartOptions.set(newOptions);
-}
 	private updateChartData() {
 		const currentProducts = this.products();
 		const currentDates = this.dates();
@@ -656,16 +667,16 @@ export class OrderHistoryComponent implements OnInit, AfterViewInit {
 		this.dates.set(datesArray.sort((a, b) => a.date.localeCompare(b.date)));
 	}
 
-getTableCellValue(product: ProductSummary, date: DateDisplay): string | number {
-	const value = product.values[date.date] || 0;
-	if (value === 0) {
-		return date.isPastOrToday ? '-' : '';
+	getTableCellValue(product: ProductSummary, date: DateDisplay): string | number {
+		const value = product.values[date.date] || 0;
+		if (value === 0) {
+			return date.isPastOrToday ? '-' : '';
+		}
+		if (this.selectedChartMetric() === 'cost' || this.selectedChartMetric() === 'price') {
+			return `${value.toFixed(2)} ₪`;
+		}
+		return value;
 	}
-	if (this.selectedChartMetric() === 'cost' || this.selectedChartMetric() === 'price') {
-		return `${value.toFixed(2)} ₪`;
-	}
-	return value;
-}
 
 	prevPeriod() {
 		if (this.isFetching()) return;
@@ -701,5 +712,115 @@ getTableCellValue(product: ProductSummary, date: DateDisplay): string | number {
 			return sum + value;
 		}, 0);
 		return this.getTableCellValue({ name: 'Total', values: { [date.date]: total } } as ProductSummary, date);
+	}
+
+
+	// --- Signals for UI state ---
+	isUploading = signal(false);
+	isDraggingOver = signal(false);
+
+	// --- Drag & Drop Handlers ---
+	onDragOver(event: DragEvent): void {
+		event.preventDefault();
+		this.isDraggingOver.set(true);
+	}
+
+	onDragLeave(event: DragEvent): void {
+		event.preventDefault();
+		this.isDraggingOver.set(false);
+	}
+
+	onDrop(event: DragEvent, supplierId: number): void {
+		event.preventDefault();
+		this.isDraggingOver.set(false);
+		const file = event.dataTransfer?.files[0];
+		if (file) {
+			this.uploadFile(file, supplierId);
+		}
+	}
+
+	onFileSelect(event: Event, supplierId: number): void {
+		const input = event.target as HTMLInputElement;
+		const file = input.files?.[0];
+		if (file) {
+			this.uploadFile(file, supplierId);
+		}
+		input.value = ''; // Reset input to allow re-selecting the same file
+	}
+
+	// --- Core Logic ---
+	private uploadFile(file: File, supplierId: number): void {
+		if (!file.name.endsWith('.txt')) {
+			this.notificationService.toast({
+				severity: 'warn',
+				summary: 'קובץ לא נתמך',
+				detail: 'יש לבחור קובץ מסוג .txt בלבד.',
+			});
+			return;
+		}
+
+		this.isUploading.set(true);
+
+		this.apiService.uploadTxtFile(file, supplierId).subscribe({
+			next: (response) => {
+				if (response.success) {
+					this.notificationService.toast({
+						severity: 'success',
+						detail: `הקובץ עובד בהצלחה.`,
+						life: 5000,
+					});
+					this.refreshData();
+				} else {
+					this.notificationService.toast({
+						severity: 'error',
+						detail: response.message || 'אירעה שגיאה לא צפויה.',
+					});
+				}
+			},
+			error: (error) => {
+				this.notificationService.toast({
+					severity: 'error',
+					detail: error.error?.message || error.message || 'לא ניתן היה להעלות את הקובץ.',
+				});
+			},
+			complete: () => {
+				this.isUploading.set(false);
+			}
+		});
+	}
+
+	deleteAllOrders(supplierId: number): void {
+		const supplierName = this.suppliers().find(s => s.id === supplierId)?.name || `ספק ${supplierId}`;
+
+		this.notificationService.confirm({
+			header: 'אישור מחיקה מלאה',
+			message: `האם אתה בטוח שברצונך למחוק את **כל** ההזמנות של הספק **${supplierName}**? פעולה זו הינה סופית ולא ניתנת לשחזור.`,
+			icon: 'pi pi-exclamation-triangle',
+			acceptLabel: 'כן, מחק הכל',
+		}).subscribe((accepted) => {
+			if (!accepted) return;
+
+			this.apiService.deleteSupplierOrders(supplierId).subscribe({
+				next: (response) => {
+					this.notificationService.toast({
+						severity: 'success',
+						detail: `כל ההזמנות של ${supplierName} נמחקו בהצלחה.`,
+					});
+					this.refreshData(); // רענן את הנתונים
+				},
+				error: (error) => {
+					this.notificationService.toast({
+						severity: 'error',
+						detail: error.error?.message || 'לא ניתן היה למחוק את ההזמנות.',
+					});
+				}
+			});
+		});
+	}
+
+	// Ensure you have this method in your component
+	refreshOrders(): void {
+		// Implement the logic to refresh the order list, for example:
+		this.fetchOrders();
 	}
 }

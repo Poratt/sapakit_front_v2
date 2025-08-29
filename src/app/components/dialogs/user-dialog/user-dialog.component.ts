@@ -116,7 +116,7 @@ export class UserDialogComponent {
 
 	patchForm(user: User) {
 		console.log(`userId: ${user.id}`);
-		
+
 		this.userForm.patchValue({
 			id: user.id ?? 0,
 			username: user.username,
@@ -271,18 +271,26 @@ export class UserDialogComponent {
 
 	//  register a new user.
 	private registerNewUser(formData: FormData): void {
-		this.apiService.register(formData).subscribe({
-			next: (response) => {
-				if (response.success) {
-					this.ref.close(response.result); // Close dialog and signal success to refresh the list
-				} else {
-					this.notificationService.toast({ severity: 'error', detail: response.message });
-				}
-			},
-			// error: (err) => {
-			// 	this.notificationService.toast({ severity: 'error', detail: err.message });
-			// }
-		});
+		// const formValue = formData;
+		// const registrationPayload: CreateUserDto = {
+		// 	email: formValue.email,
+		// 	username: formValue.username,
+		// 	password: formValue.password
+		// 	// שים לב: אנחנו לא כוללים את confirmPassword ו-rememberMe
+		// };
+		// console.log(registrationPayload);
+		// this.apiService.register(formData).subscribe({
+		// 	next: (response) => {
+		// 		if (response.success) {
+		// 			this.ref.close(response.result); // Close dialog and signal success to refresh the list
+		// 		} else {
+		// 			this.notificationService.toast({ severity: 'error', detail: response.message });
+		// 		}
+		// 	},
+		// 	// error: (err) => {
+		// 	// 	this.notificationService.toast({ severity: 'error', detail: err.message });
+		// 	// }
+		// });
 	}
 	onCancel() {
 		this.ref.close();

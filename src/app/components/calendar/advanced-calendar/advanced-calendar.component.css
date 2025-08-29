@@ -1,5 +1,5 @@
 .calendar-container {
-	padding: 1rem;
+	/* padding: 1rem; */
 	border-radius: 12px;
 	background: white;
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
@@ -20,7 +20,8 @@
 		display: grid;
 		grid-template-columns: repeat(7, minmax(0, 1fr));
 		grid-auto-rows: min-content; /* גובה שורה גמיש לפי התוכן */
-		gap: 4px;
+		column-gap: 1px;
+		row-gap: 2px;
 		position: relative; /* חיוני למיקום אירועי הספקים */
 	}
 }

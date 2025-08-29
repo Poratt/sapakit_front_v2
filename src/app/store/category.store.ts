@@ -21,7 +21,7 @@ const initialState: CategoryState = {
 };
 
 export const CategoryStore = signalStore(
-	    { providedIn: 'root' }, 
+	{ providedIn: 'root' },
 
 	withState(initialState),
 
@@ -41,6 +41,10 @@ export const CategoryStore = signalStore(
 			patchState(store, (state) => ({
 				categories: state.categories.map(c => c.id === updatedCategory.id ? updatedCategory : c)
 			}));
+		},
+
+		reset(): void {
+			patchState(store, initialState);
 		},
 
 		// --- הוספנו בחזרה את loadCategories ---
@@ -94,7 +98,7 @@ export const CategoryStore = signalStore(
 		),
 
 
-		
+
 
 
 

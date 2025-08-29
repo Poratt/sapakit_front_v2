@@ -14,7 +14,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { DragDropModule, CdkDragDrop, moveItemInArray, transferArrayItem, CdkDragMove } from '@angular/cdk/drag-drop';
 import { map } from 'rxjs/operators';
 import { OrderStatus, orderStatusData } from '../../../common/enums/order-status.enum';
-import { PackageData } from '../../../common/enums/package';
+import { Package, PackageData } from '../../../common/enums/package';
 import { ApiService } from '../../../services/api.service';
 import { NotificationService } from '../../../services/notification.service';
 import { Router } from '@angular/router';
@@ -38,6 +38,8 @@ import { PageStates } from '../../../common/models/pageStates';
 import { Product } from '../../../common/models/product';
 import { ServiceResultContainer } from '../../../common/models/serviceResultContainer';
 import { Supplier } from '../../../common/models/supplier';
+import { PluralizePackagePipe } from '../../../pipes/pluralize-package.pipe';
+
 
 
 
@@ -66,8 +68,9 @@ interface GroupedProducts {
     ConfirmDialogModule,
     ToggleSwitchModule,
     SplitButtonModule,
+    PluralizePackagePipe
   ],
-  providers: [ConfirmationService],
+  providers: [ConfirmationService, PluralizePackagePipe],
   templateUrl: './order-dialog.component.html',
   styleUrls: ['./order-dialog.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -87,7 +90,9 @@ export class OrderDialogComponent {
   private router = inject(Router);
   private scrollService = inject(ScrollService);
   private printService = inject(PrintService);
-  private whatsAppService = inject(WhatsAppService)
+  private whatsAppService = inject(WhatsAppService);
+
+  private pluralizePipe = inject(PluralizePackagePipe);
 
   UserRole = UserRole;
   readonly user = this.authStore.user;
@@ -215,7 +220,7 @@ export class OrderDialogComponent {
           this.initialOrderProducts = { ...products };
           this.initialNotes = this.existingOrder?.notes || '';
           console.log(this.initialOrderProducts);
-          
+
           this.orderProducts.set(products);
           this.notes.set(this.initialNotes);
 
@@ -259,6 +264,11 @@ export class OrderDialogComponent {
     this.updateProductQuantity(productId, (this.orderProducts()[productId] || 0) + 1);
   }
 
+  onMinusClick(event: Event, productId: number): void {
+  event.stopPropagation(); // מונע את ה-bubbling של האירוע ל-product-wrapper
+  this.decrementQuantity(productId);
+}
+
   decrementQuantity(productId: number): void {
     const currentQuantity = this.orderProducts()[productId] || 0;
     if (currentQuantity > 0) {
@@ -293,9 +303,9 @@ export class OrderDialogComponent {
   }
 
 
-// in src/app/components/dialogs/order-dialog/order-dialog.component.ts
+  // in src/app/components/dialogs/order-dialog/order-dialog.component.ts
 
-saveOrder() {
+  saveOrder() {
     if (!this.supplier || !this.date) return;
 
     // --- START OF FIX ---
@@ -305,23 +315,23 @@ saveOrder() {
     const allAvailableProducts = this.availableProducts();
 
     for (const productId in currentOrderProducts) {
-        // ודא שהמפתח שייך לאובייקט עצמו
-        if (Object.prototype.hasOwnProperty.call(currentOrderProducts, productId)) {
-            const quantity = currentOrderProducts[productId];
+      // ודא שהמפתח שייך לאובייקט עצמו
+      if (Object.prototype.hasOwnProperty.call(currentOrderProducts, productId)) {
+        const quantity = currentOrderProducts[productId];
 
-            // הוסף ל-payload רק אם הכמות גדולה מ-0
-            if (quantity > 0) {
-                const productDetails = allAvailableProducts.find(p => p.id === +productId);
-                const costAsNumber = productDetails ? parseFloat(productDetails.cost as any) : 0;
+        // הוסף ל-payload רק אם הכמות גדולה מ-0
+        if (quantity > 0) {
+          const productDetails = allAvailableProducts.find(p => p.id === +productId);
+          const costAsNumber = productDetails ? parseFloat(productDetails.cost as any) : 0;
 
-                productsForPayload.push({
-                    productId: +productId,
-                    name: productDetails?.name || 'Unknown Product',
-                    quantity: quantity,
-                    cost: isNaN(costAsNumber) ? 0 : costAsNumber,
-                });
-            }
+          productsForPayload.push({
+            productId: +productId,
+            name: productDetails?.name || 'Unknown Product',
+            quantity: quantity,
+            cost: isNaN(costAsNumber) ? 0 : costAsNumber,
+          });
         }
+      }
     }
     // --- END OF FIX ---
 
@@ -329,26 +339,26 @@ saveOrder() {
     const hasNotes = this.notes() && this.notes().trim().length > 0;
 
     if (hasProducts || hasNotes) {
-        const orderPayload: CreateOrderDto = {
-            id: this.existingOrder?.id,
-            supplierId: this.supplier.id,
-            date: this.formatDate(this.date),
-            status: OrderStatus.Draft,
-            notes: this.notes().trim() || undefined,
-            products: productsForPayload // שימוש במערך הנקי שיצרנו
-        };
+      const orderPayload: CreateOrderDto = {
+        id: this.existingOrder?.id,
+        supplierId: this.supplier.id,
+        date: this.formatDate(this.date),
+        status: OrderStatus.Draft,
+        notes: this.notes().trim() || undefined,
+        products: productsForPayload // שימוש במערך הנקי שיצרנו
+      };
 
-        console.log('--- Sending CLEANED Order Payload ---');
-        console.log(JSON.stringify(orderPayload, null, 2));
+      console.log('--- Sending CLEANED Order Payload ---');
+      console.log(JSON.stringify(orderPayload, null, 2));
 
-        this.ref.close(orderPayload);
+      this.ref.close(orderPayload);
 
     } else if (this.existingOrder) {
-        this.confirmRemove();
+      this.confirmRemove();
     } else {
-        this.closeDialog();
+      this.closeDialog();
     }
-}
+  }
 
   confirmRemove(): void {
     if (!this.existingOrder) return;
@@ -380,13 +390,19 @@ saveOrder() {
     // יצירת payload והודעה נשארת זהה
     const productsForPayload = Object.entries(this.orderProducts())
       .filter(([_, quantity]) => quantity > 0)
-      .map(([productId, quantity]) => ({
-        productId: +productId,
-        name: this.availableProducts().find(p => p.id === +productId)?.name || 'Unknown',
-        quantity,
-      }));
+      .map(([productId, quantity]) => {
+        const product = this.availableProducts().find(p => p.id === +productId);
 
-    if (productsForPayload.length === 0 && !this.notes().trim()) {
+        return {
+          productId: +productId,
+          name: product?.name || 'Unknown',
+          quantity,
+          package: product?.package || Package.Unit,
+          notes: product?.notes || '',
+        };
+      });
+
+    if (productsForPayload.length === 0 && !(this.notes() && this.notes().trim())) {
       return;
     }
 
@@ -400,8 +416,6 @@ saveOrder() {
     };
 
     const messageBody = this.createOrderMessage(productsForPayload);
-
-    // --- שינוי מרכזי: קרא לשירות וסגור את הדיאלוג עם התוצאה ---
     try {
       const whatsAppResult = await this.whatsAppService.sendMessageWithFallback({
         phone: this.supplier.phone,
@@ -409,7 +423,6 @@ saveOrder() {
         countryCode: '972'
       });
 
-      // סגור את הדיאלוג והחזר אובייקט עם כל המידע הנדרש
       this.ref.close({
         action: 'SEND_WHATSAPP',
         payload: orderPayload,
@@ -429,15 +442,39 @@ saveOrder() {
 
 
 
-  private createOrderMessage(products: any[]): string {
-    const productsList = products.map(p => `${p.name}: ${p.quantity}`).join('\n');
-    let messageBody = `הזמנה:\n${productsList}`;
+  private createOrderMessage(products: { name: string; quantity: number; package: Package; notes?: string }[]): string {
+    // Create the products list with each product formatted
+    const productsList = products
+      .map(p => {
+        // Get formatted quantity and unit using pluralizePipe
+        const quantityAndUnitText = this.pluralizePipe.transform(p.quantity, p.package);
+        console.log(quantityAndUnitText);
 
-    if (this.notes().trim()) {
+        // Get package label from PackageData or fallback to 'יחידה'
+        const packageLabel = PackageData.find(pd => pd.enumValue === p?.package)?.label || 'יחידה';
+        console.log(packageLabel);
+
+        // Format each product line
+        return ` ${quantityAndUnitText} ${p.name}${p.notes ? ' - ' + p.notes : ''}`;
+      })
+      .join('\n');
+
+    // Initialize message body with products list
+    let messageBody = productsList;
+
+    // Add notes if they exist and are not empty
+    if (this.notes() && this.notes().trim()) {
       messageBody += `\n\nהערות: ${this.notes()}`;
     }
 
-    return messageBody;
+    // Check if messageBody is empty
+    if (!messageBody.trim()) {
+      console.warn('Warning: Attempting to send an empty message to WhatsApp');
+      return '';
+    }
+
+    // Wrap the message with RTL Unicode control characters
+    return `\u202B${messageBody}\u202C`;
   }
 
   fetchSuggestions(mode: 'general' | 'daySpecific'): void {
@@ -488,7 +525,6 @@ saveOrder() {
     this.printService.printWithTemplate(orderData, new OrderPrintTemplate(), config);
   }
 
-  // in order-dialog.component.ts
 
   async pasteFromClipboard(): Promise<void> {
     if (this.isDisabled()) return;

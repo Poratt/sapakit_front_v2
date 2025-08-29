@@ -79,7 +79,7 @@ export class ProductDialogComponent implements OnInit {
 		cost: [null, [Validators.min(0)]],
 		price: [null, [Validators.min(0)]],
 		status: [{ value: Status.Active, disabled: !this.existingProduct }], // נשבית ישירות כאן
-		comment: [''],
+		notes: [''],
 		imageUrl: [''],
 		position: [0],
 	});
@@ -116,7 +116,7 @@ export class ProductDialogComponent implements OnInit {
 			cost: product.cost ?? null,
 			price: product.price ?? null,
 			status: product.status,
-			comment: product.comment || '', // תיקון: notes -> comment
+			notes: product.notes || '', 
 			imageUrl: product.imageUrl || '',
 			position: product.position ?? 0,
 		});

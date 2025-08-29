@@ -22,7 +22,7 @@
         height: 2px;
         width: 22px;
         border-radius: 1px;
-        transition: all 0.3s ease-in-out;
+                transition: all 0.7s cubic-bezier(0.19, 1, 0.22, 1);
         will-change: transform, top, opacity;
 
         &:nth-child(1) {
@@ -40,7 +40,8 @@
     }
 
     &.opened {
-        transition: all 0.2s ease;
+        transform: translateX(8px);
+
 
         span {
             &:nth-child(1) {

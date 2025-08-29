@@ -104,3 +104,6 @@
 	color: var(--primary-700);
 }
 
+:host ::ng-deep .mat-mdc-tab-body-wrapper {
+    height: 100%;
+}

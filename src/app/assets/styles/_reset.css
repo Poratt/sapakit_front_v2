@@ -204,8 +204,9 @@ p-splitbutton {
 			font-family: 'Material Symbols Rounded';
 		}
 	}
-	button.p-ripple.p-splitbutton-button.p-button.p-component.p-button-secondary.p-button-small.p-button-sm {
-		padding: 5px 12px 5px 2px !important;
+	.p-splitbutton-button.p-button-small.p-button-sm {
+		padding: 4px 8px  4px 0px !important;
+		gap: 0;
 	}
 }
 
@@ -252,13 +253,16 @@ p-tieredmenusub {
 
 	&.no-header {
 		.p-dialog-header {
-			padding: 6px;
+			padding: 0px;
 		}
 		.p-dialog-header-actions {
 			display: none;
 		}
 	}
 
+	&.bottom-overlay{
+		position: relative;
+	}
 	.p-dialog-title {
 		font-weight: 500;
 		font-size: 17px;
@@ -266,7 +270,7 @@ p-tieredmenusub {
 	}
 
 	.p-dialog-content {
-		padding: 0 24px 24px !important;
+		/* padding: 0 24px 24px !important; */
 		/* color: var(--grey-800); */
 	}
 

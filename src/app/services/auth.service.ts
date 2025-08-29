@@ -28,15 +28,18 @@ export class AuthService {
 	}
 
 	getCurrentUser(): Observable<User | null> {
-		return this.http
-			.get<ServiceResultContainer<User>>(`${this.apiUrl}/auth/user`, {
+		return this.http.get<ServiceResultContainer<User>>(`${this.apiUrl}/auth/user`, {
 				withCredentials: true,
 			})
 			.pipe(
 				tap((response) => console.log('Get current user response:', response)),
 				map((response) => (response.success ? response.result : null)),
-				catchError((err) => {
-					console.error('Get current user failed:', err);
+				catchError((error) => {
+					const errorMessage = error.message || 'Error restoring session.';
+					console.error('Get current user failed:', errorMessage);
+					this.notificationService.toast({ severity: 'error', detail: errorMessage });
+					if (errorMessage.includes('לא ניתן להתחבר לשרת')) {
+                        }
 					return of(null);
 				}),
 			);

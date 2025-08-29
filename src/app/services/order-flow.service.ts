@@ -29,7 +29,7 @@ export class OrderFlowService {
 		
 		const ref = this.dialogService.open(OrderDialogComponent, {
 			...DialogConfigWide,
-			styleClass: 'no-header',
+			styleClass: 'no-header bottom-overlay',
 			data: { supplier, date, existingOrder },
 			
 		});

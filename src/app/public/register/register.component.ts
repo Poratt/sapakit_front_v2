@@ -18,6 +18,11 @@ import { AuthService } from '../../services/auth.service';
 import { CardModule } from 'primeng/card';
 import { DialogService } from 'primeng/dynamicdialog';
 import { ApiService } from '../../services/api.service';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
+import { HttpErrorResponse } from '@angular/common/http';
+import { CreateUserDto } from '../../common/dto/user-create.dto';
+
 
 @Component({
 	selector: 'app-register',
@@ -30,6 +35,8 @@ import { ApiService } from '../../services/api.service';
 		ButtonModule,
 		RouterModule,
 		CardModule,
+		IconFieldModule,
+		InputIconModule,
 	],
 	templateUrl: './register.component.html',
 	styleUrl: './register.component.css',
@@ -47,7 +54,7 @@ export class RegisterComponent {
 	readonly currentYear = new Date().getFullYear();
 	registerForm: FormGroup = this.fb.group(
 		{
-			name: ['', Validators.required],
+			username: ['', Validators.required],
 			email: ['', [Validators.required, Validators.email]],
 			password: ['', [Validators.required, Validators.minLength(6)]],
 			confirmPassword: ['', Validators.required],
@@ -57,8 +64,8 @@ export class RegisterComponent {
 		},
 	);
 
-	get name(): AbstractControl {
-		return this.registerForm.get('name') as AbstractControl<string>;
+	get username(): AbstractControl {
+		return this.registerForm.get('username') as AbstractControl<string>;
 	}
 	get email(): AbstractControl {
 		return this.registerForm.get('email') as AbstractControl<string>;
@@ -89,9 +96,16 @@ export class RegisterComponent {
 		}
 
 		this.loading.set(true);
-		const user = this.registerForm.value as FormData;
+		const formValue = this.registerForm.value;
+		const registrationPayload: CreateUserDto = {
+			email: formValue.email,
+			username: formValue.username,
+			password: formValue.password
+		};
 
-		this.apiService.register(user).subscribe({
+
+
+		this.apiService.register(registrationPayload).subscribe({
 			next: () => {
 				this.notificationService.toast({
 					severity: 'success',
@@ -99,11 +113,11 @@ export class RegisterComponent {
 				});
 				this.router.navigate(['/login']);
 			},
-			error: (err) => {
+			error: (err: HttpErrorResponse) => {
 				this.loading.set(false);
 				this.notificationService.toast({
 					severity: 'error',
-					detail: err.message || 'Registration failed. Please try again.',
+					detail: err.error?.message || 'Registration failed. Please try again.',
 				});
 			},
 		});

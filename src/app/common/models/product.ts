@@ -12,10 +12,9 @@ export interface Product extends BaseModel {
 	quantity: number | null;
 	status: Status;
 	supplierId: number;
-	comment: string;
-	imageUrl: string;
+	notes?: string;
+	imageUrl?: string;
 	position: number;
-	isDeleted: boolean;
 }
 
 // export const mockProducts: Product[] = [

@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
+import { MarkdownToHtmlPipe } from "../../../pipes/markdown-to-html.pipe";
 
 export interface ConfirmationData {
   message: string;
@@ -17,14 +18,14 @@ export interface ConfirmationData {
 @Component({
   selector: 'app-confirmation-dialog',
   standalone: true,
-  imports: [CommonModule, ButtonModule],
+  imports: [CommonModule, ButtonModule, MarkdownToHtmlPipe],
   template: `
     <div class="confirmation-dialog no-header">
       <div class="dialog-header">
         <!-- <h3 class="header-title">{{ title }}</h3> -->
         <i [ngClass]="icon" class="header-icon"></i>
       </div>
-      <p class="dialog-message" [innerHTML]="message"></p>
+            <p class="dialog-message" [innerHTML]="message | markdownToHtml"></p>
       <div class="dialog-actions">
         <button class="primary md" (click)="reject()">
           <span class="material-symbols-rounded">cancel</span>

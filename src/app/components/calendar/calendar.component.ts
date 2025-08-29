@@ -1,16 +1,15 @@
-import { Component, DOCUMENT, effect, inject, signal, OnDestroy, OnInit, computed } from '@angular/core';
+import { Component, effect, inject, signal, OnDestroy, OnInit, computed } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { DialogService, DynamicDialogModule } from 'primeng/dynamicdialog';
 import { RouterModule } from '@angular/router';
 import { Status } from '../../common/enums/status.enum';
-import { Supplier } from '../../models/supplier';
-import { Order } from '../../models/order';
+
 import { BadgeComponent } from '../shared/badge/badge.component';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { OrderStatus, orderStatusData } from '../../common/enums/order-status.enum';
 import { fadeIn400 } from '../../common/const/animations';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DOCUMENT } from '@angular/common';
 import { OrderStatusPipe } from "../../pipes/orderStatus.pipe";
 import { TooltipModule } from 'primeng/tooltip';
 import { OrderStore } from '../../store/order.store';
@@ -18,6 +17,8 @@ import { SupplierStore } from '../../store/supplier.store';
 import { OrderType } from '../../common/enums/order-type';
 import { ReminderType } from '../../common/enums/reminderType';
 import { OrderFlowService } from '../../services/order-flow.service';
+import { Supplier } from '../../common/models/supplier';
+import { Order } from '../../common/models/order';
 
 
 export enum ScreenSizeEnum {

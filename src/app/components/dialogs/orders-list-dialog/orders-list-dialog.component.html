@@ -6,14 +6,14 @@
 		<ng-template pTemplate="header">
 			<tr>
 				<th>ספק</th>
-				<th>תאריך הזמנה</th>
+				<th>תאריך</th>
 				<th>סטטוס</th>
 				<th></th>
 			</tr>
 		</ng-template>
 		<ng-template pTemplate="body" let-order>
 			<tr [class.virtual-order]="order.status === OrderStatus.Today">
-				<td>{{ order.supplierName }}</td>
+				<td class="whitespace-nowrap">{{ order.supplierName }}</td>
 				<td>{{ order.date | hebrewDate }}</td>
 				<td>
 					<app-badge [enumValue]="order.status" [dataArray]="orderStatusData"

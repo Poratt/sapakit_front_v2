@@ -21,9 +21,11 @@
   <div @fadeIn400 class="flex flex-col gap-4 w-full h-full">
     <!-- Header -->
     <div class="flex gap-2 items-center">
-      <p-button tooltipPosition="top" pTooltip="עריכה" icon="pi pi-arrow-right" [routerLink]="['/suppliers']" size="small" [rounded]="true" severity="secondary"></p-button>
+      <p-button tooltipPosition="top" pTooltip="עריכה" icon="pi pi-arrow-right" [routerLink]="['/suppliers']"
+        size="small" [rounded]="true" severity="secondary"></p-button>
       <span class="main-title">ניהול מוצרים | {{ supplier()?.name }}</span>
-      <p-button tooltipPosition="top" pTooltip="עריכה" icon="pi pi-pen-to-square" (click)="editSupplier()" size="small" [rounded]="true" severity="secondary"></p-button>
+      <p-button tooltipPosition="top" pTooltip="עריכה" icon="pi pi-pen-to-square" (click)="editSupplier()" size="small"
+        [rounded]="true" severity="secondary"></p-button>
     </div>
 
     @if (hasProducts()) {
@@ -35,26 +37,21 @@
           (ngModelChange)="searchQuery.set($event)" />
       </span>
       <!-- <p-button label="הוסף מוצר" icon="pi pi-plus" severity="primary" size="small" (onClick)="addProduct()"></p-button> -->
-        <button class="primary md" (click)="addProduct()">
-          <span class="material-symbols-rounded">add</span>
-          <span>הוספת מוצר</span>
-        </button>
+      <button class="primary md" (click)="addProduct()">
+        <span class="material-symbols-rounded">add</span>
+        <span>הוספת מוצר</span>
+      </button>
 
     </div>
 
     <!-- Main Drag & Drop Container -->
     <div @fadeIn400 class="categories-grid">
-      <div class="category-list-container"
-        cdkDropList
-        cdkDropListGroup
-        cdkDropListOrientation="mixed"
-        [cdkDropListData]="groupedProducts()"
-        (cdkDropListDropped)="dropCategory($event)"
-        [class.single-category]="groupedProducts().length === 1" 
-        >
+      <div class="category-list-container" cdkDropList cdkDropListGroup cdkDropListOrientation="mixed"
+        [cdkDropListData]="groupedProducts()" (cdkDropListDropped)="dropCategory($event)"
+        [class.single-category]="groupedProducts().length === 1">
 
         @for (group of groupedProducts(); track group.categoryName; let i = $index) {
-        
+
         @if(group.products.length){
         <div class="category-drag-container" cdkDrag [cdkDragData]="group" (cdkDragMoved)="onDragMoved($event)"
           (cdkDragReleased)="onDragReleased()" [cdkDragDisabled]="categories().length <= 1">
@@ -108,7 +105,7 @@
                   <div class="text-responsive-sm text-right">
                     {{ product.cost ? (product.cost | currency: 'ILS') : '-' }}
                   </div>
-                  <div class="font-responsive-sm text-right" [class.pr-4]="product.price == 0">
+                  <div class="text-responsive-sm text-right" [class.pr-4]="product.price == 0">
                     {{ product.price > 0 ? (product.price | currency: 'ILS') : '-' }}
                   </div>
                   <div class="product-cell-status text-right">
@@ -132,11 +129,11 @@
             </div>
           </div>
         </div>
-      }
-      
-    }
-    <div *cdkDragPlaceholder class="product-placeholder"></div>
-    <div *cdkDragPlaceholder class="category-placeholder"></div>
+        }
+
+        }
+        <div *cdkDragPlaceholder class="product-placeholder"></div>
+        <div *cdkDragPlaceholder class="category-placeholder"></div>
       </div>
     </div>
     } @else {
@@ -152,8 +149,3 @@
   }
 
 </div>
-
-
-
-
-

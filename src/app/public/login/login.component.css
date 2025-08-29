@@ -114,29 +114,6 @@
   gap: 1.5rem;
 }
 
-.form-field {
-  position: relative;
-}
-
-.form-field label {
-  font-size: 0.8rem;
-  font-weight: 500;
-  color: var(--grey-600);
-  margin-bottom: 0.5rem;
-  display: block;
-}
-
-/* מיקרו-אינטראקציה על שדות הטופס */
-:host ::ng-deep .p-inputtext:focus,
-:host ::ng-deep .p-password-input:focus {
-  transform: scale(1.02);
-}
-
-.error-message {
-  position: absolute;
-  bottom: -1.2rem;
-  right: 0;
-}
 
 /* כפתור השליחה */
 :host ::ng-deep .p-button {

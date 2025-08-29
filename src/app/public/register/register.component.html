@@ -15,24 +15,24 @@
         </div>
 
         <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
-            <div class="form-content">
-                <div class="form-field">
-                    <label for="name">שם מלא</label>
-                    <span class="p-input-icon-left w-full">
-                        <i class="pi pi-user"></i>
-                        <input pInputText id="name" formControlName="name" placeholder="ישראל ישראלי" />
-                    </span>
-                    @if (name.touched && name.hasError('required')) {
-                    <small class="error-message">יש להזין שם מלא</small>
+            <div class="flex-wrap-wrapper">
+                <div class="flex-wrap-item">
+                    <label for="username">שם*</label>
+                    <p-iconfield>
+                        <input pInputText id="username" formControlName="username" placeholder="הקלד את שמך" />
+                        <p-inputicon styleClass="pi pi-user" />
+                    </p-iconfield>
+                    @if (username.touched && username.hasError('required')) {
+                    <small class="error-message">שדה חובה</small>
                     }
                 </div>
 
-                <div class="form-field">
-                    <label for="email">כתובת אימייל</label>
-                    <span class="p-input-icon-left w-full">
-                        <i class="pi pi-envelope"></i>
+                <div class="flex-wrap-item">
+                    <label for="email">כתובת אימייל*</label>
+                    <p-iconfield>
                         <input pInputText id="email" formControlName="email" placeholder="you@example.com" />
-                    </span>
+                        <p-inputicon styleClass="pi pi-envelope" />
+                    </p-iconfield>
                     @if (email.touched && email.invalid) {
                     <small class="error-message">
                         @if (email.hasError('required')) { יש להזין כתובת אימייל }
@@ -41,8 +41,8 @@
                     }
                 </div>
 
-                <div class="form-field">
-                    <label for="password">סיסמה</label>
+                <div class="flex-wrap-item">
+                    <label for="password">סיסמה*</label>
                     <p-password id="password" formControlName="password" [feedback]="true" [toggleMask]="true"
                         placeholder="לפחות 6 תווים"></p-password>
                     @if (password.touched && password.invalid) {
@@ -53,8 +53,8 @@
                     }
                 </div>
 
-                <div class="form-field">
-                    <label for="confirmPassword">אימות סיסמה</label>
+                <div class="flex-wrap-item">
+                    <label for="confirmPassword">אימות סיסמה*</label>
                     <p-password id="confirmPassword" formControlName="confirmPassword" [feedback]="false"
                         [toggleMask]="true" placeholder="הקלד שוב את הסיסמה"></p-password>
                     @if (registerForm.hasError('mismatch') && confirmPassword.touched) {

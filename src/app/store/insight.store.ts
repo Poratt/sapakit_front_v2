@@ -39,6 +39,9 @@ export const InsightStore = signalStore(
                     })
                 ))
             )
-        )
+        ),
+        reset(): void {
+            patchState(store, initialState);
+        },
     }))
 );
