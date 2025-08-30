@@ -14,6 +14,7 @@ import { OrderStore } from './order.store';
 import { SupplierStore } from './supplier.store';
 import { UserStore } from './user.store';
 import { StatsStore } from './stats.store';
+import { Router } from '@angular/router';
 
 // ✅ הגדרת ה-interface החסר
 interface LoginCredentials {
@@ -45,7 +46,7 @@ export const AuthStore = signalStore(
 	withMethods(
 		(
 			store,
-			// ✅ הזרקת כל השירותים הנדרשים
+			router = inject(Router), 
 			authService = inject(AuthService),
 			notificationService = inject(NotificationService),
 			supplierStore = inject(SupplierStore),
@@ -131,6 +132,7 @@ export const AuthStore = signalStore(
 										if (response.success && response.result) {
 											// ✅ קוראים למתודה המקומית
 											loadUser();
+											router.navigate(['/']);
 										} else {
 											throw new Error(response.message || 'Login failed');
 										}

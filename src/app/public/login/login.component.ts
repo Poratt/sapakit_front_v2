@@ -6,16 +6,20 @@ import {
 	ReactiveFormsModule,
 	Validators,
 } from '@angular/forms';
-import { InputTextModule } from 'primeng/inputtext';
-import { ButtonModule } from 'primeng/button';
-import { PasswordModule } from 'primeng/password';
-import { CheckboxModule } from 'primeng/checkbox';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { NotificationService } from '../../services/notification.service';
 import { markFormGroupTouched } from '../../common/const/custom-validators';
 import { AuthService } from '../../services/auth.service';
 import { AuthStore } from '../../store/auth.store';
+
+import { InputTextModule } from 'primeng/inputtext';
+import { ButtonModule } from 'primeng/button';
+import { PasswordModule } from 'primeng/password';
+import { CheckboxModule } from 'primeng/checkbox';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
+
 
 @Component({
 	selector: 'app-login',
@@ -28,19 +32,21 @@ import { AuthStore } from '../../store/auth.store';
 		ButtonModule,
 		CheckboxModule,
 		RouterModule,
+		IconFieldModule,
+		InputIconModule,
 	],
 	templateUrl: './login.component.html',
 	styleUrl: './login.component.css',
 })
 export class LoginComponent {
 	private fb = inject(FormBuilder);
-	private authStore = inject(AuthStore); 
+	private authStore = inject(AuthStore);
 	private notificationService = inject(NotificationService);
 	private router = inject(Router);
 
 	formSubmitted = signal<boolean>(false);
 	loading = signal<boolean>(false);
-    readonly currentYear = new Date().getFullYear();
+	readonly currentYear = new Date().getFullYear();
 
 	loginForm: FormGroup = this.fb.group({
 		email: ['porat@mail.com', [Validators.required, Validators.email]],
@@ -59,16 +65,16 @@ export class LoginComponent {
 	// }
 
 	constructor() {
-		// ניווט אוטומטי בהצלחה
-		effect(() => {
-			if (this.authStore.isAuthenticated()) {
-				const returnUrl = this.router.parseUrl(this.router.url).queryParams['returnUrl'] || '/';
-				this.router.navigateByUrl(returnUrl);
-				this.notificationService.toast({ severity: 'success', detail: 'התחברת בהצלחה!' });
-			}
-		});
+		// // ניווט אוטומטי בהצלחה
+		// effect(() => {
+		// 	if (this.authStore.isAuthenticated()) {
+		// 		const returnUrl = this.router.parseUrl(this.router.url).queryParams['returnUrl'] || '/';
+		// 		this.router.navigateByUrl(returnUrl);
+		// 		this.notificationService.toast({ severity: 'success', detail: 'התחברת בהצלחה!' });
+		// 	}
+		// });
 	}
-	
+
 	onSubmit() {
 		markFormGroupTouched(this.loginForm);
 

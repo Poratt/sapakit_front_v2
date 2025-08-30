@@ -15,13 +15,13 @@
         </div>
 
         <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-            <div class="form-content">
-                <div class="form-field">
-                    <label for="email">כתובת אימייל</label>
-                    <span class="p-input-icon-left w-full">
-                        <i class="pi pi-envelope"></i>
+            <div class="flex-wrap-wrapper">
+                <div class="flex-wrap-item">
+                    <label for="email">כתובת אימייל*</label>
+                    <p-iconfield>
                         <input pInputText id="email" formControlName="email" placeholder="you@example.com" />
-                    </span>
+                        <p-inputicon styleClass="pi pi-envelope" />
+                    </p-iconfield>
                     @if (email.touched && email.invalid) {
                     <small class="error-message">
                         @if (email.hasError('required')) { יש להזין כתובת אימייל }
@@ -30,7 +30,7 @@
                     }
                 </div>
 
-                <div class="form-field">
+                <div class="flex-wrap-item">
                     <label for="password">סיסמה</label>
                     <p-password id="password" formControlName="password" [feedback]="false" [toggleMask]="true"
                         placeholder="••••••••"></p-password>

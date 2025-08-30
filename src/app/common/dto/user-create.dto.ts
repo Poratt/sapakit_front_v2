@@ -6,6 +6,7 @@ export interface CreateUserDto {
 	email: string;
 	username: string;
 	password: string;
+	accountName: string;
 	// phone?: string;
 	// role: UserRole;
 	// image?: string;

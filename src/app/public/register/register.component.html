@@ -17,7 +17,17 @@
         <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
             <div class="flex-wrap-wrapper">
                 <div class="flex-wrap-item">
-                    <label for="username">שם*</label>
+                    <label for="accountName">שם העסק*</label>
+                    <p-iconfield>
+                        <input pInputText id="accountName" formControlName="accountName" placeholder="העסק שלי" />
+                        <p-inputicon styleClass="pi pi-briefcase" />
+                    </p-iconfield>
+                    @if (accountName.touched && accountName.hasError('required')) {
+                    <small class="error-message">שדה חובה</small>
+                    }
+                </div>
+                <div class="flex-wrap-item">
+                    <label for="username">שם משתמש*</label>
                     <p-iconfield>
                         <input pInputText id="username" formControlName="username" placeholder="הקלד את שמך" />
                         <p-inputicon styleClass="pi pi-user" />
