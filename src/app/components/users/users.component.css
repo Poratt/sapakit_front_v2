@@ -1,6 +1,11 @@
+.rotatable-icon{
+	transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+	
+}
+
+
 .actions-cell {
-	/* max-width: 120px; */
-	overflow: visible; /* זה הפתרון! */
+	overflow: visible;
 	position: relative;
 }
 
@@ -67,4 +72,109 @@
 
 .cancel-btn:hover {
 	background: #5a6268;
+}
+
+/* Expandable rows styling */
+.table-image {
+	width: 32px;
+	height: 32px;
+	border-radius: 50%;
+	object-fit: cover;
+}
+
+.no-image {
+	width: 32px;
+	height: 32px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background-color: #f0f0f0;
+	border-radius: 50%;
+	color: #666;
+}
+
+.badge {
+	display: inline-flex;
+	align-items: center;
+	padding: 4px 8px;
+	background-color: #e3f2fd;
+	color: #1976d2;
+	border-radius: 12px;
+	font-size: 12px;
+	font-weight: 500;
+}
+
+/* Row expansion animation */
+::ng-deep .p-datatable .p-datatable-tbody > tr.p-row-expanded {
+	background-color: #f8f9fa;
+}
+
+/* Expanded content styling */
+.expanded-content {
+	background-color: #f8f9fa;
+	border-left: 4px solid var(--primary-color);
+	padding: 1rem;
+}
+
+.user-card {
+	background: white;
+	border-radius: 8px;
+	padding: 1rem;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+	transition: box-shadow 0.2s ease;
+}
+
+.user-card:hover {
+	box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+/* Item to delete animation */
+.item-to-delete {
+	background-color: #ffebee !important;
+	animation: pulse-red 1s ease-in-out;
+}
+
+@keyframes pulse-red {
+	0% { background-color: #ffebee; }
+	50% { background-color: #ffcdd2; }
+	100% { background-color: #ffebee; }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+	.actions-cell {
+		display: flex;
+		gap: 8px;
+		justify-content: center;
+		margin-top: 8px;
+	}
+	
+	.expanded-content {
+		padding: 0.5rem;
+	}
+	
+	.user-card {
+		padding: 0.75rem;
+	}
+}
+
+/* Grid layout for expanded users */
+.grid {
+	display: grid;
+}
+
+.grid-cols-1 {
+	grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+
+@media (min-width: 768px) {
+	.md\:grid-cols-2 {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+@media (min-width: 1024px) {
+	.lg\:grid-cols-3 {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
 }

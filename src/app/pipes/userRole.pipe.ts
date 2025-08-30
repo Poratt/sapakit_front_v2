@@ -6,7 +6,7 @@ import { UserRole, userRoleData } from '../common/enums/userRole.enum';
 	standalone: true,
 })
 export class userRolePipe implements PipeTransform {
-	transform(userRole: UserRole): string {
+	transform(userRole: UserRole | undefined): string {
 		const foundData = userRoleData.find((data) => data.enumValue === userRole);
 		return foundData ? foundData.label : 'לא מוגדר';
 	}
@@ -30,6 +30,6 @@ export class userRoleIconPipe implements PipeTransform {
 export class userRoleColorPipe implements PipeTransform {
 	transform(userRole: UserRole): string {
 		const foundData = userRoleData.find((data) => data.enumValue === userRole);
-		return foundData && foundData.background ? foundData.background : '';
+		return foundData && foundData.tailwind ? foundData.tailwind : '';
 	}
 }

@@ -72,7 +72,7 @@ export class ProductDialogComponent implements OnInit {
 	private readonly allProducts: Product[] = this.config.data?.products || [];
 
 	productForm: FormGroup = this.fb.group({
-		id: [0],
+		id: [],
 		name: ['', Validators.required],
 		categoryId: [null, Validators.required],
 		package: [Package.Unit],
@@ -94,13 +94,13 @@ export class ProductDialogComponent implements OnInit {
 	}
 
 	ngOnInit(): void {
-		this.categoryStore.loadCategories(this.supplierId);	
+		this.categoryStore.loadCategories(this.supplierId);
 		console.log(this.categories());
-		
+
 		if (this.existingProduct) {
 			this.patchForm(this.existingProduct);
 		} else {
-			const initialCategoryId = this.config.data?.categoryId;			
+			const initialCategoryId = this.config.data?.categoryId;
 			if (initialCategoryId) {
 				this.productForm.patchValue({ categoryId: initialCategoryId });
 			}
@@ -116,7 +116,7 @@ export class ProductDialogComponent implements OnInit {
 			cost: product.cost ?? null,
 			price: product.price ?? null,
 			status: product.status,
-			notes: product.notes || '', 
+			notes: product.notes || '',
 			imageUrl: product.imageUrl || '',
 			position: product.position ?? 0,
 		});
@@ -146,60 +146,90 @@ export class ProductDialogComponent implements OnInit {
 	}
 
 
-onSave(): void {
-	markFormGroupTouched(this.productForm);
-	if(this.productForm.invalid) {
-	this.notificationService.toast({ severity: 'error', detail: 'יש למלא את כל השדות המסומנים באדום' });
-	return;
-}
+	// in product-dialog.component.ts
 
-const formValue = this.productForm.getRawValue();
-const isEditMode = !!formValue.id;
+	onSave(): void {
+		markFormGroupTouched(this.productForm);
+		if (this.productForm.invalid) {
+			this.notificationService.toast({ severity: 'error', detail: 'יש למלא את כל השדות המסומנים באדום' });
+			return;
+		}
 
-const productPayload: Partial<Product> = {
-	...formValue,
-	supplierId: this.supplierId,
-	categoryName: this.categories().find(c => c.id === formValue.categoryId)?.name || 'ללא קטגוריה',
-	position: isEditMode ? formValue.position : this.calculateNewPosition(formValue.categoryId),
-};
+		const formValue = this.productForm.getRawValue();
+		const isEditMode = !!formValue.id;
 
-if (this.isNameTaken(productPayload.name!, formValue.id)) {
-	this.notificationService.toast({ severity: 'error', detail: 'קיים מוצר בשם זה' });
-	return;
-}
+		if (this.isNameTaken(formValue.name!, formValue.id)) {
+			this.notificationService.toast({ severity: 'error', detail: 'קיים מוצר בשם זה' });
+			return;
+		}
 
-const apiCall = isEditMode
-	? this.apiService.updateProduct(formValue.id, productPayload)
-	: this.apiService.addProduct(productPayload);
+		if (isEditMode) {
+			// --- לוגיקה לעדכון ---
+			const payload = {
+				name: formValue.name,
+				categoryId: formValue.categoryId,
+				package: formValue.package,
+				price: formValue.price,
+				cost: formValue.cost,
+				status: formValue.status,
+				notes: formValue.notes,
+				imageUrl: formValue.imageUrl,
+				position: formValue.position,
+			};
+			this.apiService.updateProduct(formValue.id, payload).subscribe({
+				next: this.handleApiResponse.bind(this),
+				error: this.handleApiError.bind(this)
+			});
 
-apiCall.subscribe({
-	next: (response) => {
+		} else {
+			// --- לוגיקה ליצירה ---
+			const payload = {
+				name: formValue.name,
+				categoryId: formValue.categoryId,
+				supplierId: this.supplierId,
+				position: this.calculateNewPosition(formValue.categoryId),
+				package: formValue.package,
+				price: formValue.price,
+				cost: formValue.cost,
+				status: formValue.status,
+				notes: formValue.notes,
+				imageUrl: formValue.imageUrl
+			};
+			this.apiService.addProduct(payload).subscribe({
+				next: this.handleApiResponse.bind(this),
+				error: this.handleApiError.bind(this)
+			});
+		}
+	}
+
+	// --- פונקציות עזר לטיפול בתגובה ---
+	private handleApiResponse(response: any): void {
 		if (response.success && response.result) {
+			const formValue = this.productForm.getRawValue();
 			const resultProduct = {
 				...response.result,
-				categoryName: productPayload.categoryName,
+				categoryName: this.categories().find(c => c.id === formValue.categoryId)?.name || 'ללא קטגוריה',
 			};
-			this.f['categoryId'].setValue(productPayload.categoryName)
-			this.notificationService.toast({ severity: 'success', detail: response.message || 'הפעולה בוצעה בהצלחה' });
+			this.notificationService.toast({ severity: 'success', detail: response.message });
 			this.ref.close(resultProduct);
 		} else {
-			this.notificationService.toast({ severity: 'error', detail: response.message || 'הפעולה נכשלה' });
+			this.notificationService.toast({ severity: 'error', detail: response.message });
 		}
-	},
-	error: () => this.notificationService.toast({ severity: 'error', detail: 'אירעה שגיאה קריטית' }),
-});
 	}
-    
-    private isNameTaken(name: string, currentId: number): boolean {
-	return this.allProducts.some(p => p.name.toLowerCase() === name.toLowerCase() && p.id !== currentId);
-}
-    
-    private calculateNewPosition(categoryId: number | null): number {
-	const productsInSameCategory = this.allProducts.filter(p => p.categoryId === categoryId);
-	return productsInSameCategory.length;
-}
 
-onCancel(): void {
-	this.ref.close(null);
-}
+	private handleApiError(err: any): void {
+		this.notificationService.toast({ severity: 'error', detail: err.error?.message });
+	}
+	private isNameTaken(name: string, currentId: number): boolean {
+		return this.allProducts.some(p => p.name.toLowerCase() === name.toLowerCase() && p.id !== currentId);
+	}
+
+	private calculateNewPosition(categoryId: number | null): number {
+		const productsInSameCategory = this.allProducts.filter(p => p.categoryId === categoryId);
+		return productsInSameCategory.length;
+	}
+
+	onCancel(): void {
+		this.ref.close(null);
+	}
 }

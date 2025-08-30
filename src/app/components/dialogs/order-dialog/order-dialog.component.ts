@@ -12,7 +12,7 @@ import { LoaderComponent } from '../../shared/loader/loader.component';
 import { MessageModule } from 'primeng/message';
 import { TooltipModule } from 'primeng/tooltip';
 import { DragDropModule, CdkDragDrop, moveItemInArray, transferArrayItem, CdkDragMove } from '@angular/cdk/drag-drop';
-import { map } from 'rxjs/operators';
+import { map, tap } from 'rxjs/operators';
 import { OrderStatus, orderStatusData } from '../../../common/enums/order-status.enum';
 import { Package, PackageData } from '../../../common/enums/package';
 import { ApiService } from '../../../services/api.service';
@@ -199,41 +199,52 @@ export class OrderDialogComponent {
   }
 
 
-  private getData() {
+// in order-dialog.component.ts
+
+private getData() {
     if (!this.supplier?.id) {
-      this.pageState.set(PageStates.Error);
-      return;
+        this.pageState.set(PageStates.Error);
+        return;
     }
 
     this.pageState.set(PageStates.Loading);
     this.ApiService.getProductsBySupplier(this.supplier.id).pipe(
-      map((response: ServiceResultContainer<Product[]>) => {
-        if (response.success && response.result) {
-          this.availableProducts.set(response.result);
+        // ✅ התיקון כאן: השתמש ב-tap במקום map
+        tap((response: ServiceResultContainer<Product[]>) => {
+            if (response.success && response.result) {
+                // אם יש תוצאות, טפל בהן
+                if (response.result.length > 0) {
+                    this.availableProducts.set(response.result);
 
-          const products: { [productId: number]: number } = {};
-          response.result.forEach(product => {
-            products[product.id] =
-              this.existingOrder?.orderProducts?.find(p => p.productId === product.id)?.quantity || 0;
-          });
+                    const products: { [productId: number]: number } = {};
+                    response.result.forEach(product => {
+                        products[product.id] =
+                            this.existingOrder?.orderProducts?.find(p => p.productId === product.id)?.quantity || 0;
+                    });
 
-          this.initialOrderProducts = { ...products };
-          this.initialNotes = this.existingOrder?.notes || '';
-          console.log(this.initialOrderProducts);
+                    this.initialOrderProducts = { ...products };
+                    this.initialNotes = this.existingOrder?.notes || '';
 
-          this.orderProducts.set(products);
-          this.notes.set(this.initialNotes);
+                    this.orderProducts.set(products);
+                    this.notes.set(this.initialNotes);
 
-          this.orderedAvailableProducts.set(response.result);
-          this.pageState.set(PageStates.Ready);
-        } else {
-          this.pageState.set(PageStates.Empty);
-        }
-      })
+                    this.orderedAvailableProducts.set(response.result);
+                    this.pageState.set(PageStates.Ready);
+                } else {
+                    // ✅ אם יש הצלחה אבל התוצאה היא מערך ריק
+                    this.pageState.set(PageStates.Empty);
+                }
+            } else {
+                // ✅ אם ה-API החזיר success: false
+                this.pageState.set(PageStates.Error);
+            }
+        })
     ).subscribe({
-      error: () => this.pageState.set(PageStates.Error),
+        // אנחנו יכולים להשאיר את בלוק ה-next ריק, כי tap כבר עשה את העבודה
+        next: () => { /* Logic is now in tap */ },
+        error: () => this.pageState.set(PageStates.Error),
     });
-  }
+}
 
 
   resetForm(): void {

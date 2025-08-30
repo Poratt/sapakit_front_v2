@@ -1,35 +1,36 @@
-// in header.component.ts
-
 import { CommonModule } from '@angular/common';
 import { Component, inject, computed } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { BadgeModule } from 'primeng/badge';
-import { PopoverModule } from 'primeng/popover'; // ✅ ייבוא הרכיב החדש
 import { MenuService } from '../../../services/menu.service';
 import { AuthStore } from '../../../store/auth.store';
 import { InsightStore } from '../../../store/insight.store';
 import { ApiService } from '../../../services/api.service';
-import { ButtonModule } from 'primeng/button';
 import { StatsStore } from '../../../store/stats.store';
 import { OrderFlowService } from '../../../services/order-flow.service';
 import { SupplierStore } from '../../../store/supplier.store';
 import { Insight } from '../../../common/models/insight';
-import { TableModule } from "primeng/table";
 import { BadgeComponent } from "../badge/badge.component";
 import { HebrewDatePipe } from "../../../pipes/hebrew-date.pipe";
 import { OrderStatusPipe } from "../../../pipes/orderStatus.pipe";
 import { OrderStatus, orderStatusData } from '../../../common/enums/order-status.enum';
 import { Order } from '../../../common/models/order';
-import { TooltipModule } from 'primeng/tooltip';
 import { OrderStore } from '../../../store/order.store';
-import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { parseDateStringAsLocal } from '../../../common/utils/date.utils';
 import { NotificationService } from '../../../services/notification.service';
+
+import { BadgeModule } from 'primeng/badge';
+import { PopoverModule } from 'primeng/popover'; // ✅ ייבוא הרכיב החדש
+import { ButtonModule } from 'primeng/button';
+import { TableModule } from "primeng/table";
+import { TooltipModule } from 'primeng/tooltip';
+import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
+import { userRolePipe } from "../../../pipes/userRole.pipe";
+
 
 @Component({
 	selector: 'app-header',
 	standalone: true,
-	imports: [CommonModule, RouterModule, BadgeModule, PopoverModule, ButtonModule, TooltipModule, TableModule, BadgeComponent, HebrewDatePipe, OrderStatusPipe], // ✅ עדכון ה-imports
+	imports: [CommonModule, RouterModule, BadgeModule, PopoverModule, ButtonModule, TooltipModule, TableModule, BadgeComponent, HebrewDatePipe, OrderStatusPipe, userRolePipe], // ✅ עדכון ה-imports
 	providers: [DialogService],
 	templateUrl: './header.component.html',
 	styleUrl: './header.component.css',

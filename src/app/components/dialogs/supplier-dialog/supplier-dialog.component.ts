@@ -65,7 +65,7 @@ export function orderSelectionValidator(): ValidatorFn {
 	templateUrl: './supplier-dialog.component.html',
 	styleUrl: './supplier-dialog.component.css',
 	animations: [fadeIn400,
-		
+
 	],
 })
 export class SupplierDialogComponent {
@@ -85,7 +85,7 @@ export class SupplierDialogComponent {
 
 	supplierForm: FormGroup = this.fb.group(
 		{
-			id: [0],
+			id: [],
 			name: ['', Validators.required],
 			status: [Status.Active, Validators.required],
 			phone: ['', [Validators.required, Validators.pattern(/^\+?\d{10,12}$/)]],
@@ -251,104 +251,52 @@ export class SupplierDialogComponent {
 			});
 			return;
 		}
-		const sortedOrderDays = [...this.orderDays.value].sort((a, b) => a - b);
-		const sortedOrderDates = [...this.orderDates.value].sort((a, b) => a - b);
 
-		const supplier: Supplier = {
-			...this.supplierForm.value,
-			orderDays: sortedOrderDays || [],
-			orderDates: sortedOrderDates || [],
-			status: this.status.value,
-			createdAt: this.supplierForm.value.id ? undefined : new Date(),
-			updatedAt: new Date(),
+		const formValue = this.supplierForm.getRawValue();
+		const isEditMode = !!formValue.id;
+
+		// 1. בנה payload נקי
+		const payload = {
+			name: formValue.name,
+			phone: formValue.phone,
+			email: formValue.email,
+			status: formValue.status,
+			orderType: formValue.orderType,
+			orderDays: [...formValue.orderDays].sort((a, b) => a - b),
+			orderDates: [...formValue.orderDates].sort((a, b) => a - b),
+			reminderType: formValue.reminderType,
+			image: formValue.image,
 		};
 
 		const suppliers = this.config.data?.suppliers || [];
 		const isNameTaken = suppliers.some(
-			(s: Supplier) => s.name === supplier.name && s.id !== supplier.id,
+			(s: Supplier) => s.name === payload.name && s.id !== formValue.id
 		);
 		if (isNameTaken) {
-			this.notificationService.toast({
-				severity: 'error',
-				// summary: 'שגיאה',
-				detail: 'שם הספק כבר קיים',
-			});
+			this.notificationService.toast({ severity: 'error', detail: 'שם הספק כבר קיים' });
 			return;
 		}
 
-		if (supplier.id) {
-			this.apiService.updateSupplier(supplier.id, supplier).subscribe({
-				next: (response: ServiceResultContainer<Supplier>) => {
-					console.log('Update response:', response);
-					if (response.success && response.result) {
-						this.notificationService.toast({
-							severity: 'success',
-							// summary: 'עודכן',
-							detail: response.message || 'הספק עודכן בהצלחה.',
-						});
-						const updatedSupplier = response.result;
-						this.ref.close(updatedSupplier);
-					} else if (response.message?.includes('שם הספק כבר קיים')) {
-						this.notificationService.toast({
-							severity: 'error',
-							// summary: 'שגיאה',
-							detail: 'שם הספק כבר קיים',
-						});
-					} else {
-						this.notificationService.toast({
-							severity: 'error',
-							// summary: 'שגיאה',
-							detail: response.message || 'לא ניתן לעדכן ספק.',
-						});
-					}
-				},
-				error: (err) => {
-					console.error('Update error:', err);
-					this.notificationService.toast({
-						severity: 'error',
-						// summary: 'שגיאה',
-						detail: 'אירעה שגיאה בעדכון הספק.',
-					});
-				},
-			});
-		} else {
-			// הוספת ספק חדש
-			this.apiService.addSupplier(supplier).subscribe({
-				next: (response: ServiceResultContainer<Supplier>) => {
-					console.log('Add response:', response);
-					if (response.success && response.result) {
-						this.notificationService.toast({
-							severity: 'success',
-							// summary: 'נוסף',
-							detail: response.message || 'הספק נוסף בהצלחה.',
-						});
-						const newSupplier = response.result;
-						console.log('Closing dialog with new supplier:', newSupplier);
-						this.ref.close(newSupplier);
-					} else if (response.message?.includes('שם הספק כבר קיים')) {
-						this.notificationService.toast({
-							severity: 'error',
-							// summary: 'שגיאה',
-							detail: 'שם הספק כבר קיים',
-						});
-					} else {
-						this.notificationService.toast({
-							severity: 'error',
-							// summary: 'שגיאה',
-							detail: response.message || 'לא ניתן להוסיף ספק.',
-						});
-					}
-				},
-				error: (err) => {
-					console.error('Add error:', err);
-					this.notificationService.toast({
-						severity: 'error',
-						// summary: 'שגיאה',
-						detail: 'אירעה שגיאה בהוספת הספק.',
-					});
-				},
-			});
-		}
+		const apiCall$ = isEditMode
+			? this.apiService.updateSupplier(formValue.id, payload)
+			: this.apiService.addSupplier(payload);
+
+		apiCall$.subscribe({
+			next: (response) => {
+				if (response.success && response.result) {
+					this.notificationService.toast({ severity: 'success', detail: response.message });
+					this.ref.close(response.result); // החזר את הישות המעודכנת/החדשה
+				} else {
+					this.notificationService.toast({ severity: 'error', detail: response.message });
+				}
+			},
+			error: (err) => {
+				this.notificationService.toast({
+					severity: 'error',
+					detail: err.error?.message || 'אירעה שגיאה',
+				});
+			}
+		});
 	}
 
 	isAllSelected(arrayName: 'orderDays' | 'orderDates'): boolean {

@@ -14,10 +14,7 @@ import { NotificationService } from '../services/notification.service';
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
 	private authService = inject(AuthService);
-	private notificationService = inject(NotificationService);
-
-
-
+	private notificationService = inject(NotificationService)
 	private isRefreshing = false;
 	private refreshTokenSubject: BehaviorSubject<string | null> = new BehaviorSubject<
 		string | null
@@ -30,17 +27,18 @@ export class AuthInterceptor implements HttpInterceptor {
 		return next.handle(authReq).pipe(
 			catchError((error) => {
 				if (error.status === 0) {
-                    const customError = { message: 'לא ניתן להתחבר לשרת. אנא בדוק את חיבור האינטרנט או נסה שוב מאוחר יותר.' };
-                    
-                    // ❌ אל תציג הודעה כאן
-                    // this.notificationService.toast(...);
-                    
-                    // ✅ רק תזרוק את השגיאה הנקייה
-                    return throwError(() => customError);
-                }
+					const customError = { message: 'לא ניתן להתחבר לשרת. אנא בדוק את חיבור האינטרנט או נסה שוב מאוחר יותר.' };
+
+					// ❌ אל תציג הודעה כאן
+					// this.notificationService.toast(...);
+
+					// ✅ רק תזרוק את השגיאה הנקייה
+					return throwError(() => customError);
+				}
 				if (
 					error instanceof HttpErrorResponse &&
 					error.status === 401 &&
+					!request.url.includes('/auth/login') &&
 					!request.url.includes('/auth/refresh')
 				) {
 					return this.handle401Error(request, next);

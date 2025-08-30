@@ -1,4 +1,4 @@
-import { Component, ElementRef, inject, signal, ViewChild } from '@angular/core';
+import { Component, computed, ElementRef, inject, signal, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, Validators, } from '@angular/forms';
 import { DynamicDialogRef, DynamicDialogConfig } from 'primeng/dynamicdialog';
 import { Status, statusData } from '../../../common/enums/status.enum';
@@ -18,6 +18,9 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { environment } from '../../../../environments/environment';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { User } from '../../../common/models/user';
+import { CreateUserDto } from '../../../common/dto/user-create.dto';
+import { HttpErrorResponse } from '@angular/common/http';
+import { AuthStore } from '../../../store/auth.store';
 
 @Component({
 	selector: 'app-user-dialog',
@@ -44,6 +47,10 @@ export class UserDialogComponent {
 	private config = inject(DynamicDialogConfig);
 	private notificationService = inject(NotificationService);
 	private apiService = inject(ApiService);
+
+	private readonly authStore = inject(AuthStore);
+
+	readonly isCurrentUserAdmin = computed(() => this.authStore.user()?.role === UserRole.Admin);
 
 	@ViewChild('emailRef') emailRef!: ElementRef;
 
@@ -95,15 +102,21 @@ export class UserDialogComponent {
 	}
 
 	ngOnInit() {
-		const user = this.config.data?.user;
-		// Create user
-		if (!user || user.id === 0) {
-			this.status.disable();
-		}
-		// Edit user
-		if (user && user.id) {
+		const userToEdit = this.config.data?.user;
+
+		if (userToEdit) { // מצב עריכה
 			this.userForm.removeControl('password');
-			this.patchForm(user);
+			this.patchForm(userToEdit);
+		} else { // מצב יצירה
+			this.status.disable();
+            
+            // ✅ התיקון הקריטי כאן
+            if (this.isCurrentUserAdmin()) {
+                // אם המשתמש המחובר הוא Admin, קבע את התפקיד כ-User ונטרל את השדה
+                this.role.setValue(UserRole.User);
+                this.role.disable();
+            }
+
 		}
 
 		setTimeout(() => {
@@ -232,11 +245,12 @@ export class UserDialogComponent {
 	private createFormData(): FormData {
 		const formData = new FormData();
 		const formValue = this.userForm.getRawValue();;
+		console.log(formValue);
 
 		// Append core fields
 		formData.append('email', formValue.email);
 		formData.append('username', formValue.username);
-		formData.append('role', formValue.role);
+		formData.append('role', formValue.role.toString());
 		formData.append('status', formValue.status.toString());
 
 		// Append optional fields only if they have a value
@@ -250,48 +264,56 @@ export class UserDialogComponent {
 			formData.append('image', formValue.image, formValue.image.name);
 		}
 
+		console.log("--- FormData Content ---");
+		for (let [key, value] of formData.entries()) {
+			console.log(`${key}:`, value);
+		}
+		console.log("------------------------");
+
 		return formData;
 	}
 
-	//  update an existing user.
+	// in user-dialog.component.ts
+
 	private updateExistingUser(id: number, formData: FormData): void {
 		this.apiService.updateUser(id, formData).subscribe({
 			next: (response) => {
-				if (response.success) {
-					this.ref.close(response.result); // Close dialog with the updated user data
+				if (response.success && response.result) {
+					// this.notificationService.toast({ severity: 'success', detail: 'המשתמש עודכן בהצלחה' });
+					this.ref.close(response.result);
 				} else {
 					this.notificationService.toast({ severity: 'error', detail: response.message });
 				}
 			},
-			error: (err) => {
-				this.notificationService.toast({ severity: 'error', detail: err.message });
+			error: (err: HttpErrorResponse) => { // ✅ התיקון הקריטי
+				this.notificationService.toast({
+					severity: 'error',
+					// חלץ את ההודעה הידידותית מהשרת
+					detail: err.error?.message || 'שגיאה בעדכון המשתמש',
+				});
 			}
 		});
 	}
 
-	//  register a new user.
 	private registerNewUser(formData: FormData): void {
-		// const formValue = formData;
-		// const registrationPayload: CreateUserDto = {
-		// 	email: formValue.email,
-		// 	username: formValue.username,
-		// 	password: formValue.password
-		// 	// שים לב: אנחנו לא כוללים את confirmPassword ו-rememberMe
-		// };
-		// console.log(registrationPayload);
-		// this.apiService.register(formData).subscribe({
-		// 	next: (response) => {
-		// 		if (response.success) {
-		// 			this.ref.close(response.result); // Close dialog and signal success to refresh the list
-		// 		} else {
-		// 			this.notificationService.toast({ severity: 'error', detail: response.message });
-		// 		}
-		// 	},
-		// 	// error: (err) => {
-		// 	// 	this.notificationService.toast({ severity: 'error', detail: err.message });
-		// 	// }
-		// });
+		this.apiService.addUser(formData).subscribe({
+			next: (response) => {
+				if (response.success && response.result) {
+					this.notificationService.toast({ severity: 'success', detail: 'משתמש חדש נוסף בהצלחה' });
+					this.ref.close(response.result);
+				} else {
+					this.notificationService.toast({ severity: 'warn', detail: response.message || 'הפעולה לא הצליחה' });
+				}
+			},
+			error: (err: HttpErrorResponse) => { // ✅ התיקון הקריטי
+				this.notificationService.toast({
+					severity: 'error',
+					detail: err.error?.message || 'שגיאה לא צפויה אירעה'
+				});
+			}
+		});
 	}
+
 	onCancel() {
 		this.ref.close();
 	}

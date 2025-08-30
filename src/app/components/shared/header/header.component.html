@@ -16,25 +16,26 @@
 
   <div class="header-right">
 
-    <div class="flex gap-6 pt-2">
+    <div class="flex gap-6">
       <!-- AI Insight -->
-      <div class="insights-bell" (click)="insightsPopover.toggle($event)">
-        <i class="pi pi-sparkles p-overlay-badge">
-          @if (insightStore.hasUnread()) {
-          <p-badge size="small" [value]="insightStore.unreadCount().toString()" styleClass="custom-badge"></p-badge>
-          }
-        </i>
-      </div>
-      <!-- ALARM - NOTIFICATIONS - TODAY ORDERS -->
-      <div class="today-orders" (click)="todayOrdersPopup.toggle($event)">
-        <i class="pi pi-bell p-overlay-badge">
-          @if (stats().dueToday > 0) {
-          <p-badge size="small" [value]="stats().dueToday.toString()" styleClass="custom-badge"></p-badge>
-          }
-        </i>
+      <div class="flex items-center gap-3">
+        <div class="insights-bell" (click)="insightsPopover.toggle($event)">
+          <i class="pi pi-sparkles p-overlay-badge !text-base">
+            @if (insightStore.hasUnread()) {
+            <p-badge size="small" [value]="insightStore.unreadCount().toString()" styleClass="custom-badge"></p-badge>
+            }
+          </i>
+        </div>
+        <!-- ALARM - NOTIFICATIONS - TODAY ORDERS -->
+        <div class="today-orders" (click)="todayOrdersPopup.toggle($event)">
+          <i class="pi pi-bell p-overlay-badge !text-base">
+            @if (stats().dueToday > 0) {
+            <p-badge size="small" [value]="stats().dueToday.toString()" styleClass="custom-badge"></p-badge>
+            }
+          </i>
+        </div>
       </div>
     </div>
-
 
     <!-- USER PROFILE  -->
     @if (!isGuest() && username()) {
@@ -144,11 +145,30 @@
 <p-popover #userPopover appendTo="body" styleClass="user-popover">
   <ng-template pTemplate="content">
     <div class="user-panel">
-      <div class="action-item" (click)="userPopover.hide()"><i class="pi pi-user"></i><span>פרופיל</span></div>
-      <div class="action-item" (click)="userPopover.hide()"><i class="pi pi-cog"></i><span>הגדרות</span></div>
-      <div class="separator"></div>
-      <div class="action-item logout" (click)="logout(); userPopover.hide()"><i
-          class="pi pi-sign-out"></i><span>יציאה</span></div>
+      <div class="account-info">
+        <span class="account-name">{{ user()?.account?.name }}</span>
+        <!-- <span class="account-role">{{ user()?.role | userRole }}</span>  -->
+      </div>
+      <div class="flex flex-col gap-1 p-1">
+        <div class="action-item" (click)="userPopover.hide()">
+          <i class="pi pi-user"></i>
+          <span>פרופיל</span>
+        </div>
+
+        <div class="action-item" (click)="userPopover.hide()">
+          <i class="pi pi-cog"></i>
+          <span>הגדרות</span>
+        </div>
+
+        <div class="separator"></div>
+
+        <div class="action-item logout" (click)="logout(); userPopover.hide()">
+          <i class="pi pi-sign-out"></i>
+          <span>יציאה</span>
+        </div>
+
+
+      </div>
     </div>
   </ng-template>
 </p-popover>

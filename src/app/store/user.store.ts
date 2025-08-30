@@ -39,10 +39,16 @@ export const UserStore = signalStore(
 					users: [...state.users, user],
 				}));
 			},
-			updateUser(updatedUser: User): void {
+			updateUser(updatedUser: Partial<User>): void {
 				patchState(store, (state) => ({
-					users: state.users.map((u) => (u.id === updatedUser.id ? updatedUser : u)),
+					users: state.users.map(u => {
+						if (u.id === updatedUser.id) {
+							return { ...u, ...updatedUser };
+						}
+						return u;
+					}),
 				}));
+
 			},
 			removeUser(userId: number): void {
 				patchState(store, (state) => ({
@@ -80,34 +86,34 @@ export const UserStore = signalStore(
 					),
 				),
 			),
+			// in user.store.ts -> withMethods
+
 			deleteUser: rxMethod<number>(
-				pipe(
-					tap(() => patchState(store, { isLoading: true })),
-					switchMap((userId) =>
-						apiService.deleteUser(userId).pipe(
-							tap({
-								next: () => {
-									syncMethods.removeUser(userId);
-									// patchState(store, { isLoading: false });
-									notificationService.toast({
-										severity: 'success',
-										detail: 'המשתמש נמחק בהצלחה',
-									});
-								},
-							}),
-							catchError((err) => {
-								patchState(store, { isLoading: false, error: err.message });
-								notificationService.toast({
-									severity: 'error',
-									detail: 'שגיאה במחיקת המשתמש',
-								});
-								return of();
-							}),
-						),
-					),
-				),
-			),
+    pipe(
+        // אל תעדכן את ה-error state הגלובלי בכלל
+        switchMap((userId) => 
+            apiService.deleteUser(userId).pipe(
+                tap({
+                    next: () => {
+                        patchState(store, (state) => ({
+                            users: state.users.filter(u => u.id !== userId),
+                        }));
+                        notificationService.toast({ severity: 'success', detail: 'המשתמש נמחק בהצלחה' });
+                    },
+                    error: (err: HttpErrorResponse) => {
+                        // טפל בשגיאה באופן מקומי - רק הצג הודעה
+                        const errorMessage = err.error?.message || 'שגיאה במחיקת המשתמש';
+                        notificationService.toast({ severity: 'error', detail: errorMessage });
+                    }
+                }),
+                // ה-catchError רק מונע קריסה
+                catchError(() => of(null)) 
+            )
+        )
+    )
+),
 		};
+
 
 		// --- שלב 3: החזר את כל המתודות מאוחדות ---
 		return {

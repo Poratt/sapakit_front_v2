@@ -15,6 +15,7 @@ import { DashboardStats } from '../common/models/statistics';
 import { Supplier } from '../common/models/supplier';
 import { User } from '../common/models/user';
 import { CreateUserDto } from '../common/dto/user-create.dto';
+import { Account } from '../common/models/account';
 
 export interface OrderSuggestion {
 	productId: number;
@@ -26,25 +27,36 @@ export class ApiService {
 	private http = inject(HttpClient);
 	private apiUrl = environment.apiUrl;
 
+	//Accounts
+	getAllAccountsWithUsers(): Observable<ServiceResultContainer<Account[]>> {
+		return this.http.get<ServiceResultContainer<Account[]>>(`${this.apiUrl}/accounts/with-users`);
+	}
+
+	deleteAccount(accountId: number): Observable<ServiceResultContainer<void>> {
+		return this.http.delete<ServiceResultContainer<void>>(`${this.apiUrl}/accounts/${accountId}`);
+	}
+
 	// Users
 	getUsers(): Observable<ServiceResultContainer<User[]>> {
 		return this.http.get<ServiceResultContainer<User[]>>(`${this.apiUrl}/users`);
-
 	}
 
-	register(newUser: CreateUserDto): Observable<ServiceResultContainer<null>> {
-		return this.http.post<ServiceResultContainer<null>>(`${this.apiUrl}/users/register`, newUser);
+	//New Account
+	register(newUser: CreateUserDto): Observable<ServiceResultContainer<User>> {
+		return this.http.post<ServiceResultContainer<User>>(`${this.apiUrl}/auth/register`, newUser);
+	}
 
+	// New User
+	addUser(formData: FormData): Observable<ServiceResultContainer<User>> {
+		return this.http.post<ServiceResultContainer<User>>(`${this.apiUrl}/users/add`, formData);
 	}
 
 	updateUser(id: number, formData: FormData): Observable<ServiceResultContainer<User>> {
 		return this.http.put<ServiceResultContainer<User>>(`${this.apiUrl}/users/${id}`, formData);
-
 	}
 
 	deleteUser(id: number): Observable<ServiceResultContainer<void>> {
 		return this.http.delete<ServiceResultContainer<void>>(`${this.apiUrl}/users/${id}`);
-
 	}
 
 

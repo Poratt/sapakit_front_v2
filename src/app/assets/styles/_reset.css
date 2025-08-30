@@ -205,7 +205,7 @@ p-splitbutton {
 		}
 	}
 	.p-splitbutton-button.p-button-small.p-button-sm {
-		padding: 4px 8px  4px 0px !important;
+		padding: 4px 8px 4px 0px !important;
 		gap: 0;
 	}
 }
@@ -243,6 +243,7 @@ p-tieredmenusub {
 
 	.p-dialog-header {
 		/* background: var(--primary-50); */
+		
 		color: var(--grey-800);
 		padding: 12px 20px;
 		.p-button-text.p-button-secondary {
@@ -260,7 +261,7 @@ p-tieredmenusub {
 		}
 	}
 
-	&.bottom-overlay{
+	&.bottom-overlay {
 		position: relative;
 	}
 	.p-dialog-title {
@@ -318,6 +319,11 @@ p-tieredmenusub {
 	.p-dialog-content {
 		padding: 0 !important;
 	}
+}
+
+.dialog-header {
+	white-space: nowrap;
+
 }
 /* button.p-button {
   display: flex;
@@ -500,6 +506,29 @@ textarea,
 			width: 2px;
 			background-color: var(--red-500);
 		}
+	}
+}
+
+tr[ng-reflect-animation-trigger='rowExpansionTrigger'] {
+	backface-visibility: hidden;
+	perspective: 1000px;
+
+	>td{
+		background-color: green!important;
+		border:1px solid  green!important;
+	}
+}
+
+.expanded-table-content {
+	box-shadow: none;
+	border: 1px solid var(--grey-100);
+	th {
+		background-color: var(--grey-40) !important;
+	}
+	>td {
+		padding: 0;
+		background-color: green !important;
+		border: 1px solid green !important;
 	}
 }
 

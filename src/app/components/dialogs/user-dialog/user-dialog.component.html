@@ -52,8 +52,9 @@
             }
             <div class="flex-wrap-item">
                 <label for="role">תפקיד*</label>
-                <p-select id="role" formControlName="role" [options]="userRoleData" optionLabel="label"
-                    optionValue="enumValue" appendTo="body" styleClass="w-full">
+                <p-select id="role" formControlName="role" [options]="userRoleData" 
+        optionLabel="label" optionValue="enumValue" appendTo="body" styleClass="w-full"
+        [disabled]="isCurrentUserAdmin() && id.value === 0">
                     <ng-template #selectedItem let-selectedOption>
                         <div class="flex items-center gap-2 text-xs" *ngIf="selectedOption">
                             <span class="" [ngClass]="selectedOption.icon"></span>

@@ -1,7 +1,7 @@
 <div class="dialog-content no-padding" #dialogContent>
   <p-confirmDialog [style]="{width: '350px'}" [baseZIndex]="10000" rejectButtonStyleClass="p-button-text"></p-confirmDialog>
 
-  <div class="flex flex-col gap-2 w-full h-full">
+  <div class="flex flex-col gap-2 w-full h-full min-h-52">
     @if (supplier && date) {
       <div class="flex flex-col gap-1">
         <div class="flex flex-col">
@@ -107,6 +107,7 @@
           </div>
         }
         @case (PageStates().Ready) {
+          {{ PageStates()[pageState()]}}
           <div class="grid grid-cols-2 gap-0" cdkDropList cdkDropListGroup cdkDropListOrientation="mixed" [cdkDropListData]="groupedProducts()" (cdkDropListDropped)="dropCategory($event)">
             @for (group of groupedProducts(); track group.categoryName; let i = $index) {
               <div class="category-drag-container" cdkDrag [cdkDragDisabled]="!dragAndDropEnable()" (cdkDragMoved)="onDragMoved($event)">
