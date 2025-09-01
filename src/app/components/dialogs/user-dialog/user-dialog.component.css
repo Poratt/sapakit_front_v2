@@ -1,3 +1,51 @@
+/* Styling for the password requirements list */
+.password-rules {
+  list-style-type: none;
+  padding: 0 1rem;
+  margin: 0;
+  font-size: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  li {
+   display: flex;
+   align-items: center;
+   gap: 0.5rem;
+   color: var(--grey-500); 
+   transition: color 0.3s ease;
+  }
+  
+  li .pi {
+   font-size: 0.8rem;
+   transition: color 0.3s ease;
+   color: var(--red-400); 
+  }
+  
+  
+  li.valid span {
+   color: var(--green-600); 
+   text-decoration: line-through; 
+  }
+  
+  li.valid .pi {
+   color: var(--green-500); 
+  }
+  
+}
+:host {
+  --p-password-strength-weak-background: linear-gradient(135deg, var(--red-500) 0%, var(--red-600) 50%, var(--red-700) 100%);
+  --p-password-strength-medium-background: linear-gradient(135deg, var(--yellow-500) 0%, var(--yellow-600) 50%, var(--yellow-700) 100%);
+  --p-password-strength-strong-background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 50%, var(--primary-700) 100%);
+}
+
+::ng-deep .p-password-meter-text{
+  font-size: 12px;
+  padding: 0;
+  margin: auto0;
+  
+}
+
+
 .image-upload-container {
     width: 100%;
     max-width: 240px;

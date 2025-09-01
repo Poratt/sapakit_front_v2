@@ -46,7 +46,7 @@ export const AuthStore = signalStore(
 	withMethods(
 		(
 			store,
-			router = inject(Router), 
+			router = inject(Router),
 			authService = inject(AuthService),
 			notificationService = inject(NotificationService),
 			supplierStore = inject(SupplierStore),
@@ -57,8 +57,8 @@ export const AuthStore = signalStore(
 			statsStore = inject(StatsStore),
 			insightStore = inject(InsightStore),
 		) => {
-			// --- מתודות אסינכרוניות ---
 
+			
 			const loadUser = rxMethod<void>(
 				pipe(
 					tap(() => patchState(store, { isLoading: true, error: null })),
@@ -67,6 +67,13 @@ export const AuthStore = signalStore(
 							tap({
 								next: (user: User | null) => {
 									patchState(store, { user, isLoading: false });
+									// if (user) {
+									// 	if (user.role === UserRole.SysAdmin) {
+									// 		router.navigate(['/admin/dashboard']);
+									// 	} else {
+									// 		router.navigate(['/']);
+									// 	}
+									// }
 								},
 								error: (err) => {
 									patchState(store, { user: null, isLoading: false, error: err.message });
@@ -77,7 +84,6 @@ export const AuthStore = signalStore(
 				),
 			);
 
-			// --- מחזירים את כל המתודות ---
 			return {
 				async initialize(): Promise<void> {
 					patchState(store, { isLoading: true });
@@ -132,7 +138,7 @@ export const AuthStore = signalStore(
 										if (response.success && response.result) {
 											// ✅ קוראים למתודה המקומית
 											loadUser();
-											router.navigate(['/']);
+											// router.navigate(['/']);
 										} else {
 											throw new Error(response.message || 'Login failed');
 										}

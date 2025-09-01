@@ -72,6 +72,28 @@ export function passwordValidator(control: AbstractControl): ValidationErrors | 
 	return null;
 }
 
+export function detailedPasswordValidator(): ValidatorFn {
+	return (control: AbstractControl): ValidationErrors | null => {
+		const value = control.value || '';
+
+		// בדוק את כל החוקים
+		const hasUpperCase = /[A-Z]/.test(value);
+		const hasLowerCase = /[a-z]/.test(value);
+		const hasNumeric = /[0-9]/.test(value);
+		const isLongEnough = value.length >= 8;
+
+		// צור אובייקט שגיאות
+		const errors: ValidationErrors = {};
+		if (!hasUpperCase) errors['noUpperCase'] = true;
+		if (!hasLowerCase) errors['noLowerCase'] = true;
+		if (!hasNumeric) errors['noNumeric'] = true;
+		if (!isLongEnough) errors['minLength'] = true; // אפשר להשתמש בזה במקום ב-minLength המובנה
+
+		// החזר את האובייקט רק אם יש בו שגיאות
+		return Object.keys(errors).length > 0 ? errors : null;
+	};
+}
+
 export const phoneValidator: ValidatorFn = Validators.pattern('^0[0-9]{8,9}$');
 // export const landLineValidator: ValidatorFn = Validators.pattern('^0[0-9]{8}$');
 export const mobileValidator: ValidatorFn = Validators.pattern('^0[0-9]{9}$');

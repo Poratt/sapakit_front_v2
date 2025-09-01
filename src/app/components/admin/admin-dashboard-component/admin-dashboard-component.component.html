@@ -1,0 +1,86 @@
+<div class="p-responsive">
+    @switch (pageState()) {
+        @case(PageStates.Loading) { <app-loader></app-loader> }
+        @case(PageStates.Error) {
+            <div @fadeIn400 class="error-card-container">
+                <div class="error-card">
+                    <div class="error-icon-wrapper"><span class="material-symbols-rounded">cloud_off</span></div>
+                    <h3 class="error-title">אופס, משהו השתבש</h3>
+                    <button (click)="loadKpis(true)" class="primary md retry-button">
+                        <span class="material-symbols-rounded">refresh</span>
+                        <span>נסה שוב</span>
+                    </button>
+                </div>
+            </div>
+        }
+        @case(PageStates.Ready) {
+            @if (kpis(); as kpiData) {
+                <div @fadeIn400 class="flex flex-col gap-4 w-full h-full">
+                    <h1 class="main-title">דאשבורד ניהול מערכת</h1>
+                    
+                    <div class="stats-grid">
+                        <!-- Total Accounts Card -->
+                        <div class="card-content">
+                            <div class="flex gap-3 items-center">
+                                <span class="card-icon icon-accounts"></span>
+                                <p>סה"כ חשבונות</p>
+                            </div>
+                            <div class="card-info">
+                                <count-up theme="gradient" [to]="kpiData.totalAccounts"></count-up>
+                                <small class="card-explanation">
+                                    <span class="material-symbols-rounded">add_business</span>
+                                    {{ kpiData.newAccountsLast30Days }} חשבונות חדשים ב-30 הימים האחרונים
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- Total Users Card -->
+                        <div class="card-content">
+                            <div class="flex gap-3 items-center">
+                                <span class="card-icon icon-users"></span>
+                                <p>סה"כ משתמשים</p>
+                            </div>
+                            <div class="card-info">
+                                <count-up theme="gradient" [to]="kpiData.totalUsers"></count-up>
+                                <small class="card-explanation">
+                                    <span class="material-symbols-rounded">group</span>
+                                    כלל המשתמשים הרשומים במערכת
+                                </small>
+                            </div>
+                        </div>
+                        
+                        <!-- Total Orders Card -->
+                        <div class="card-content">
+                            <div class="flex gap-3 items-center">
+                                <span class="card-icon icon-orders-admin"></span>
+                                <p>הזמנות (30 יום)</p>
+                            </div>
+                            <div class="card-info">
+                                <count-up theme="gradient" [to]="kpiData.totalOrdersLast30Days"></count-up>
+                                <small class="card-explanation">
+                                    <span class="material-symbols-rounded">shopping_cart</span>
+                                    סה"כ הזמנות שבוצעו בכל החשבונות
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- Placeholder Card -->
+                        <div class="card-content">
+                            <div class="flex gap-3 items-center">
+                                <span class="card-icon icon-revenue"></span>
+                                <p>הכנסות (עתידי)</p>
+                            </div>
+                            <div class="card-info">
+                                <count-up theme="gradient" prefix="₪" [to]="0"></count-up>
+                                <small class="card-explanation">
+                                    <span class="material-symbols-rounded">trending_up</span>
+                                    מדד להכנסות עתידיות מהמערכת
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    }
+</div>

@@ -16,6 +16,7 @@ import { Supplier } from '../common/models/supplier';
 import { User } from '../common/models/user';
 import { CreateUserDto } from '../common/dto/user-create.dto';
 import { Account } from '../common/models/account';
+import { SystemKpis } from '../components/admin/admin-dashboard-component/admin-dashboard-component.component';
 
 export interface OrderSuggestion {
 	productId: number;
@@ -195,7 +196,7 @@ export class ApiService {
 
 	}
 
-	// בAPI Service
+	// API Service
 	deleteSupplierOrders(supplierId: number): Observable<any> {
 		console.log(`🗑️ API: Deleting orders for supplier: ${supplierId}`);
 
@@ -206,6 +207,9 @@ export class ApiService {
 	getDashboardKpis(): Observable<ServiceResultContainer<DashboardStats>> {
 		return this.http.get<ServiceResultContainer<DashboardStats>>(`${this.apiUrl}/statistics/dashboard-kpis`);
 	}
+	getSystemKpis(): Observable<ServiceResultContainer<SystemKpis>> {
+    return this.http.get<ServiceResultContainer<SystemKpis>>(`${this.apiUrl}/admin/kpis`);
+}
 
 
 

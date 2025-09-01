@@ -1,3 +1,4 @@
+import { UserStore } from './../../../store/user.store';
 import { CommonModule } from '@angular/common';
 import { Component, inject, computed } from '@angular/core';
 import { RouterModule } from '@angular/router';
@@ -25,6 +26,7 @@ import { TableModule } from "primeng/table";
 import { TooltipModule } from 'primeng/tooltip';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { userRolePipe } from "../../../pipes/userRole.pipe";
+import { UserRole } from '../../../common/enums/userRole.enum';
 
 
 @Component({
@@ -41,7 +43,7 @@ export class HeaderComponent {
 	private readonly supplierStore = inject(SupplierStore);
 	private readonly orderStore = inject(OrderStore);
 	public readonly insightStore = inject(InsightStore);
-	
+
 	// --- Services ---
 	private readonly menuService = inject(MenuService);
 	private readonly orderFlowService = inject(OrderFlowService);
@@ -53,6 +55,7 @@ export class HeaderComponent {
 	public readonly isGuest = this.authStore.isGuest;
 	public readonly isLoading = this.authStore.isLoading;
 	public readonly username = computed(() => this.user()?.username || this.user()?.email);
+	public readonly userRole = this.authStore.userRole;
 	public readonly stats = this.statsStore.stats;
 
 	public isMobileMenuOpen = this.menuService.isMobileMenuOpen;
@@ -66,7 +69,9 @@ export class HeaderComponent {
 	});
 
 	ngOnInit() {
-		this.insightStore.loadInsights();
+		if (this.userRole() != UserRole.SysAdmin) {
+			this.insightStore.loadInsights();
+		}
 	}
 
 
@@ -117,7 +122,7 @@ export class HeaderComponent {
 		}
 	}
 
-	viewOrder(order: Order, popup:any): void {
+	viewOrder(order: Order, popup: any): void {
 		popup.hide()
 		const supplier = this.supplierStore.getSupplierById(order.supplierId);
 		if (!supplier) {

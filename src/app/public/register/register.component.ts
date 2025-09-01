@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, ViewChild } from '@angular/core';
 import {
 	FormBuilder,
 	FormGroup,
@@ -10,7 +10,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { NotificationService } from '../../services/notification.service';
-import { markFormGroupTouched } from '../../common/const/custom-validators';
+import { detailedPasswordValidator, markFormGroupTouched } from '../../common/const/custom-validators';
 import { AuthService } from '../../services/auth.service';
 import { ApiService } from '../../services/api.service';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -24,6 +24,7 @@ import { CardModule } from 'primeng/card';
 import { DialogService } from 'primeng/dynamicdialog';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
+import { PasswordInputComponent } from '../../components/shared/password-input/password-input.component';
 
 
 @Component({
@@ -39,6 +40,7 @@ import { InputIconModule } from 'primeng/inputicon';
 		CardModule,
 		IconFieldModule,
 		InputIconModule,
+		PasswordInputComponent,
 	],
 	templateUrl: './register.component.html',
 	styleUrl: './register.component.css',
@@ -51,7 +53,10 @@ export class RegisterComponent {
 	private notificationService = inject(NotificationService);
 	private router = inject(Router);
 
-		private authStore = inject(AuthStore);
+	private authStore = inject(AuthStore);
+	public readonly passwordLength = signal(8);
+
+	@ViewChild('passwordInputComp') passwordInputComp!: PasswordInputComponent;
 
 
 	formSubmitted = signal<boolean>(false);
@@ -60,9 +65,9 @@ export class RegisterComponent {
 	registerForm: FormGroup = this.fb.group(
 		{
 			username: ['', Validators.required],
-			accountName: ['', Validators.required], 
+			accountName: ['', Validators.required],
 			email: ['', [Validators.required, Validators.email]],
-			password: ['', [Validators.required, Validators.minLength(6)]],
+			password: ['', [Validators.required, detailedPasswordValidator()]],
 			confirmPassword: ['', Validators.required],
 		},
 		{
@@ -82,14 +87,19 @@ export class RegisterComponent {
 		return password === confirmPassword ? null : { mismatch: true };
 	}
 
+
 	onSubmit() {
 		this.formSubmitted.set(true);
 		markFormGroupTouched(this.registerForm);
 
+		if (this.password && this.passwordInputComp) {
+			this.passwordInputComp.markAsTouched();
+		}
+
 		if (this.registerForm.invalid) {
 			this.notificationService.toast({
 				severity: 'error',
-				detail: 'Please fill all required fields correctly',
+				detail: 'יש למלא את כל השדות המסומנים באדום',
 			});
 			return;
 		}
@@ -112,9 +122,9 @@ export class RegisterComponent {
 					detail: 'ההרשמה בוצעה בהצלחה!',
 				});
 				this.authStore.login({
-                    email: formValue.email,
-                    password: formValue.password
-                });
+					email: formValue.email,
+					password: formValue.password
+				});
 			},
 			error: (err: HttpErrorResponse) => {
 				this.loading.set(false);

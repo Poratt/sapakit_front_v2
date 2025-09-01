@@ -1,0 +1,22 @@
+@import '../../home/home.component.css';
+
+
+.card-icon.icon-accounts {
+    --gradient: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%);
+    --icon: '\e7ee'; /* business_center */
+}
+
+.card-icon.icon-users {
+    --gradient: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+    --icon: '\e7f0'; /* groups */
+}
+
+.card-icon.icon-orders-admin {
+    --gradient: linear-gradient(135deg, #f794a4 0%, #fdd6bd 100%);
+    --icon: '\e8cc'; /* receipt_long */
+}
+
+.card-icon.icon-revenue {
+    --gradient: linear-gradient(135deg, #a8e063 0%, #56ab2f 100%);
+    --icon: '\e941'; /* attach_money */
+}

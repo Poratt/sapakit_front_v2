@@ -29,32 +29,27 @@
                 <small class="error-message">יש להזין שם משתמש</small>
                 }
             </div>
-            <div class="flex-wrap-item">
-                <label for="phone">טלפון</label>
-                <input pInputText id="phone" formControlName="phone" />
-                @if (phone.touched && phone.hasError('pattern')) {
-                <small class="error-message">מספר טלפון לא תקין (10-12 ספרות)</small>
-                }
-            </div>
-        </div>
-        <div class="flex-wrap-wrapper">
+
             @if (id.value === 0) {
             <div class="flex-wrap-item">
-                <label for="password">סיסמה* (מינימום 6 תווים)</label>
-                <p-password id="password" formControlName="password" [feedback]="true" [toggleMask]="true"></p-password>
-                @if (password.touched && password.hasError('required')) {
-                <small class="error-message">יש להזין סיסמה</small>
-                }
-                @if (password.touched && password.hasError('minlength')) {
-                <small class="error-message">הסיסמה חייבת להכיל לפחות 6 תווים</small>
-                }
+                <label for="password">סיסמה</label>
+                <!-- ✅ Use the new password component -->
+                <app-password-input
+                    #passwordInputComp
+                    inputId="password"
+                    formControlName="password"
+                    [minLength]="8"
+                    [useCustomValidator]="true"
+                    autocomplete="new-password">
+                </app-password-input>
             </div>
             }
+            
             <div class="flex-wrap-item">
                 <label for="role">תפקיד*</label>
                 <p-select id="role" formControlName="role" [options]="userRoleData" 
-        optionLabel="label" optionValue="enumValue" appendTo="body" styleClass="w-full"
-        [disabled]="isCurrentUserAdmin() && id.value === 0">
+                    optionLabel="label" optionValue="enumValue" appendTo="body" styleClass="w-full">
+        
                     <ng-template #selectedItem let-selectedOption>
                         <div class="flex items-center gap-2 text-xs" *ngIf="selectedOption">
                             <span class="" [ngClass]="selectedOption.icon"></span>
@@ -72,10 +67,17 @@
                 <small class="error-message">יש לבחור תפקיד</small>
                 }
             </div>
+
+            <div class="flex-wrap-item">
+                <label for="phone">טלפון</label>
+                <input pInputText id="phone" formControlName="phone" />
+                @if (phone.touched && phone.hasError('pattern')) {
+                <small class="error-message">מספר טלפון לא תקין (10-12 ספרות)</small>
+                }
+            </div>
         </div>
 
-
-        <div class="flex  w-full justify-between">
+        <div class="flex w-full justify-between">
             <label for="image">תמונת פרופיל</label>
             <div class="image-upload-container">
                 <!-- Drop Or Select image-->
@@ -121,7 +123,6 @@
                 }
             </div>
         </div>
-
 
         <div class="dialog-footer">
             <button type="button" (click)="onCancel()" class="empty md">

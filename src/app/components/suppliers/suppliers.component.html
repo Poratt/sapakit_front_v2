@@ -30,7 +30,6 @@
         <h1 class="main-title">ניהול ספקים</h1>
 
 
-        @if (filteredSuppliers().length > 0) {
         <div class="actions-bar">
             <span class="search-box">
                 <i class="pi pi-search"></i>
@@ -52,7 +51,7 @@
         </div>
         <p-table @fadeIn400 [value]="filteredSuppliers()" responsiveLayout="stack" [breakpoint]="'768px'"
             [rowHover]="true">
-            <ng-template pTemplate="header">
+            <ng-template #header>
                 <tr>
                     <th pSortableColumn="name">שם <p-sortIcon field="name"></p-sortIcon></th>
                     <th pSortableColumn="status">סטטוס <p-sortIcon field="status"></p-sortIcon></th>
@@ -63,7 +62,7 @@
                     <th></th>
                 </tr>
             </ng-template>
-            <ng-template pTemplate="body" let-supplier>
+            <ng-template #body let-supplier>
                 <tr [routerLink]="['/suppliers', supplier.id]">
                     <td class="name" data-label="שם">{{ supplier.name }}</td>
                     <td data-label="סטטוס">
@@ -90,31 +89,39 @@
                                 [routerLink]="['/suppliers', supplier.id]" size="small" [rounded]="true"
                                 severity="secondary"></p-button>
                             <p-button tooltipPosition="top" pTooltip="עריכה" icon="pi pi-pen-to-square"
-                                (click)="editSupplier(supplier)" size="small" [rounded]="true"
+                                (click)="editSupplier(supplier, $event)" size="small" [rounded]="true"
                                 severity="secondary"></p-button>
                             <p-button tooltipPosition="top" pTooltip="מחיקה" icon="pi pi-trash" class="delete-btn"
-                                (click)="confirmDelete(supplier)" size="small" [rounded]="true"
+                                (click)="confirmDelete(supplier, $event)" size="small" [rounded]="true"
                                 severity="danger"></p-button>
                         </div>
                     </td>
                 </tr>
             </ng-template>
-            <ng-template pTemplate="emptymessage">
+            <ng-template #emptymessage>
                 <tr>
-                    <td colspan="7" class="empty-message">לא נמצאו תוצאות</td>
+                    <td colspan="7" class="text-center p-4">
+                        <div class="flex flex-col items-center gap-2 text-gray-500">
+                            <i class="pi pi-search-minus text-3xl"></i>
+                            <span>לא נמצאו ספקים התואמים לחיפוש.</span>
+                        </div>
+                    </td>
                 </tr>
             </ng-template>
         </p-table>
-        }
-        @else {
-        <div class="empty-state">
-            <i class="pi pi-box"></i>
-            <p>אין ספקים זמינים</p>
-            <p-button label="הוסף ספק חדש" (onClick)="addSupplier()"></p-button>
-        </div>
-        }
     </div>
     }
     }
 
 </div>
+
+
+
+
+<!-- @else {
+<div class="empty-state">
+    <i class="pi pi-box"></i>
+    <p>אין ספקים זמינים</p>
+    <p-button label="הוסף ספק חדש" (onClick)="addSupplier()"></p-button>
+</div>
+} -->

@@ -7,6 +7,7 @@ import { FormsModule } from '@angular/forms';
 import { TooltipModule } from 'primeng/tooltip';
 import { MenuService } from '../../../services/menu.service';
 import { AuthStore } from '../../../store/auth.store';
+import { UserRole } from '../../../common/enums/userRole.enum';
 
 @Component({
 	selector: 'app-side-menu',
@@ -17,7 +18,7 @@ import { AuthStore } from '../../../store/auth.store';
 	animations: [],
 })
 export class SideMenuComponent implements OnInit {
-	items: MenuItem[] = [];
+	items = signal<MenuItem[]>([]);
 
 	private router = inject(Router);
 	private menuService = inject(MenuService);
@@ -35,10 +36,15 @@ export class SideMenuComponent implements OnInit {
 			this.isMenuExpanded();
 			this.restoreSubmenuState();
 		});
+
+		effect(() => {
+			const role = this.authStore.userRole();
+			this.buildMenu(role);
+		});
+
 	}
 
 	ngOnInit() {
-		this.initMenu();
 		this.authStore.loadUser();
 
 		const url = this.router.url.split('?')[0];
@@ -49,7 +55,7 @@ export class SideMenuComponent implements OnInit {
 	}
 
 	private expandSettings(state: boolean) {
-		const settingsItem = this.items.find((item) => item['key'] === 'settings');
+		const settingsItem = this.items().find((item) => item['key'] === 'settings');
 		if (settingsItem) {
 			settingsItem.expanded = state;
 			this.menuService.saveSubmenuState('settings', state);
@@ -57,7 +63,7 @@ export class SideMenuComponent implements OnInit {
 	}
 
 	private restoreSubmenuState() {
-		this.items.forEach((item) => {
+		this.items().forEach((item) => {
 			if (item['key']) {
 				item.expanded = this.menuService.getSubmenuState(item['key']);
 			}
@@ -81,115 +87,14 @@ export class SideMenuComponent implements OnInit {
 		this.authStore.logout();
 	}
 
-	
-	private initMenu() {
-		this.items = [
-			{
-				label: 'דשבורד',
-				icon: 'home',
-				key: 'dashboard',
-				routerLink: '/',
-				routerLinkActiveOptions: true,
-				styleClass: 'menu-item',
-				matTooltip: 'דשבורד',
-				command: () => {
-					this.menuService.closeMobileMenu();
-				},
-			},
-			{
-				label: 'משתמשים',
-				icon: 'group',
-				key: 'users',
-				routerLink: 'users',
-				routerLinkActiveOptions: true,
-				styleClass: 'menu-item',
-				matTooltip: 'משתמשים',
-				command: () => {
-					this.menuService.closeMobileMenu();
-				},
-			},
-			{
-				label: 'ספקים',
-				icon: 'two_pager_store',
-				key: 'suppliers',
-				routerLink: 'suppliers',
-				routerLinkActiveOptions: false,
-				styleClass: 'menu-item',
-				matTooltip: 'ספקים',
-				command: () => {
-					this.menuService.closeMobileMenu();
-				},
-			},
-			{
-				label: 'הזמנות',
-				icon: 'shopping_cart',
-				key: 'orders',
-				routerLink: 'orders',
-				routerLinkActiveOptions: true,
-				styleClass: 'menu-item',
-				matTooltip: 'הזמנות',
-				command: () => {
-					this.menuService.closeMobileMenu();
-				},
-			},
+
+	private buildMenu(role: UserRole): void {
+		const commonItems: MenuItem[] = [
 			{
 				separator: true,
 				key: 'separator',
 			},
-			{
-				label: 'ai',
-				icon: 'network_intelligence',
-				key: 'ai',
-				routerLink: 'ai',
-				routerLinkActiveOptions: true,
-				styleClass: 'menu-item',
-				matTooltip: 'ai',
-				command: () => {
-					this.menuService.closeMobileMenu();
-				},
-			},
-			// {
-			//   isChild: false,
-			//   label: 'הגדרות',
-			//   icon: 'settings',
-			//   key: 'settings',
-			//   routerLink: 'settings',
-			//   styleClass: 'menu-item',
-			//   queryParams: { main_tab: 0 },
-			//   routerLinkActiveOptions: { exact: false, queryParams: 'subset' },
-			//   matTooltip: 'הגדרות',
-			//   command: () => {
-			//     this.menuService.closeMobileMenu();
-			//   },
-			//   items: [
-			//     {
-			//       icon: 'table_view',
-			//       label: 'טבלאות מערכת',
-			//       key: 'tablesTabs',
-			//       routerLink: 'settings',
-			//       queryParams: { main_tab: 0 },
-			//       isChild: true,
-			//       styleClass: 'submenu-item',
-			//       matTooltip: 'טבלאות מערכת',
-			//       command: () => {
-			//         this.menuService.closeMobileMenu();
-			//       },
-			//     },
-			//     {
-			//       icon: 'admin_panel_settings',
-			//       label: 'מנהל מערכת',
-			//       key: 'adminTab',
-			//       routerLink: 'settings',
-			//       queryParams: { main_tab: 3 },
-			//       isChild: true,
-			//       styleClass: 'submenu-item',
-			//       // visible: UserRole.Admin === StateService.USER()?.role,
-			//       command: () => {
-			//         this.menuService.closeMobileMenu();
-			//       },
-			//     },
-			//   ],
-			// },
+
 			{
 				isChild: false,
 				key: 'shrinkExpand',
@@ -197,7 +102,7 @@ export class SideMenuComponent implements OnInit {
 				icon: 'keyboard_double_arrow_left',
 				styleClass: 'menu-item',
 				command: () => {
-					this.items.forEach((item) => {
+					this.items().forEach((item) => {
 						if (item['key'] && item.expanded !== undefined) {
 							this.menuService.saveSubmenuState(item['key'], item.expanded);
 						}
@@ -206,19 +111,93 @@ export class SideMenuComponent implements OnInit {
 					this.menuService.toggleMenuExpand();
 				},
 			},
-			// {
-			// 	isChild: false,
-			// 	key: 'logout',
-			// 	label: 'יציאה',
-			// 	icon: 'logout',
-			// 	styleClass: 'menu-item',
-			// 	command: () => {
-			// 		this.signOut();
-			// 	},
-			// },
 		];
+
+		if (role === UserRole.SysAdmin) {
+			this.items.set([
+				{
+					label: 'מערכת',
+					icon: 'monitoring',
+					key: 'dashboard',
+					routerLink: '/admin',
+					routerLinkActiveOptions: true,
+					styleClass: 'menu-item',
+					matTooltip: 'דשבורד מערכת',
+					command: () => {
+						this.menuService.closeMobileMenu();
+					},
+				},
+				{
+					label: 'ניהול חשבונות',
+					icon: 'group',
+					key: 'accounts',
+					routerLink: '/admin/accounts',
+					routerLinkActiveOptions: true,
+					styleClass: 'menu-item',
+					matTooltip: 'ניהול חשבונות',
+					command: () => {
+						this.menuService.closeMobileMenu();
+					},
+				},
+				...commonItems
+			]);
+		} else {
+			this.items.set([
+				{
+					label: 'דשבורד',
+					icon: 'home',
+					key: 'dashboard',
+					routerLink: '/',
+					routerLinkActiveOptions: true,
+					styleClass: 'menu-item',
+					matTooltip: 'דשבורד',
+					command: () => {
+						this.menuService.closeMobileMenu();
+					},
+				},
+				{
+					label: 'משתמשים',
+					icon: 'group',
+					key: 'users',
+					routerLink: 'users',
+					routerLinkActiveOptions: true,
+					styleClass: 'menu-item',
+					matTooltip: 'משתמשים',
+					command: () => {
+						this.menuService.closeMobileMenu();
+					},
+				},
+				{
+					label: 'ספקים',
+					icon: 'two_pager_store',
+					key: 'suppliers',
+					routerLink: 'suppliers',
+					routerLinkActiveOptions: false,
+					styleClass: 'menu-item',
+					matTooltip: 'ספקים',
+					command: () => {
+						this.menuService.closeMobileMenu();
+					},
+				},
+				{
+					label: 'הזמנות',
+					icon: 'shopping_cart',
+					key: 'orders',
+					routerLink: 'orders',
+					routerLinkActiveOptions: true,
+					styleClass: 'menu-item',
+					matTooltip: 'הזמנות',
+					command: () => {
+						this.menuService.closeMobileMenu();
+					},
+				},
+				...commonItems
+
+			])
+		}
+
+
+
 	}
 
-
-	
 }

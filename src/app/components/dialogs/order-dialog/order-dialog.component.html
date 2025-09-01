@@ -3,7 +3,7 @@
 
   <div class="flex flex-col gap-2 w-full h-full min-h-52">
     @if (supplier && date) {
-      <div class="flex flex-col gap-1">
+      <div class="fixed-header">
         <div class="flex flex-col">
           <div class="flex items-center justify-between gap-2 flex-wrap sm:flex-nowrap">
             <div class="flex items-center gap-1 order-1">
@@ -107,8 +107,7 @@
           </div>
         }
         @case (PageStates().Ready) {
-          {{ PageStates()[pageState()]}}
-          <div class="grid grid-cols-2 gap-0" cdkDropList cdkDropListGroup cdkDropListOrientation="mixed" [cdkDropListData]="groupedProducts()" (cdkDropListDropped)="dropCategory($event)">
+          <div class="grid grid-cols-2 px-4" cdkDropList cdkDropListGroup cdkDropListOrientation="mixed" [cdkDropListData]="groupedProducts()" (cdkDropListDropped)="dropCategory($event)">
             @for (group of groupedProducts(); track group.categoryName; let i = $index) {
               <div class="category-drag-container" cdkDrag [cdkDragDisabled]="!dragAndDropEnable()" (cdkDragMoved)="onDragMoved($event)">
                 <div class="category-wrapper">
@@ -166,7 +165,7 @@
             }
           </div>
         
-          <div class="form-field">
+          <div class="form-field px-6 mb-6">
             <label for="notes" class="form-label">הערות</label>
             <textarea id="notes" pTextarea [(ngModel)]="notes" rows="4" [style]="{ width: '100%' }" [disabled]="isDisabled()" [placeholder]="isDisabled() ? '' : 'הוסף הערות (אופציונלי)'"></textarea>
           </div>

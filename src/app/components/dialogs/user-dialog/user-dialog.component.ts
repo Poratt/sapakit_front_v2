@@ -1,32 +1,34 @@
-import { Component, computed, ElementRef, inject, signal, ViewChild } from '@angular/core';
+import { Component, computed, effect, ElementRef, inject, signal, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, Validators, } from '@angular/forms';
-import { DynamicDialogRef, DynamicDialogConfig } from 'primeng/dynamicdialog';
 import { Status, statusData } from '../../../common/enums/status.enum';
 import { fadeIn400 } from '../../../common/const/animations';
-import { markFormGroupTouched } from '../../../common/const/custom-validators';
+import { detailedPasswordValidator, markFormGroupTouched } from '../../../common/const/custom-validators';
 import { NotificationService } from '../../../services/notification.service';
 import { ApiService } from '../../../services/api.service';
-import { ButtonModule } from 'primeng/button';
 import { CommonModule } from '@angular/common';
-import { InputTextModule } from 'primeng/inputtext';
-import { SelectModule } from 'primeng/select';
-import { SelectButtonModule } from 'primeng/selectbutton';
-import { ToastModule } from 'primeng/toast';
 import { UserRole, userRoleData } from '../../../common/enums/userRole.enum';
-import { PasswordModule } from 'primeng/password';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { environment } from '../../../../environments/environment';
-import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { User } from '../../../common/models/user';
 import { CreateUserDto } from '../../../common/dto/user-create.dto';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AuthStore } from '../../../store/auth.store';
+
+import { DynamicDialogRef, DynamicDialogConfig } from 'primeng/dynamicdialog';
+import { ButtonModule } from 'primeng/button';
+import { InputTextModule } from 'primeng/inputtext';
+import { SelectModule } from 'primeng/select';
+import { SelectButtonModule } from 'primeng/selectbutton';
+import { ToastModule } from 'primeng/toast';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { ToggleSwitchModule } from 'primeng/toggleswitch';
+import { PasswordInputComponent } from '../../shared/password-input/password-input.component';
 
 @Component({
 	selector: 'app-user-dialog',
 	templateUrl: './user-dialog.component.html',
 	styleUrl: './user-dialog.component.css',
 	animations: [fadeIn400],
+	standalone: true,
 	imports: [
 		CommonModule,
 		ReactiveFormsModule,
@@ -35,11 +37,10 @@ import { AuthStore } from '../../../store/auth.store';
 		SelectModule,
 		SelectButtonModule,
 		ToastModule,
-		PasswordModule,
 		ProgressSpinnerModule,
 		ToggleSwitchModule,
+		PasswordInputComponent,
 	],
-	standalone: true,
 })
 export class UserDialogComponent {
 	private fb = inject(FormBuilder);
@@ -53,16 +54,32 @@ export class UserDialogComponent {
 	readonly isCurrentUserAdmin = computed(() => this.authStore.user()?.role === UserRole.Admin);
 
 	@ViewChild('emailRef') emailRef!: ElementRef;
+	@ViewChild('passwordInputComp') passwordInputComp!: PasswordInputComponent; 
 
 	statusData = statusData;
 	Status = Status;
-	userRoleData = userRoleData;
+	userRoleData = userRoleData.slice(1);
 	backendUrl = environment.apiUrl;
 
 	imagePreview = signal<string | null>(null);
 	isDraggingOver = signal<boolean>(false);
 	isImageLoading = signal<boolean>(false);
 	formSubmitted = signal<boolean>(false);
+	public readonly passwordLength = signal(8);
+
+	readonly isDisabled = computed(() => { return this.isCurrentUserAdmin() && this.id.value === 0; });
+
+	constructor() {
+		effect(() => {
+			// const disabled = this.isDisabled();
+			// if (disabled) {
+			// 	this.role.disable();
+			// } else {
+			// 	this.role.enable();
+			// }
+			this.role.disable()
+		});
+	}
 
 	userForm: FormGroup = this.fb.group({
 		id: [0],
@@ -71,8 +88,7 @@ export class UserDialogComponent {
 		phone: ['', Validators.pattern(/^\+?\d{10,12}$/)],
 		email: ['', [Validators.required, Validators.email]],
 		role: ['', Validators.required],
-		password: ['', [Validators.required, Validators.minLength(6)]],
-
+		password: ['', [Validators.required, detailedPasswordValidator()]],
 		image: [null],
 	});
 
@@ -104,19 +120,19 @@ export class UserDialogComponent {
 	ngOnInit() {
 		const userToEdit = this.config.data?.user;
 
-		if (userToEdit) { // מצב עריכה
+		if (userToEdit) { 
 			this.userForm.removeControl('password');
 			this.patchForm(userToEdit);
-		} else { // מצב יצירה
+		} 
+		else { 
 			this.status.disable();
-            
-            // ✅ התיקון הקריטי כאן
-            if (this.isCurrentUserAdmin()) {
-                // אם המשתמש המחובר הוא Admin, קבע את התפקיד כ-User ונטרל את השדה
-                this.role.setValue(UserRole.User);
-                this.role.disable();
-            }
 
+			// ✅ התיקון הקריטי כאן
+			if (this.isCurrentUserAdmin()) {
+				// אם המשתמש המחובר הוא Admin, קבע את התפקיד כ-User ונטרל את השדה
+				this.role.setValue(UserRole.User);
+				this.role.disable();
+			}
 		}
 
 		setTimeout(() => {
@@ -124,7 +140,6 @@ export class UserDialogComponent {
 				this.emailRef.nativeElement.focus();
 			}
 		});
-
 	}
 
 	patchForm(user: User) {
@@ -141,7 +156,6 @@ export class UserDialogComponent {
 		});
 		if (user.image && user.image !== '/Uploads/undefined') {
 			console.log(user.image);
-
 			this.imagePreview.set(this.getImageUrl(user.image));
 		}
 	}
@@ -223,10 +237,14 @@ export class UserDialogComponent {
 		this.formSubmitted.set(true);
 		markFormGroupTouched(this.userForm);
 
+		if (this.password && this.passwordInputComp) {
+			this.passwordInputComp.markAsTouched();
+		}
+		
 		if (this.userForm.invalid) {
 			this.notificationService.toast({
 				severity: 'error',
-				detail: 'Please fill in all required fields.',
+				detail: 'יש למלא את כל השדות המסומנים באדום',
 			});
 			return;
 		}
@@ -273,22 +291,18 @@ export class UserDialogComponent {
 		return formData;
 	}
 
-	// in user-dialog.component.ts
-
 	private updateExistingUser(id: number, formData: FormData): void {
 		this.apiService.updateUser(id, formData).subscribe({
 			next: (response) => {
 				if (response.success && response.result) {
-					// this.notificationService.toast({ severity: 'success', detail: 'המשתמש עודכן בהצלחה' });
 					this.ref.close(response.result);
 				} else {
 					this.notificationService.toast({ severity: 'error', detail: response.message });
 				}
 			},
-			error: (err: HttpErrorResponse) => { // ✅ התיקון הקריטי
+			error: (err: HttpErrorResponse) => {
 				this.notificationService.toast({
 					severity: 'error',
-					// חלץ את ההודעה הידידותית מהשרת
 					detail: err.error?.message || 'שגיאה בעדכון המשתמש',
 				});
 			}
@@ -299,13 +313,12 @@ export class UserDialogComponent {
 		this.apiService.addUser(formData).subscribe({
 			next: (response) => {
 				if (response.success && response.result) {
-					this.notificationService.toast({ severity: 'success', detail: 'משתמש חדש נוסף בהצלחה' });
 					this.ref.close(response.result);
 				} else {
 					this.notificationService.toast({ severity: 'warn', detail: response.message || 'הפעולה לא הצליחה' });
 				}
 			},
-			error: (err: HttpErrorResponse) => { // ✅ התיקון הקריטי
+			error: (err: HttpErrorResponse) => {
 				this.notificationService.toast({
 					severity: 'error',
 					detail: err.error?.message || 'שגיאה לא צפויה אירעה'

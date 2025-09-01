@@ -124,7 +124,8 @@ export class SuppliersComponent implements OnInit {
 		});
 	}
 
-	editSupplier(supplier: Supplier): void {
+	editSupplier(supplier: Supplier, event: MouseEvent): void {
+		event.stopPropagation()
 		const ref = this.dialogService.open(SupplierDialogComponent, {
 			...DialogConfig,
 			header: `עריכת ספק | ${supplier.name}`,
@@ -139,7 +140,8 @@ export class SuppliersComponent implements OnInit {
 		});
 	}
 
-	confirmDelete(supplier: Supplier): void {
+	confirmDelete(supplier: Supplier, event: MouseEvent): void {
+		event.stopPropagation()
 		this.notificationService.confirm({
 			message: `האם אתה בטוח שברצונך למחוק את הספק "${supplier.name}"?`,
 			header: ' מחיקת ספק',

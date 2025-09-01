@@ -1,168 +1,86 @@
 <div class="p-responsive">
     @switch (pageState()) {
-    @case(PageStates.Loading) { <app-loader></app-loader> }
-    @case(PageStates.Error) { /* ... קוד השגיאה ... */ }
-    @case(PageStates.Empty) {
-    <div @fadeIn400 class="empty-state">
-        <i class="pi {{ userRole() === UserRoles.SysAdmin ? 'pi-building' : 'pi-users' }}"></i>
-        <p>{{ userRole() === UserRoles.SysAdmin ? 'אין חשבונות במערכת' : 'אין משתמשים בחשבון זה' }}</p>
-        <p-button label="הוסף משתמש חדש" (onClick)="addUser()"></p-button>
-    </div>
-    }
-    @case(PageStates.Ready) {
-    <div @fadeIn400 class="flex flex-col gap-4 w-full h-full">
-        <h1 class="main-title">ניהול {{ userRole() === UserRoles.SysAdmin ? 'חשבונות' : 'משתמשים' }}</h1>
-
-        <div class="actions-bar">
-            <span class="search-box">
-                <i class="pi pi-search"></i>
-                <input pInputText type="text" placeholder="חיפוש..." [(ngModel)]="searchQuery">
-            </span>
-            <div class="flex gap-2">
-                <button type="button" (click)="exportUsers()" class="empty md">
-                    <span class="material-symbols-rounded">download</span>
-                    <span>ייצוא</span>
-                </button>
-                <button type="button" (click)="addUser()" class="primary md">
-                    <span class="material-symbols-rounded">add</span>
-                    <span>הוסף משתמש</span>
-                </button>
+        @case(PageStates.Loading) { <app-loader></app-loader> }
+        @case(PageStates.Error) {
+            <div @fadeIn400 class="error-card-container">
+                <div class="error-card">
+                    <div class="error-icon-wrapper"><span class="material-symbols-rounded">cloud_off</span></div>
+                    <h3 class="error-title">אופס, משהו השתבש</h3>
+                    <button (click)="refreshData()" class="primary md retry-button">
+                        <span class="material-symbols-rounded">refresh</span>
+                        <span>נסה שוב</span>
+                    </button>
+                </div>
             </div>
-        </div>
-
-        @if (userRole() === UserRoles.SysAdmin) {
-        <!-- תצוגת SysAdmin: טבלה של חשבונות -->
-        <p-table [value]="accounts()" dataKey="id" [tableStyle]="{ 'min-width': '60rem' }"
-            [expandedRowKeys]="expandedRows" (onRowExpand)="onRowExpand($event)"
-            (onRowCollapse)="onRowCollapse($event)">
-
-            <ng-template #header>
-                <tr>
-                    <th style="width: 3rem"></th>
-                    <th pSortableColumn="name">שם החשבון <p-sortIcon field="name"></p-sortIcon></th>
-                    <th pSortableColumn="owner">בעל החשבון <p-sortIcon field="owner"></p-sortIcon></th>
-                    <th pSortableColumn="users">מספר משתמשים <p-sortIcon field="users"></p-sortIcon></th>
-                    <th></th>
-                </tr>
-            </ng-template>
-
-            <ng-template #body let-account let-expanded="expanded">
-                <tr>
-                    <td>
-                        <button type="button" pButton pRipple [pRowToggler]="account" icon="pi pi-chevron-left"
-                            [pRowToggler]="account" size="small" [rounded]="true"
-                            class="rotatable-icon"
-                            [class.-rotate-90]="expanded"
-                            severity="secondary">
+        }
+        @case(PageStates.Empty) {
+            <div @fadeIn400 class="empty-state">
+                <i class="pi pi-users"></i>
+                <p>אין משתמשים בחשבון זה.</p>
+                <p-button label="הוסף משתמש חדש" (onClick)="addUser()"></p-button>
+            </div>
+        }
+        @case(PageStates.Ready) {
+            <div @fadeIn400 class="flex flex-col gap-4 w-full h-full">
+                <h1 class="main-title">ניהול משתמשים</h1>
+                <div class="actions-bar">
+                    <span class="search-box">
+                        <i class="pi pi-search"></i>
+                        <input pInputText type="text" placeholder="חיפוש משתמשים..." [(ngModel)]="searchQuery">
+                    </span>
+                    <div class="flex gap-2">
+                        <button type="button" (click)="addUser()" class="primary md">
+                            <span class="material-symbols-rounded">add</span>
+                            <span>הוסף משתמש</span>
                         </button>
-                    </td>
-                    <td>{{ account.name }}</td>
-                    <td>{{ account.owner?.username || account.owner?.email }}</td>
-                    <td><p-badge [value]="account.users?.length || 0"></p-badge></td>
-                    <td>
-                        <div class="actions-cell">
-                            <div class="actions-cell">
-                                <p-button tooltipPosition="top" pTooltip="עריכה" icon="pi pi-pen-to-square"
-                                    (click)="editAccount(account)" size="small" [rounded]="true"
-                                    severity="secondary">
-                                </p-button>
-                                <p-button tooltipPosition="top" pTooltip="מחיקה" icon="pi pi-trash"
-                                    (click)="confirmDelete(account)" size="small" [rounded]="true"
-                                    severity="danger">
-                                </p-button>
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-            </ng-template>
-            
-            <ng-template #expandedrow let-account>
-                <tr @rowExpansionTrigger>
-                    <td colspan="5">
-                        <div>
-                            
-                            <p-table [value]="account.users" dataKey="id" styleClass="expanded-table-content">
-                                <ng-template #header>
-                                    <tr>
-                                        <th pSortableColumn="username">שם <p-sortIcon field="username"></p-sortIcon></th>
-                                        <th pSortableColumn="email">אימייל <p-sortIcon field="email"></p-sortIcon></th>
-                                        <th pSortableColumn="role">תפקיד <p-sortIcon field="role"></p-sortIcon></th>
-                                        
-                                        <th></th>
-                                    </tr>
-                                </ng-template>
-                                <ng-template #body let-user>
-                                    <tr>
-                                        <td>{{ user.username }}</td>
-                                        <td>{{ user.email }}</td>
-                                        <td><app-badge [enumValue]="user.role" [dataArray]="userRoleData"></app-badge></td>
-                                        <td>
-                                            <div class="actions-cell">
-                                                <p-button tooltipPosition="top" pTooltip="עריכה" icon="pi pi-pen-to-square"
-                                                    (click)="editUser(user)" size="small" [rounded]="true" severity="secondary"></p-button>
-                                                <p-button tooltipPosition="top" pTooltip="מחיקה" icon="pi pi-trash"
-                                                    (click)="confirmDelete(user)" size="small" [rounded]="true"
-                                                    severity="danger"></p-button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </ng-template>
-                            </p-table>
-                        </div>
-                    </td>
-                </tr>
-            </ng-template>
-        </p-table>
-    } 
-    @else {
-    <!-- תצוגת משתמש רגיל -->
-    <p-table [value]="filteredUsers()" responsiveLayout="stack" [breakpoint]="'768px'" [rowHover]="true">
-        <ng-template pTemplate="header">
-            <tr>
-                <th pSortableColumn="name">שם <p-sortIcon field="name"></p-sortIcon></th>
-                <th pSortableColumn="email">אימייל <p-sortIcon field="email"></p-sortIcon></th>
-                <th pSortableColumn="role">תפקיד <p-sortIcon field="role"></p-sortIcon></th>
-                <th pSortableColumn="phone">טלפון <p-sortIcon field="phone"></p-sortIcon></th>
-                <th></th>
-            </tr>
-        </ng-template>
-        <ng-template pTemplate="body" let-user>
-            <tr [ngClass]="{'item-to-delete' : itemToDelete() == user.id}">
-                <td data-label="שם">
-                    <div class="flex gap-1 items-center">
-                        @if(user.image) {
-                        <img [src]="getImageUrl(user.image)" class="table-image" />
-                        } @else {
-                        <div class="no-image"><i class="material-symbols-rounded">account_circle</i></div>
-                        }
-                        {{ user.username }}
                     </div>
-                </td>
-                <td data-label="אימייל">{{ user.email }}</td>
-                <td data-label="תפקיד"><app-badge [enumValue]="user.role" [dataArray]="userRoleData"></app-badge></td>
-                <td data-label="טלפון">{{ user.phone }}</td>
-                <td data-label="">
-                    <div class="actions-cell">
-                        <p-button tooltipPosition="top" pTooltip="עריכה" icon="pi pi-pen-to-square"
-                            (click)="editUser(user)" size="small" [rounded]="true" severity="secondary"></p-button>
-                        <p-button tooltipPosition="top" pTooltip="מחיקה" icon="pi pi-trash"
-                            (click)="confirmDelete(user)" size="small" [rounded]="true" severity="danger"></p-button>
-                    </div>
-                </td>
-            </tr>
-        </ng-template>
-    </p-table>
+                </div>
+                <p-table [value]="filteredUsers()" responsiveLayout="stack" [breakpoint]="'768px'" [rowHover]="true">
+                    <ng-template #header>
+                        <tr>
+                            <th>שם</th>
+                            <th>אימייל</th>
+                            <th>תפקיד</th>
+                            <th>טלפון</th>
+                            <th></th>
+                        </tr>
+                    </ng-template>
+                    <ng-template #body let-user>
+                        <tr>
+                            <td data-label="שם">
+                                <div class="flex gap-1 items-center">
+                                    @if(user.image) {
+                                        <img [src]="getImageUrl(user.image)" class="table-image" />
+                                    } @else {
+                                        <div class="no-image"><i class="material-symbols-rounded">account_circle</i></div>
+                                    }
+                                    {{ user.username }}
+                                </div>
+                            </td>
+                            <td data-label="אימייל">{{ user.email }}</td>
+                            <td data-label="תפקיד"><app-badge [enumValue]="user.role" [dataArray]="userRoleData"></app-badge></td>
+                            <td data-label="טלפון">{{ user.phone }}</td>
+                            <td data-label="">
+                                <div class="actions-cell">
+                                    <p-button tooltipPosition="top" pTooltip="עריכה" icon="pi pi-pen-to-square" (click)="editUser(user)" size="small" [rounded]="true" severity="secondary"></p-button>
+                                    <p-button tooltipPosition="top" pTooltip="מחיקה" icon="pi pi-trash" (click)="confirmDelete(user)" size="small" [rounded]="true" severity="danger"></p-button>
+                                </div>
+                            </td>
+                        </tr>
+                    </ng-template>
+					<ng-template pTemplate="emptymessage">
+						<tr>
+							<td colspan="5" class="text-center p-4">
+								<div class="flex flex-col items-center gap-2 text-gray-500">
+									<i class="pi pi-search-minus text-3xl"></i>
+									<span>לא נמצאו משתמשים התואמים לחיפוש.</span>
+								</div>
+							</td>
+						</tr>
+					</ng-template>
+                </p-table>
+            </div>
+        }
     }
-</div>
-}
-}
-<p-confirmdialog header="אישור מחיקה" icon="pi pi-exclamation-triangle" [acceptLabel]="'מחק'" [rejectLabel]="'ביטול'"
-    [acceptButtonStyleClass]="'p-button-danger'" [rejectButtonStyleClass]="'p-button-text'">
-    <ng-template #message let-message>
-        <div class="flex flex-col items-center w-full gap-4">
-            <i [ngClass]="message.icon" class="!text-6xl text-primary-500"></i>
-            <p>{{ message.message }}</p>
-        </div>
-    </ng-template>
-</p-confirmdialog>
+    <p-confirmdialog header="אישור מחיקה" icon="pi pi-exclamation-triangle" acceptLabel="מחק" rejectLabel="ביטול" acceptButtonStyleClass="p-button-danger" rejectButtonStyleClass="p-button-text"></p-confirmdialog>
 </div>

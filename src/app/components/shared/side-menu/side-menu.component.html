@@ -2,7 +2,7 @@
 <div class="menu-content" [ngClass]="{'shrink': !isMenuExpanded()}" role="navigation">
 
 
-    <p-panelmenu [model]="items" styleClass="w-full" [multiple]="false" (onItemToggle)="onMenuItemToggle($event)">
+    <p-panelmenu [model]="items()" styleClass="w-full" [multiple]="false" (onItemToggle)="onMenuItemToggle($event)">
         <ng-template #item let-item>
             @if (item.separator) {
             <div class="menu-separator" aria-hidden="true"></div>

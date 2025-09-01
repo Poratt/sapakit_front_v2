@@ -31,15 +31,15 @@
                 </div>
 
                 <div class="flex-wrap-item">
-                    <label for="password">סיסמה</label>
+                    <label for="password">סיסמה*</label>
                     <p-password id="password" formControlName="password" [feedback]="false" [toggleMask]="true"
-                        placeholder="••••••••"></p-password>
+                        placeholder="הקלד סיסמה"></p-password>
                     @if (password.touched && password.hasError('required')) {
                     <small class="error-message">יש להזין סיסמה</small>
                     }
                 </div>
 
-                <button pButton type="submit" [loading]="loading()" class="w-full justify-center">
+                <button pButton type="submit" [loading]="loading()" class="w-full justify-center mt-10">
                     <span class="p-button-label">התחברות</span>
                 </button>
             </div>
