@@ -1,0 +1,107 @@
+<form [formGroup]="form" (ngSubmit)="onSave()" class="tier-form">
+	<div class="form-grid">
+
+		<h3 class="grid-header">מידע בסיסי</h3>
+
+		<div class="form-field">
+			<label for="name">שם תוכנית</label>
+			<input pInputText id="name" formControlName="name">
+		</div>
+
+		<div class="form-field">
+			<label for="tierKey">מפתח (Key)</label>
+			<input pInputText id="tierKey" formControlName="tierKey" placeholder="לדוגמה: BASIC">
+		</div>
+
+		<div class="form-field">
+			<label for="price">מחיר (₪)</label>
+			<p-inputNumber inputId="price" formControlName="price" [min]="0" [showButtons]="true"
+				prefix="₪"></p-inputNumber>
+		</div>
+
+		<div class="form-field">
+			<label for="period">תקופה</label>
+			<input pInputText id="period" formControlName="period">
+		</div>
+
+		<div class="form-field">
+			<label for="displayOrder">סדר תצוגה</label>
+			<p-inputNumber inputId="displayOrder" formControlName="displayOrder" [showButtons]="true"></p-inputNumber>
+		</div>
+
+		<div class="form-field full-width">
+			<label for="audience">קהל יעד (תיאור קצר)</label>
+			<input pInputText id="audience" formControlName="audience">
+		</div>
+
+		<div class="form-field full-width">
+			<label>אייקון</label>
+			<app-icon-selector formControlName="icon" [size]="'medium'" [showIconName]="true" [showCategoryTabs]="true" (iconChange)="onIconChange($event)">
+			</app-icon-selector>
+		</div>
+
+
+
+		<div class="flex  justify-around full-width">
+			<div class="form-field flex-row">
+				<p-toggleSwitch formControlName="isActive"></p-toggleSwitch>
+				<label for="isActive">פעילה?</label>
+			</div>
+			<div class="form-field flex-row">
+				<p-toggleSwitch formControlName="isPopular"></p-toggleSwitch>
+				<label for="isPopular">פופולרית?</label>
+			</div>
+		</div>
+
+		<h3 class="grid-header">מגבלות (1- ללא הגבלה)</h3>
+
+		<div class="form-field">
+			<label for="limit_users">מגבלת משתמשים</label>
+			<p-inputNumber inputId="limit_users" formControlName="limit_users" [showButtons]="true"></p-inputNumber>
+		</div>
+
+		<div class="form-field">
+			<label for="limit_suppliers">מגבלת ספקים</label>
+			<p-inputNumber inputId="limit_suppliers" formControlName="limit_suppliers"
+				[showButtons]="true"></p-inputNumber>
+		</div>
+
+		<div class="form-field">
+			<label for="limit_history_days">מגבלת היסטוריה (ימים)</label>
+			<p-inputNumber inputId="limit_history_days" formControlName="limit_history_days"
+				[showButtons]="true"></p-inputNumber>
+		</div>
+
+		<h3 class="grid-header">פיצ'רים</h3>
+
+		<div class="features-group">
+			<div class="form-field flex-row">
+				<p-checkbox formControlName="can_export_excel" [binary]="true"></p-checkbox>
+				<label>ייצוא לאקסל</label>
+			</div>
+			<div class="form-field flex-row">
+				<p-checkbox formControlName="can_manage_roles" [binary]="true"></p-checkbox>
+				<label>ניהול הרשאות</label>
+			</div>
+			<div class="form-field flex-row">
+				<p-checkbox formControlName="can_use_ai_insights" [binary]="true"></p-checkbox>
+				<label>תובנות AI</label>
+			</div>
+			<div class="form-field flex-row">
+				<p-checkbox formControlName="can_import_from_text" [binary]="true"></p-checkbox>
+				<label>יבוא מטקסט</label>
+			</div>
+		</div>
+	</div>
+
+	<div class="dialog-footer">
+		<button type="button" (click)="onCancel()" class="empty md">
+			<span class="material-symbols-rounded">cancel</span>
+			<span>ביטול</span>
+		</button>
+		<button type="submit" class="primary md" [disabled]="form.invalid">
+			<span class="material-symbols-rounded">save</span>
+			<span>{{ isEditMode ? 'שמור שינויים' : 'צור תוכנית' }}</span>
+		</button>
+	</div>
+</form>

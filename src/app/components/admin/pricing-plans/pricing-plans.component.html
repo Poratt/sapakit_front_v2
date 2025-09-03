@@ -4,59 +4,65 @@
         <p class="subtitle">מגוון תוכניות שמותאמות לכל שלב בצמיחת העסק שלכם</p>
     </div>
 
-    <div class="plans-grid">
-        @for(plan of plans; track plan.id) {
-            <div 
-                class="plan-card"
-                [class.selected]="selectedPlan() === plan.id"
-                [class.popular]="plan.popular"
-                (mouseenter)="hoveredPlan.set(plan.id)"
-                (mouseleave)="hoveredPlan.set(null)"
-            >
-                @if (plan.popular) {
-                    <div class="popular-badge">
-                        <span>הכי פופולרי ⚡</span>
-                    </div>
-                }
-
-                <div class="plan-content">
-                    <div class="plan-header">
-                        <div class="icon-wrapper" [ngClass]="'icon-' + plan.id">
-                            <i [class]="plan.icon"></i>
+    @if (isLoading()) {
+        <div class="flex justify-center items-center h-96">
+            <app-loader></app-loader>
+        </div>
+    } @else {
+        <div class="plans-grid">
+            @for(plan of plans(); track plan.id) {
+                <div 
+                    class="plan-card"
+                    [class.selected]="selectedPlan() === plan.id"
+                    [class.popular]="plan.isPopular"
+                    (mouseenter)="hoveredPlan.set(plan.id)"
+                    (mouseleave)="hoveredPlan.set(null)"
+                >
+                    @if (plan.isPopular) {
+                        <div class="popular-badge">
+                            <span>הכי פופולרי ⚡</span>
                         </div>
-                        <h3 class="plan-name">{{ plan.name }}</h3>
-                        <p class="plan-audience">{{ plan.audience }}</p>
-                        <div class="plan-price">
-                            <span class="price-amount">{{ plan.price }}</span>
-                            <span class="price-period">/{{ plan.period }}</span>
-                        </div>
-                    </div>
+                    }
 
-                    <div class="features-list">
-                        @for(feature of plan.features; track feature.name) {
-                            <div class="feature-item">
-                                <div class="feature-icon" [class.included]="feature.included">
-                                    <i [class]="feature.included ? 'pi pi-check' : 'pi pi-times'"></i>
-                                </div>
-                                <div class="feature-text">
-                                    <span [class.excluded]="!feature.included">{{ feature.name }}</span>
-                                    @if (feature.note) {
-                                        <small class="feature-note">{{ feature.note }}</small>
-                                    }
-                                </div>
+                    <div class="plan-content">
+                        <div class="plan-header">
+                            <div class="icon-wrapper" [ngClass]="'icon-' + plan.tierKey.toLowerCase()">
+                                <i [class]="plan.icon"></i>
                             </div>
-                        }
-                    </div>
+                            <h3 class="plan-name">{{ plan.name }}</h3>
+                            <p class="plan-audience">{{ plan.audience }}</p>
+                            <div class="plan-price">
+                                <span class="price-amount">₪{{ plan.price }}</span>
+                                <span class="price-period">/{{ plan.period }}</span>
+                            </div>
+                        </div>
 
-                    <button
-                        (click)="selectPlan(plan.id)"
-                        class="select-button"
-                        [class.selected-button]="selectedPlan() === plan.id"
-                    >
-                        {{ plan.id === selectedPlan() ? 'התוכנית שלך' : (plan.id === 'free' ? 'התחילו חינם' : 'בחירה בתוכנית') }}
-                    </button>
+                        <div class="features-list">
+                            @for(feature of plan.features; track feature.name) {
+                                <div class="feature-item">
+                                    <div class="feature-icon" [class.included]="feature.included">
+                                        <i [class]="feature.included ? 'pi pi-check' : 'pi pi-times'"></i>
+                                    </div>
+                                    <div class="feature-text">
+                                        <span [class.excluded]="!feature.included">{{ feature.name }}</span>
+                                        @if (feature.note) {
+                                            <small class="feature-note">{{ feature.note }}</small>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
+                        <button
+                            (click)="selectPlan(plan.id)"
+                            class="select-button"
+                            [class.selected-button]="selectedPlan() === plan.id"
+                        >
+                            {{ plan.id === selectedPlan() ? 'התוכנית שלך' : (plan.price === 0 ? 'התחילו חינם' : 'בחירה בתוכנית') }}
+                        </button>
+                    </div>
                 </div>
-            </div>
-        }
-    </div>
+            }
+        </div>
+    }
 </div>

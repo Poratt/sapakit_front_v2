@@ -1,0 +1,64 @@
+<div class="p-responsive">
+    @switch (pageState()) {
+        @case (PageStates.Loading) { <app-loader></app-loader> }
+        @case (PageStates.Error) {
+            <!-- Error State HTML -->
+        }
+        @case (PageStates.Ready) {
+            <div @fadeIn400 class="flex flex-col gap-4 w-full h-full">
+                <h1 class="main-title">ניהול תוכניות מנויים</h1>
+                <div class="actions-bar">
+                    <span class="text-sm text-gray-500">ניהול התוכניות המוצגות למשתמשים והמגבלות שלהן.</span>
+                    <button type="button" (click)="addTier()" class="primary md">
+                        <span class="material-symbols-rounded">add</span>
+                        <span>הוסף תוכנית חדשה</span>
+                    </button>
+                </div>
+
+                <p-table [value]="tiers()" [rowHover]="true" size="small">
+                    <ng-template #header>
+                        <tr>
+                            <th>שם התוכנית</th>
+                            <th>מחיר</th>
+                            <th>משתמשים</th>
+                            <th>ספקים</th>
+                            <th>סטטוס</th>
+                            <th></th>
+                        </tr>
+                    </ng-template>
+                    <ng-template #body let-tier>
+                        <tr>
+                            <td>
+                                <strong>{{ tier.name }}</strong>
+                                @if (tier.isPopular) {
+                                    <span class="ml-2 text-yellow-500 pi pi-star-fill"></span>
+                                }
+                            </td>
+                            <td>{{ tier.price | currency:'ILS' }} / {{ tier.period }}</td>
+                            <td>{{ tier.limit_users === -1 ? 'ללא הגבלה' : tier.limit_users }}</td>
+                            <td>{{ tier.limit_suppliers === -1 ? 'ללא הגבלה' : tier.limit_suppliers }}</td>
+                            <td>
+                                @if(tier.isActive){
+                                    <span class="text-green-600 font-semibold">פעילה</span>
+                                } @else {
+                                    <span class="text-gray-400">לא פעילה</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="actions-cell">
+                                    <p-button tooltipPosition="top" pTooltip="עריכה" icon="pi pi-pen-to-square"
+                                        (click)="editTier(tier)" size="small" [rounded]="true"
+                                        severity="secondary"></p-button>
+                                    <p-button tooltipPosition="top" pTooltip="מחיקה" icon="pi pi-trash"
+                                        (click)="confirmDelete(tier)" size="small" [rounded]="true"
+                                        severity="danger"></p-button>
+                                </div>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+        }
+    }
+	<app-pricing-plans></app-pricing-plans>
+</div>

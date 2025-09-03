@@ -35,7 +35,7 @@ import { DialogConfig } from '../../common/const/dialog-config';
 import { PageStates } from '../../common/models/pageStates';
 import { Supplier } from '../../common/models/supplier';
 import { AuthStore } from '../../store/auth.store';
-import { AccountTier } from '../../common/enums/account-tier.enums';
+// import { AccountTier } from '../../common/enums/account-tier.enums';
 import { TierManagementService } from '../../services/tier-management.service';
 
 @Component({
@@ -67,11 +67,11 @@ export class SuppliersComponent implements OnInit {
 	private readonly excelExportService = inject(ExcelExportService);
 	private readonly supplierStore = inject(SupplierStore);
 	private readonly authStore = inject(AuthStore);
-	private readonly tierService = inject(TierManagementService); 
+	private readonly tierService = inject(TierManagementService);
 
 	readonly searchQuery = signal('');
 
-	readonly AccountTier = AccountTier;
+	// readonly AccountTier = AccountTier;
 
 	readonly PageStates = signal(PageStates);
 	readonly pageState = computed(() => {
@@ -86,12 +86,15 @@ export class SuppliersComponent implements OnInit {
 	readonly reminderTypeData = reminderTypeData;
 
 	readonly suppliers = this.supplierStore.suppliers;
-    readonly suppliersCount = computed(() => this.suppliers().length);
-    readonly accountTier = computed(() => this.authStore.user()?.account?.tier); 
+	readonly suppliersCount = computed(() => this.suppliers().length);
+	readonly accountTier = computed(() => this.authStore.user()?.account?.tier);
 	readonly supplierLimit = this.tierService.getLimitFor('suppliers');
 	readonly hasReachedSupplierLimit = this.tierService.hasReachedLimit('suppliers');
-    readonly tooltipMessage = this.tierService.getTooltipMessage('suppliers'); // <-- שימוש במתודה החדשה
-
+	readonly tooltipMessage = this.tierService.getTooltipMessage('suppliers'); // <-- שימוש במתודה החדשה
+	readonly isLimited = computed(() => {
+		const limit = this.supplierLimit;
+		return limit !== -1 && limit !== Infinity;
+	});
 
 	// --- Computed Signals ---
 	readonly filteredSuppliers = computed(() => {

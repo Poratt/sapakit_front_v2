@@ -1,22 +1,14 @@
-import { Injectable, computed, inject, Signal } from '@angular/core'; // 1. הוספת Signal
+import { Injectable, computed, inject, Signal } from '@angular/core';
 import { AuthStore } from '../store/auth.store';
 import { SupplierStore } from '../store/supplier.store';
 import { UserStore } from '../store/user.store';
-import { AccountTier } from '../common/enums/account-tier.enums';
+import { TierStore } from '../store/tier.store'; // 1. ייבוא
 
-const TIER_LIMITS = {
-    [AccountTier.Free]: { users: 1, suppliers: 3 },
-    [AccountTier.Basic]: { users: 5, suppliers: 20 },
-    [AccountTier.Pro]: { users: Infinity, suppliers: Infinity },
-};
-
-// 2. יצירת מילון שמות בעברית במקום מרכזי
+type Feature = 'users' | 'suppliers';
 const FEATURE_NAMES_HEBREW = {
     users: { singular: 'משתמש', plural: 'המשתמשים' },
     suppliers: { singular: 'ספק', plural: 'הספקים' },
 };
-
-type Feature = keyof typeof FEATURE_NAMES_HEBREW;
 
 @Injectable({
     providedIn: 'root'
@@ -25,31 +17,41 @@ export class TierManagementService {
     private authStore = inject(AuthStore);
     private supplierStore = inject(SupplierStore);
     private userStore = inject(UserStore);
+    private tierStore = inject(TierStore); // 2. הזרקה
 
-    private readonly accountTier = computed(() => this.authStore.user()?.account?.tier);
+    private readonly accountTierId = computed(() => this.authStore.user()?.account?.tierId);
     
-    getLimitFor(feature: Feature): number {
-        const tier = this.accountTier();
-        if (tier === undefined || tier === null) {
-            return Infinity;
+    // 3. Signal שמחזיק את פרטי התוכנית הנוכחית
+    private readonly currentTierDetails = computed(() => {
+        const tiers = this.tierStore.tiers();
+        const currentTierId = this.accountTierId();
+        if (!tiers.length || currentTierId === undefined) {
+            return null;
         }
-        return TIER_LIMITS[tier][feature];
+        return tiers.find(t => t.id === currentTierId);
+    });
+
+    getLimitFor(feature: Feature): number {
+        const tierDetails = this.currentTierDetails();
+        if (!tierDetails) return Infinity;
+
+        switch (feature) {
+            case 'users': return tierDetails.limit_users;
+            case 'suppliers': return tierDetails.limit_suppliers;
+            default: return Infinity;
+        }
     }
 
-    hasReachedLimit(feature: Feature): Signal<boolean> { // החזרת Signal<boolean> במקום פונקציה
+    hasReachedLimit(feature: Feature): Signal<boolean> {
         return computed(() => {
             const limit = this.getLimitFor(feature);
+            if (limit === -1) return false; // -1 = ללא הגבלה
+
             const currentCount = this.getCountFor(feature);
             return currentCount >= limit;
         });
     }
-    
-    // --- 3. המתודה החדשה ---
-    /**
-     * יוצר הודעת tooltip דינמית עבור פיצ'ר מסוים.
-     * @param feature - 'users' or 'suppliers'
-     * @returns Signal<string> ריאקטיבי עם ההודעה המתאימה.
-     */
+
     getTooltipMessage(feature: Feature): Signal<string> {
         return computed(() => {
             const limitReached = this.hasReachedLimit(feature)();
@@ -57,7 +59,7 @@ export class TierManagementService {
             const featureName = FEATURE_NAMES_HEBREW[feature].plural;
             const featureNameSingular = FEATURE_NAMES_HEBREW[feature].singular;
 
-            if (limitReached) {
+            if (limitReached && limit !== -1) {
                 return `הגעת למגבלת ${featureName} (${limit}) בתוכנית שלך. שדרג כדי להוסיף עוד.`;
             }
             return `הוסף ${featureNameSingular} חדש`;
@@ -66,12 +68,9 @@ export class TierManagementService {
 
     private getCountFor(feature: Feature): number {
         switch (feature) {
-            case 'users':
-                return this.userStore.usersCount();
-            case 'suppliers':
-                return this.supplierStore.suppliersCount();
-            default:
-                return 0;
+            case 'users': return this.userStore.usersCount();
+            case 'suppliers': return this.supplierStore.suppliersCount();
+            default: return 0;
         }
     }
 }

@@ -1,16 +1,17 @@
-import { AccountTier } from '../enums/account-tier.enums';
 import { User } from './user';
+import { AccountTier } from './account-tier.model';
 
 export interface Account {
 	id: number;
 	name: string;
-	tier: AccountTier;
+	tierId?: number; // זה השדה שמגיע עם היוזר
+    tier?: AccountTier; // זה השדה שמגיע משאילתות אחרות
 	ownerId: number;
 	owner?: User;
 	users?: User[];
-	supplierCount?: number; 
-	categoryCount?: number; 
-	productCount?: number; 
+	supplierCount?: number;
+	categoryCount?: number;
+	productCount?: number;
 	createdAt: Date;
 	updatedAt: Date;
 }

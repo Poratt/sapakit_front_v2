@@ -29,7 +29,8 @@
     <div @fadeIn400 class="flex flex-col gap-4 w-full h-full">
         <div class="flex gap-1 items-center">
             <h1 class="main-title">ניהול ספקים</h1>
-            @if (accountTier() !== AccountTier.Pro) {
+            {{isLimited()}}
+            @if (isLimited()) {
             <span class="text-sm tracking-tighter text-gray-500">
                 ({{  suppliersCount() }}/{{ supplierLimit }})
             </span>

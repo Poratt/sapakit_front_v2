@@ -60,7 +60,8 @@
 							<td>{{ account.name }}</td>
 							<td>{{ account.owner?.username || account.owner?.email }}</td>
 							<td>
-								<app-badge [enumValue]="account.tier" [dataArray]="AccountTierData"></app-badge>
+								<!-- <app-badge [enumValue]="account.tier" [dataArray]="AccountTierData"></app-badge> -->
+								<span>{{ account.tier?.name || 'לא שויך' }}</span> 
 							</td>
 							<td><p-badge [value]="account.users?.length || 0" severity="secondary"></p-badge></td>
 							<td class="hidden sm:table-cell" ><p-badge [value]="account.supplierCount || 0" severity="secondary"></p-badge></td>
@@ -150,7 +151,6 @@
     }
     <p-confirmdialog header="אישור מחיקה" icon="pi pi-exclamation-triangle" acceptLabel="מחק" rejectLabel="ביטול" acceptButtonStyleClass="p-button-danger" rejectButtonStyleClass="p-button-text"></p-confirmdialog>
 
-	<app-pricing-plans></app-pricing-plans>
 
 </div>
 

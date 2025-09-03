@@ -15,6 +15,7 @@ import { SupplierStore } from './supplier.store';
 import { UserStore } from './user.store';
 import { StatsStore } from './stats.store';
 import { Router } from '@angular/router';
+import { TierStore } from './tier.store';
 
 // ✅ הגדרת ה-interface החסר
 interface LoginCredentials {
@@ -56,6 +57,7 @@ export const AuthStore = signalStore(
 			productStore = inject(ProductStore),
 			statsStore = inject(StatsStore),
 			insightStore = inject(InsightStore),
+			tierStore = inject(TierStore),
 		) => {
 
 			
@@ -92,6 +94,7 @@ export const AuthStore = signalStore(
 						patchState(store, { user: user || null, isLoading: false });
 						if (user && user.role !== UserRole.SysAdmin) { // <<< התיקון כאן
 										statsStore.loadStats({});
+										tierStore.loadTiers();
 									}
 					} catch (error: any) {
 						// ✅ הוסף הצגת הודעה כאן
@@ -151,6 +154,7 @@ export const AuthStore = signalStore(
 									// ואז טען את הסטטיסטיקות, בדיוק כמו ב-initialize
 									if (user && user.role !== UserRole.SysAdmin) { // <<< התיקון כאן
 										statsStore.loadStats({});
+										tierStore.loadTiers();
 									}
 								}),
 								catchError((err) => {

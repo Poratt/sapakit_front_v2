@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { DynamicDialogRef, DynamicDialogConfig } from 'primeng/dynamicdialog';
@@ -7,7 +7,8 @@ import { SelectButtonModule } from 'primeng/selectbutton';
 import { NotificationService } from '../../../services/notification.service';
 import { ApiService } from '../../../services/api.service';
 import { Account } from '../../../common/models/account';
-import { AccountTierData } from '../../../common/enums/account-tier.enums';
+import { TierStore } from '../../../store/tier.store';
+import { AccountTier } from '../../../common/models/account-tier.model';
 
 @Component({
   selector: 'app-account-dialog',
@@ -22,16 +23,22 @@ export class AccountDialogComponent {
   private apiService = inject(ApiService);
   private notificationService = inject(NotificationService);
 
-  account: Account = this.config.data.account;
-  accountTierData = AccountTierData;
+  account: Account = this.config.data.account
+  accountTiers = signal<AccountTier[]>(this.config.data.tiers || []);
   form: FormGroup;
 
   constructor() {
     this.form = this.fb.group({
-      tier: [this.account.tier, Validators.required]
+      tier: [this.account.tierId, Validators.required]
     });
+
   }
 
+  ngOnInit() {
+    console.log('ngOnInit called in AccountDialogComponent');
+
+    console.log(this.accountTiers());
+  }
   onSave(): void {
     if (this.form.invalid) return;
 

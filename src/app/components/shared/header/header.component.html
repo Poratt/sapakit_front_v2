@@ -16,6 +16,8 @@
 
   <div class="header-left">
 
+
+
     <div class="flex gap-6">
       <!-- AI Insight -->
       <div class="flex items-center gap-3">
@@ -151,7 +153,8 @@
           <span class="account-role">SysAdmin</span>
         } @else {
           <span class="account-name">{{ user()?.account?.name }}</span>
-          <span class="account-role">{{ user()?.account?.tier | accountTierLabel }}</span>
+                <span class="account-role">{{ user()?.account?.tierId | accountTierLabel }}</span>
+
         }
       </div>
 

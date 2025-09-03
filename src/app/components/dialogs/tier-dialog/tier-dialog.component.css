@@ -1,0 +1,104 @@
+.tier-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+}
+
+.grid-header {
+    grid-column: 1 / -1;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--primary-700);
+    border-bottom: 1px solid var(--primary-100);
+    padding-bottom: 0.5rem;
+    margin-top: 1rem;
+}
+.grid-header:first-of-type {
+    margin-top: 0;
+}
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.form-field.flex-row {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.full-width {
+    grid-column: 1 / -1;
+}
+
+.features-group {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+}
+
+/* Icon Selector Styles */
+.icon-selector {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    border: 1px solid var(--surface-border);
+    border-radius: var(--border-radius);
+    background: var(--surface-ground);
+}
+
+.icon-nav-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border: 1px solid var(--surface-border);
+    border-radius: 50%;
+    background: var(--surface-card);
+    color: var(--text-color);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.icon-nav-btn:hover {
+    background: var(--primary-color);
+    color: var(--primary-color-text);
+    border-color: var(--primary-color);
+}
+
+.icon-nav-btn:active {
+    transform: scale(0.95);
+}
+
+.icon-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    flex: 1;
+    padding: 0.5rem;
+    min-height: 4rem;
+}
+
+.icon-display i {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+}
+
+.icon-name {
+    font-size: 0.75rem;
+    color: var(--text-color-secondary);
+    text-align: center;
+    word-break: break-all;
+}

@@ -1,3 +1,4 @@
+import { Account } from './../common/models/account';
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -15,9 +16,9 @@ import { DashboardStats } from '../common/models/statistics';
 import { Supplier } from '../common/models/supplier';
 import { User } from '../common/models/user';
 import { CreateUserDto } from '../common/dto/user-create.dto';
-import { Account } from '../common/models/account';
 import { SystemKpis } from '../components/admin/admin-dashboard-component/admin-dashboard-component.component';
-import { AccountTier } from '../common/enums/account-tier.enums';
+import { AccountTier } from '../common/models/account-tier.model';
+
 
 export interface OrderSuggestion {
 	productId: number;
@@ -37,9 +38,30 @@ export class ApiService {
 	updateAccount(accountId: number, payload: { tier: AccountTier }): Observable<ServiceResultContainer<Account>> {
 		return this.http.put<ServiceResultContainer<Account>>(`${this.apiUrl}/accounts/${accountId}`, payload);
 	}
-	
+
 	deleteAccount(accountId: number): Observable<ServiceResultContainer<void>> {
 		return this.http.delete<ServiceResultContainer<void>>(`${this.apiUrl}/accounts/${accountId}`);
+	}
+	
+	// Tiers
+	getTiersConfig(): Observable<ServiceResultContainer<AccountTier[]>> {
+		return this.http.get<ServiceResultContainer<AccountTier[]>>(`${this.apiUrl}/tiers/config`);
+	}
+
+	getAllTiers(): Observable<ServiceResultContainer<AccountTier[]>> {
+		return this.http.get<ServiceResultContainer<AccountTier[]>>(`${this.apiUrl}/tiers`);
+	}
+
+	createTier(tier: Partial<AccountTier>): Observable<ServiceResultContainer<AccountTier>> {
+		return this.http.post<ServiceResultContainer<AccountTier>>(`${this.apiUrl}/tiers`, tier);
+	}
+
+	updateTier(id: number, tier: Partial<AccountTier>): Observable<ServiceResultContainer<AccountTier>> {
+		return this.http.put<ServiceResultContainer<AccountTier>>(`${this.apiUrl}/tiers/${id}`, tier);
+	}
+
+	deleteTier(id: number): Observable<ServiceResultContainer<void>> {
+		return this.http.delete<ServiceResultContainer<void>>(`${this.apiUrl}/tiers/${id}`);
 	}
 
 	// Users
@@ -213,8 +235,8 @@ export class ApiService {
 		return this.http.get<ServiceResultContainer<DashboardStats>>(`${this.apiUrl}/statistics/dashboard-kpis`);
 	}
 	getSystemKpis(): Observable<ServiceResultContainer<SystemKpis>> {
-    return this.http.get<ServiceResultContainer<SystemKpis>>(`${this.apiUrl}/admin/kpis`);
-}
+		return this.http.get<ServiceResultContainer<SystemKpis>>(`${this.apiUrl}/admin/kpis`);
+	}
 
 
 

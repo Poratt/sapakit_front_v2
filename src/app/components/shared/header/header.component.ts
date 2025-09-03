@@ -37,7 +37,7 @@ import { AccountTierPipe } from "../../../pipes/account-tier.pipe";
 	standalone: true,
 	imports: [CommonModule, RouterModule, BadgeModule, PopoverModule,
     ButtonModule, TooltipModule, TableModule, BadgeComponent,
-    HebrewDatePipe, OrderStatusPipe, userRolePipe, OverlayBadgeModule, AccountTierPipe],
+    HebrewDatePipe, OrderStatusPipe, OverlayBadgeModule, AccountTierPipe],
 	providers: [DialogService],
 	templateUrl: './header.component.html',
 	styleUrl: './header.component.css',
@@ -79,6 +79,8 @@ export class HeaderComponent {
 		if (this.userRole() != UserRole.SysAdmin) {
 			this.insightStore.loadInsights();
 		}
+		console.log(this.user());
+		
 	}
 
 

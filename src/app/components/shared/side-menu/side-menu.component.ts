@@ -139,6 +139,16 @@ export class SideMenuComponent implements OnInit {
 						this.menuService.closeMobileMenu();
 					},
 				},
+				{
+					label: 'ניהול תוכניות',
+					icon: 'workspace_premium',
+					key: 'tiers',
+					routerLink: '/admin/tiers',
+					routerLinkActiveOptions: true,
+					styleClass: 'menu-item',
+					matTooltip: 'ניהול תוכניות',
+					command: () => { this.menuService.closeMobileMenu(); },
+				},
 				...commonItems
 			]);
 		} else {

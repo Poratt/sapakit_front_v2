@@ -2,11 +2,15 @@
     <div class="flex flex-col gap-4 p-fluid">
         <p>בחר תוכנית חדשה עבור חשבון <strong>{{ account.name }}</strong>:</p>
         
-        <p-selectButton formControlName="tier" [options]="accountTierData" optionLabel="label" optionValue="enumValue">
+        <p-selectButton 
+            formControlName="tier" 
+            [options]="accountTiers()"
+            optionLabel="name"
+            optionValue="id">
             <ng-template let-item pTemplate="item">
                 <div class="flex items-center gap-2 px-2">
-                    <i [class]="item.icon"></i>
-                    <span>{{ item.label }}</span>
+                    <!-- האייקון לא קיים במודל שלנו כרגע, נשאיר אותו בחוץ -->
+                    <span>{{ item.name }}</span> <!-- וגם כאן, להשתמש ב-name -->
                 </div>
             </ng-template>
         </p-selectButton>

@@ -22,9 +22,10 @@ import { BadgeModule } from 'primeng/badge';
 import { ApiService } from '../../../services/api.service';
 import { trigger, state, style, transition, animate, sequence } from '@angular/animations';
 import { UserStore } from '../../../store/user.store';
-import { AccountTierData } from '../../../common/enums/account-tier.enums';
+// import { AccountTierData } from '../../../common/enums/account-tier.enums';
 import { AccountDialogComponent } from '../../dialogs/account-dialog/account-dialog.component';
 import { PricingPlansComponent } from "../pricing-plans/pricing-plans.component";
+import { TierStore } from '../../../store/tier.store';
 
 
 @Component({
@@ -34,47 +35,47 @@ import { PricingPlansComponent } from "../pricing-plans/pricing-plans.component"
     CommonModule, TableModule, ButtonModule, ConfirmDialogModule, InputTextModule,
     FormsModule, BadgeComponent, TooltipModule, LoaderComponent, BadgeModule,
     PricingPlansComponent
-],
+  ],
   templateUrl: './accounts.component.html',
   styleUrls: ['./accounts.component.css'],
   providers: [ConfirmationService, DialogService],
-  animations: [fadeIn400, 
-        trigger('rowExpansionTrigger', [
-          transition(':enter', [
-            style({
-              height: '0px',
-              opacity: 0,
-              overflow: 'hidden',
-              transform: 'scaleY(0.1) translateY(-10px)',
-              transformOrigin: 'top center',
-              filter: 'blur(1px)',
-              willChange: 'transform, height, opacity'
-            }),
-            sequence([
-              animate('200ms cubic-bezier(0.25, 0.8, 0.25, 1)', style({
-                height: '*',
-                transform: 'scaleY(0.8) translateY(-2px)',
-                filter: 'blur(0.5px)'
-              })),
-              animate('150ms cubic-bezier(0.25, 0.46, 0.45, 0.94)', style({
-                opacity: 1,
-                transform: 'scaleY(1) translateY(0)',
-                filter: 'blur(0px)'
-              }))
-            ])
-          ]),
-    
-          transition(':leave', [
-            animate('250ms cubic-bezier(0.4, 0.0, 0.6, 1)', style({
-              height: '0px',
-              opacity: 0,
-              overflow: 'hidden',
-              transform: 'scaleY(0.1) translateY(-5px)',
-              filter: 'blur(1px)'
-            }))
-          ])
-    
+  animations: [fadeIn400,
+    trigger('rowExpansionTrigger', [
+      transition(':enter', [
+        style({
+          height: '0px',
+          opacity: 0,
+          overflow: 'hidden',
+          transform: 'scaleY(0.1) translateY(-10px)',
+          transformOrigin: 'top center',
+          filter: 'blur(1px)',
+          willChange: 'transform, height, opacity'
+        }),
+        sequence([
+          animate('200ms cubic-bezier(0.25, 0.8, 0.25, 1)', style({
+            height: '*',
+            transform: 'scaleY(0.8) translateY(-2px)',
+            filter: 'blur(0.5px)'
+          })),
+          animate('150ms cubic-bezier(0.25, 0.46, 0.45, 0.94)', style({
+            opacity: 1,
+            transform: 'scaleY(1) translateY(0)',
+            filter: 'blur(0px)'
+          }))
         ])
+      ]),
+
+      transition(':leave', [
+        animate('250ms cubic-bezier(0.4, 0.0, 0.6, 1)', style({
+          height: '0px',
+          opacity: 0,
+          overflow: 'hidden',
+          transform: 'scaleY(0.1) translateY(-5px)',
+          filter: 'blur(1px)'
+        }))
+      ])
+
+    ])
   ],
 })
 
@@ -83,6 +84,11 @@ export class AccountsComponent implements OnInit {
   private readonly dialogService = inject(DialogService);
   private readonly apiService = inject(ApiService);
   private readonly userStore = inject(UserStore);
+  private readonly tierStore = inject(TierStore);
+
+  readonly accountTiers = this.tierStore.tiers;
+  readonly areTiersLoading = this.tierStore.isLoading; // 1. הוסף signal למצב הטעינה
+
 
   readonly PageStates = PageStates;
   readonly pageState = signal(PageStates.Loading);
@@ -92,39 +98,42 @@ export class AccountsComponent implements OnInit {
   readonly accounts = signal<Account[]>([]);
   expandedRows = {};
 
-  AccountTierData = AccountTierData
+  // AccountTierData = AccountTierData
 
-readonly filteredAccounts = computed(() => {
+  readonly filteredAccounts = computed(() => {
     const allAccounts = this.accounts();
     const query = this.searchQuery().toLowerCase();
     if (!query) return allAccounts;
 
     return allAccounts
-        .map(account => {
-            // צור עותק של החשבון כדי לא לשנות את המקור
-            const filteredAccount = { ...account }; 
-            
-            // סנן את המשתמשים הפנימיים
-            const matchingUsers = account.users?.filter(u => 
-                u.username.toLowerCase().includes(query) || 
-                u.email.toLowerCase().includes(query)
-            );
+      .map(account => {
+        // צור עותק של החשבון כדי לא לשנות את המקור
+        const filteredAccount = { ...account };
 
-            // עדכן את מערך המשתמשים בחשבון המסונן
-            filteredAccount.users = matchingUsers;
-            
-            return filteredAccount;
-        })
-        .filter(account => 
-            // השאר את החשבון רק אם הוא עצמו תואם לחיפוש, או שיש לו משתמשים תואמים
-            account.name.toLowerCase().includes(query) || 
-            (account.users && account.users.length > 0)
+        // סנן את המשתמשים הפנימיים
+        const matchingUsers = account.users?.filter(u =>
+          u.username.toLowerCase().includes(query) ||
+          u.email.toLowerCase().includes(query)
         );
-});
+
+        // עדכן את מערך המשתמשים בחשבון המסונן
+        filteredAccount.users = matchingUsers;
+
+        return filteredAccount;
+      })
+      .filter(account =>
+        // השאר את החשבון רק אם הוא עצמו תואם לחיפוש, או שיש לו משתמשים תואמים
+        account.name.toLowerCase().includes(query) ||
+        (account.users && account.users.length > 0)
+      );
+  });
 
   ngOnInit() {
     this.loadAccounts();
+    this.tierStore.loadTiers();
+
   }
+
 
   public refreshData(): void {
     this.loadAccounts();
@@ -159,24 +168,48 @@ readonly filteredAccounts = computed(() => {
     });
   }
 
-editAccount(account: Account): void {
-		const ref = this.dialogService.open(AccountDialogComponent, {
-			...DialogConfig,
-			header: `עריכת תוכנית | ${account.name}`,
-			data: { account },
-		});
+  editAccount(account: Account): void {
+    console.log('Attempting to edit account. Tiers loading:', this.areTiersLoading());
+    console.log('Current tiers in store:', JSON.stringify(this.accountTiers(), null, 2));
 
-		ref.onClose.subscribe((updatedAccountPartial: Account | undefined) => {
-			if (updatedAccountPartial) {
+    if (this.areTiersLoading()) {
+      this.notificationService.toast({ severity: 'info', summary: 'אנא המתן', detail: 'טוען את הגדרות התוכניות...' });
+      return;
+    }
+
+    const tiers = this.accountTiers();
+    if (tiers.length === 0) {
+      this.notificationService.toast({ severity: 'error', detail: 'לא נטענו תוכניות מהשרת. נסה לרענן.' });
+      return;
+    }
+
+    const ref = this.dialogService.open(AccountDialogComponent, {
+      ...DialogConfig,
+      header: `עריכת תוכנית | ${account.name}`,
+      data: {
+        account,
+        tiers: tiers
+      },
+    });
+
+ref.onClose.subscribe((updatedAccountFromServer: Account | undefined) => {
+			if (updatedAccountFromServer) {
 				this.accounts.update(currentAccounts => 
 					currentAccounts.map(existingAccount => {
-						if (existingAccount.id === updatedAccountPartial.id) {
-							return { ...existingAccount, ...updatedAccountPartial };
+						if (existingAccount.id === updatedAccountFromServer.id) {
+							// --- התיקון המרכזי ---
+                            // צור עותק חדש של החשבון הקיים
+                            const newAccountState = { ...existingAccount };
+                            // עדכן רק את המאפיינים שהשתנו שהתקבלו מהשרת
+                            newAccountState.tier = updatedAccountFromServer.tier;
+                            newAccountState.tierId = updatedAccountFromServer.tierId;
+                            // אם השרת מחזיר שדות נוספים, עדכן גם אותם
+                            // newAccountState.updatedAt = updatedAccountFromServer.updatedAt; 
+							return newAccountState;
 						}
 						return existingAccount;
 					})
 				);
-
 			}
 		});
 	}
@@ -218,7 +251,7 @@ editAccount(account: Account): void {
       }
     });
   }
-  
+
   private deleteUser(user: User): void {
     this.userStore.deleteUser(user.id);
     // אחרי מחיקה, רענן את הנתונים כדי שהשינוי יופיע
@@ -226,38 +259,38 @@ editAccount(account: Account): void {
     setTimeout(() => this.loadAccounts(), 100);
   }
 
-  
-	private loadAccountsForAdmin(): void {
-		// ✅ ננהל את המצב ישירות כאן
-		this.pageState.set(PageStates.Loading);
-		this.apiService.getAllAccountsWithUsers().subscribe({
-			next: (response) => {
-				if (response.success && response.result) {
-					this.accounts.set(response.result);
-					if (response.result.length > 0) {
-						this.pageState.set(PageStates.Ready);
-					} else {
-						this.pageState.set(PageStates.Empty);
-					}
-				} else {
-					this.pageState.set(PageStates.Error);
-				}
-			},
-			error: () => {
-				this.pageState.set(PageStates.Error);
-			},
-		});
-	}
 
-	
+  private loadAccountsForAdmin(): void {
+    // ✅ ננהל את המצב ישירות כאן
+    this.pageState.set(PageStates.Loading);
+    this.apiService.getAllAccountsWithUsers().subscribe({
+      next: (response) => {
+        if (response.success && response.result) {
+          this.accounts.set(response.result);
+          if (response.result.length > 0) {
+            this.pageState.set(PageStates.Ready);
+          } else {
+            this.pageState.set(PageStates.Empty);
+          }
+        } else {
+          this.pageState.set(PageStates.Error);
+        }
+      },
+      error: () => {
+        this.pageState.set(PageStates.Error);
+      },
+    });
+  }
 
-	onRowExpand(event: TableRowExpandEvent) {
-		console.log({ severity: 'info', summary: 'Product Expanded', detail: event.data.name, life: 3000 });
-	}
 
-	onRowCollapse(event: TableRowCollapseEvent) {
-		console.log({ severity: 'success', summary: 'Product Collapsed', detail: event.data.name, life: 3000 });
-	}
+
+  onRowExpand(event: TableRowExpandEvent) {
+    console.log({ severity: 'info', summary: 'Product Expanded', detail: event.data.name, life: 3000 });
+  }
+
+  onRowCollapse(event: TableRowCollapseEvent) {
+    console.log({ severity: 'success', summary: 'Product Collapsed', detail: event.data.name, life: 3000 });
+  }
 
 
 }

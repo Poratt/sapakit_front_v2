@@ -33,19 +33,23 @@ export const routes: Routes = [
 		component: DashboardComponent, // משתמש באותו Layout
 		canActivate: [authGuard, sysAdminGuard],
 		children: [
-			{ 
-                path: '', 
-                redirectTo: 'dashboard',
-                pathMatch: 'full' 
-            },
-			{ 
-                path: 'dashboard', 
-                loadComponent: () => import('./components/admin/admin-dashboard-component/admin-dashboard-component.component').then(m => m.AdminDashboardComponentComponent) 
-            },
-            { 
-                path: 'accounts', // נתיב: /admin/accounts
-                loadComponent: () => import('./components/admin/accounts/accounts.component').then(m => m.AccountsComponent) 
-            },
+			{
+				path: '',
+				redirectTo: 'dashboard',
+				pathMatch: 'full'
+			},
+			{
+				path: 'dashboard',
+				loadComponent: () => import('./components/admin/admin-dashboard-component/admin-dashboard-component.component').then(m => m.AdminDashboardComponentComponent)
+			},
+			{
+				path: 'accounts', // נתיב: /admin/accounts
+				loadComponent: () => import('./components/admin/accounts/accounts.component').then(m => m.AccountsComponent)
+			},
+			{
+				path: 'tiers', // נתיב: /admin/tiers
+				loadComponent: () => import('./components/admin/tiers/tiers.component').then(m => m.TiersComponent)
+			},
 		]
 	},
 

@@ -24,7 +24,7 @@
     <div @fadeIn400 class="flex flex-col gap-4 w-full h-full">
         <div class="flex gap-1 items-center">
             <h1 class="main-title">ניהול משתמשים</h1>
-            @if (accountTier() !== AccountTier.Pro) {
+            @if (isLimited()) {
             <span class="text-sm tracking-tighter text-gray-500">
                 ({{  usersCount() }}/{{ userLimit }})
             </span>

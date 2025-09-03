@@ -1,5 +1,9 @@
-import { Component, signal } from '@angular/core';
+import { Component, OnInit, signal, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TierStore } from '../../../store/tier.store';
+import { AuthStore } from '../../../store/auth.store';
+import { AccountTier } from '../../../common/models/account-tier.model';
+import { LoaderComponent } from '../../shared/loader/loader.component';
 
 interface PlanFeature {
 	name: string;
@@ -7,91 +11,72 @@ interface PlanFeature {
 	note?: string;
 }
 
-interface PricingPlan {
-	id: string;
-	name: string;
-	price: string;
-	period: string;
-	audience: string;
-	icon: string;
-	popular?: boolean;
-	features: PlanFeature[];
+interface DisplayPlan extends AccountTier {
+    features: PlanFeature[];
 }
 
 @Component({
 	selector: 'app-pricing-plans',
 	standalone: true,
-	imports: [CommonModule],
+	imports: [CommonModule, LoaderComponent],
 	templateUrl: './pricing-plans.component.html',
     styleUrls: ['./pricing-plans.component.css']
 })
-export class PricingPlansComponent {
-	selectedPlan = signal<string>('basic');
-	hoveredPlan = signal<string | null>(null);
+export class PricingPlansComponent implements OnInit {
+    private tierStore = inject(TierStore);
+    private authStore = inject(AuthStore);
 
-	readonly plans: PricingPlan[] = [
-		{
-			id: 'free',
-			name: 'חינמית',
-			price: '₪0',
-			period: 'לתמיד',
-			audience: 'עסק בתחילת דרכו, בעלים יחיד',
-			icon: 'pi pi-gift',
-			features: [
-				{ name: 'משתמש 1 (הבעלים בלבד)', included: true },
-				{ name: 'עד 3 ספקים', included: true },
-				{ name: 'מוצרים וקטגוריות ללא הגבלה', included: true },
-				{ name: 'ניהול הזמנות', included: true },
-				{ name: 'לוח שנה מתקדם', included: true },
-				{ name: 'דאשבורד בסיסי', included: true, note: 'הזמנות להיום וטיוטות' },
-				{ name: 'היסטוריית הזמנות (7 ימים)', included: true, note: 'מוגבל ל-7 ימים אחרונים' },
-				{ name: 'ייצוא לאקסל', included: false },
-				{ name: 'תובנות AI', included: false },
-				{ name: 'יבוא הזמנות מטקסט', included: false },
-				{ name: 'תמיכה בקהילה', included: true }
-			]
-		},
-		{
-			id: 'basic',
-			name: 'בסיסית',
-			price: '₪49',
-			period: 'לחודש',
-			audience: 'עסק מבוסס עם צוות קטן',
-			icon: 'pi pi-star',
-            popular: true,
-			features: [
-				{ name: 'עד 5 משתמשים', included: true },
-				{ name: 'עד 20 ספקים', included: true },
-				{ name: 'כל תכונות התוכנית החינמית', included: true },
-				{ name: 'היסטוריית הזמנות מלאה', included: true },
-				{ name: 'ייצוא לאקסל', included: true },
-				{ name: 'דאשבורד מתקדם', included: true, note: 'כולל עלויות חודשיות' },
-				{ name: 'ניהול הרשאות (Admin/User)', included: true },
-				{ name: 'תובנות AI', included: false },
-				{ name: 'יבוא הזמנות מטקסט', included: false },
-				{ name: 'תמיכה במייל', included: true }
-			]
-		},
-		{
-			id: 'pro',
-			name: 'פרו',
-			price: '₪99',
-			period: ' לחודש',
-			audience: 'עסק שרוצה אופטימיזציה מלאה',
-			icon: 'pi pi-crown',
-			features: [
-				{ name: 'משתמשים ללא הגבלה', included: true },
-				{ name: 'ספקים ללא הגבלה', included: true },
-				{ name: 'כל תכונות התוכנית הבסיסית', included: true },
-				{ name: 'תובנות AI מ-Gemini', included: true },
-				{ name: 'יבוא הזמנות מטקסט', included: true },
-				{ name: 'פיצ\'רים חדשים בעדיפות', included: true },
-				{ name: 'תמיכה בעדיפות גבוהה', included: true, note: 'מייל וטלפון' }
-			]
-		}
-	];
+	selectedPlan = signal<number | undefined>(undefined);
+	hoveredPlan = signal<number | null>(null);
+    isLoading = computed(() => this.tierStore.isLoading() || this.plans().length === 0);
+    
+    plans = computed<DisplayPlan[]>(() => {
+        return this.tierStore.tiers().map(tier => ({
+            ...tier,
+            features: this.buildFeaturesForTier(tier)
+        }));
+    });
 
-	selectPlan(planId: string): void {
+    ngOnInit() {
+        this.tierStore.loadTiers();
+        this.selectedPlan.set(this.authStore.user()?.account?.tierId);
+    }
+
+	selectPlan(planId: number): void {
 		this.selectedPlan.set(planId);
 	}
+
+    private buildFeaturesForTier(tier: AccountTier): PlanFeature[] {
+        const features: PlanFeature[] = [];
+
+        features.push({ 
+            name: tier.limit_users === -1 ? 'משתמשים ללא הגבלה' : `עד ${tier.limit_users} משתמשים`,
+            included: true 
+        });
+
+        features.push({
+            name: tier.limit_suppliers === -1 ? 'ספקים ללא הגבלה' : `עד ${tier.limit_suppliers} ספקים`,
+            included: true
+        });
+
+        features.push({
+            name: tier.limit_history_days === -1 ? 'היסטוריית הזמנות מלאה' : 'היסטוריית הזמנות',
+            included: true,
+            note: tier.limit_history_days !== -1 ? `מוגבל ל-${tier.limit_history_days} ימים אחרונים` : undefined
+        });
+
+        features.push({ name: 'ייצוא לאקסל', included: tier.can_export_excel });
+        features.push({ name: 'ניהול הרשאות (Admin/User)', included: tier.can_manage_roles });
+        features.push({ name: 'תובנות AI', included: tier.can_use_ai_insights });
+        features.push({ name: 'יבוא הזמנות מטקסט', included: tier.can_import_from_text });
+        
+        const supportMap: {[key: string]: string} = {
+            community: 'תמיכה בקהילה',
+            email: 'תמיכה במייל',
+            priority: 'תמיכה בעדיפות גבוהה'
+        };
+        features.push({ name: supportMap[tier.support_level] || 'תמיכה', included: true });
+
+        return features;
+    }
 }

@@ -26,7 +26,7 @@ import { fadeIn400 } from '../../common/const/animations';
 import { PageStates } from '../../common/models/pageStates';
 import { User } from '../../common/models/user';
 import { environment } from '../../../environments/environment';
-import { AccountTier } from '../../common/enums/account-tier.enums';
+// import { AccountTier } from '../../common/enums/account-tier.enums';
 import { ConfirmationService } from 'primeng/api';
 import { TierManagementService } from '../../services/tier-management.service';
 
@@ -53,7 +53,7 @@ export class UsersComponent implements OnInit {
 
 	readonly searchQuery = signal('');
 
-	readonly AccountTier = AccountTier;
+	// readonly AccountTier = AccountTier;
 
 	readonly PageStates = PageStates;
 	readonly pageState = signal(PageStates.Loading);
@@ -66,6 +66,10 @@ export class UsersComponent implements OnInit {
 	readonly userLimit = this.tierService.getLimitFor('users');
 	readonly hasReachedUserLimit = this.tierService.hasReachedLimit('users');
 	readonly tooltipMessage = this.tierService.getTooltipMessage('users');
+	readonly isLimited = computed(() => {
+        const limit = this.userLimit;
+        return limit !== -1 && limit !== Infinity;
+    });
 
 
 	constructor() {
