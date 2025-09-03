@@ -10,13 +10,18 @@ import { EnumData } from '../../../common/models/enumData';
 	imports: [CommonModule, TooltipModule],
 	template: `
 		<span
-			[class]="'badge' + (size() ? ' badge-' + size() : '')"
-			[ngClass]="selectedData()?.tailwind || defaultTailwind()"
+			class="badge"
+			[ngClass]="[
+				'badge-' + size(), 
+				selectedData()?.tailwind || defaultTailwind()
+			]"
 			tabindex="0"
 			>
-
-			<span class="{{ selectedData()?.icon || defaultIcon() }}"></span>
+			@if(selectedData()?.icon || defaultIcon()){
+				<span class="{{ selectedData()?.icon || defaultIcon() }}"></span>
+			}
 			{{ label() ? label() : selectedData()?.label || 'הזמנה' }}
+			
 		</span>
 	`,
 	styleUrls: ['./badge.component.css'],

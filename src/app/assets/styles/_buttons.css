@@ -24,6 +24,11 @@ button.danger {
 		padding-top: 2px;
 	}
 	
+	&:disabled {
+		/* cursor: default; */
+		opacity: 0.5;
+		background-color: var(--grey-100);
+	}
 	&.float {
 		box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.2705882353);
 	}
@@ -86,7 +91,7 @@ button.danger {
 button.primary {
 	background: var(--primary-100);
 	
-	&:hover {
+	&:hover:not(:disabled) {
 		background: var(--primary-200);
 		color: var(--primary-800);
 		.material-symbols-rounded {
@@ -94,7 +99,7 @@ button.primary {
 		}
 	}
 	
-	&:active {
+	&:active:not(:disabled) {
 		background: var(--primary-300);
 		color: var(--primary-800);
 		.material-symbols-rounded {
@@ -102,7 +107,7 @@ button.primary {
 		}
 	}
 	
-	&:focus-visible {
+	&:focus-visible:not(:disabled) {
 		outline-color: var(--primary-500);
 		background: var(--primary-150, var(--primary-200));
 	}
@@ -116,7 +121,7 @@ button.danger {
 		/* color: var(--red-800); */
 	}
 	
-	&:hover {
+	&:hover:not(:disabled) {
 		background: var(--red-500);
 		color: var(--red-50);
 		.material-symbols-rounded {
@@ -124,7 +129,7 @@ button.danger {
 		}
 	}
 	
-	&:active {
+	&:active:not(:disabled) {
 		background: var(--red-300);
 		color: var(--red-50);
 		.material-symbols-rounded {
@@ -132,7 +137,7 @@ button.danger {
 		}
 	}
 	
-	&:focus-visible {
+	&:focus-visible:not(:disabled) {
 		outline-color: var(--red-500);
 		background: var(--red-150, var(--red-200));
 	}
@@ -142,7 +147,7 @@ button.empty {
 	background: var(--grey-50);
 	border: 1px solid var(--grey-100);
 	
-	&:hover {
+	&:hover:not(:disabled) {
 		background: var(--grey-100);
 		color: var(--grey-800);
 		.material-symbols-rounded {
@@ -150,7 +155,7 @@ button.empty {
 		}
 	}
 	
-	&:active {
+	&:active:not(:disabled) {
 		background: var(--grey-200);
 		color: var(--grey-800);
 		.material-symbols-rounded {
@@ -158,12 +163,16 @@ button.empty {
 		}
 	}
 	
-	&:focus-visible {
+	&:focus-visible:not(:disabled) {
 		outline-color: var(--grey-500);
 		background: var(--grey-75, var(--grey-100));
 		border-color: var(--grey-300);
 	}
 }
+
+
+
+
 
 
 .toggle-switch {

@@ -1,3 +1,6 @@
+const colors = require('tailwindcss/colors');
+
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
@@ -95,7 +98,8 @@ module.exports = {
           700: 'hsl(48.28 71% 35%)',
           800: 'hsl(48.28 71% 25%)',
           900: 'hsl(48.28 71% 15%)',
-        }
+        },
+        ...colors,
       },
       fontSize: {
         'responsive-sm': 'clamp(10px, 1.75cqw, 14px)',
@@ -106,7 +110,7 @@ module.exports = {
       },
       width: {
         '17': '4.25rem',
-        '18': '4.5rem', 
+        '18': '4.5rem',
         '19': '4.75rem',
       },
     },

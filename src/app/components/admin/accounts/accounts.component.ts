@@ -22,6 +22,9 @@ import { BadgeModule } from 'primeng/badge';
 import { ApiService } from '../../../services/api.service';
 import { trigger, state, style, transition, animate, sequence } from '@angular/animations';
 import { UserStore } from '../../../store/user.store';
+import { AccountTierData } from '../../../common/enums/account-tier.enums';
+import { AccountDialogComponent } from '../../dialogs/account-dialog/account-dialog.component';
+import { PricingPlansComponent } from "../pricing-plans/pricing-plans.component";
 
 
 @Component({
@@ -29,8 +32,9 @@ import { UserStore } from '../../../store/user.store';
   standalone: true,
   imports: [
     CommonModule, TableModule, ButtonModule, ConfirmDialogModule, InputTextModule,
-    FormsModule, BadgeComponent, TooltipModule, LoaderComponent, BadgeModule
-  ],
+    FormsModule, BadgeComponent, TooltipModule, LoaderComponent, BadgeModule,
+    PricingPlansComponent
+],
   templateUrl: './accounts.component.html',
   styleUrls: ['./accounts.component.css'],
   providers: [ConfirmationService, DialogService],
@@ -87,6 +91,8 @@ export class AccountsComponent implements OnInit {
 
   readonly accounts = signal<Account[]>([]);
   expandedRows = {};
+
+  AccountTierData = AccountTierData
 
 readonly filteredAccounts = computed(() => {
     const allAccounts = this.accounts();
@@ -147,11 +153,33 @@ readonly filteredAccounts = computed(() => {
     });
     ref.onClose.subscribe((updatedUser: User | undefined) => {
       if (updatedUser) {
-        this.loadAccounts(); // טען מחדש את כל החשבונות כדי לסנכרן
+        this.loadAccounts();
         this.notificationService.toast({ severity: 'success', detail: 'המשתמש עודכן בהצלחה' });
       }
     });
   }
+
+editAccount(account: Account): void {
+		const ref = this.dialogService.open(AccountDialogComponent, {
+			...DialogConfig,
+			header: `עריכת תוכנית | ${account.name}`,
+			data: { account },
+		});
+
+		ref.onClose.subscribe((updatedAccountPartial: Account | undefined) => {
+			if (updatedAccountPartial) {
+				this.accounts.update(currentAccounts => 
+					currentAccounts.map(existingAccount => {
+						if (existingAccount.id === updatedAccountPartial.id) {
+							return { ...existingAccount, ...updatedAccountPartial };
+						}
+						return existingAccount;
+					})
+				);
+
+			}
+		});
+	}
 
   public confirmDelete(item: User | Account): void {
     const isAccount = 'users' in item;
@@ -231,7 +259,5 @@ readonly filteredAccounts = computed(() => {
 		console.log({ severity: 'success', summary: 'Product Collapsed', detail: event.data.name, life: 3000 });
 	}
 
-	editAccount(account: Account) {
 
-	}
 }

@@ -1,0 +1,25 @@
+<form [formGroup]="form" (ngSubmit)="onSave()">
+    <div class="flex flex-col gap-4 p-fluid">
+        <p>בחר תוכנית חדשה עבור חשבון <strong>{{ account.name }}</strong>:</p>
+        
+        <p-selectButton formControlName="tier" [options]="accountTierData" optionLabel="label" optionValue="enumValue">
+            <ng-template let-item pTemplate="item">
+                <div class="flex items-center gap-2 px-2">
+                    <i [class]="item.icon"></i>
+                    <span>{{ item.label }}</span>
+                </div>
+            </ng-template>
+        </p-selectButton>
+    </div>
+
+    <div class="dialog-footer">
+        <button type="button" (click)="onCancel()" class="empty md">
+            <span class="material-symbols-rounded">cancel</span>
+            <span>ביטול</span>
+        </button>
+        <button type="submit" class="primary md" [disabled]="form.invalid || !form.dirty">
+            <span class="material-symbols-rounded">save</span>
+            <span>שמור שינויים</span>
+        </button>
+    </div>
+</form>

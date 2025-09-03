@@ -38,14 +38,18 @@
 							<th style="width: 3rem"></th>
 							<th pSortableColumn="name">שם החשבון <p-sortIcon field="name"></p-sortIcon></th>
 							<th pSortableColumn="owner">בעל החשבון <p-sortIcon field="owner"></p-sortIcon></th>
-							<th pSortableColumn="users">מספר משתמשים <p-sortIcon field="users"></p-sortIcon></th>
+							<th pSortableColumn="tier">תוכנית<p-sortIcon field="tier"></p-sortIcon></th>
+							<th pSortableColumn="users">משתמשים <p-sortIcon field="users"></p-sortIcon></th>
+							<th class="hidden sm:table-cell" pSortableColumn="supplierCount">ספקים <p-sortIcon field="supplierCount"></p-sortIcon></th>
+							<th class="hidden md:table-cell" pSortableColumn="categoryCount">קטגוריות <p-sortIcon field="categoryCount"></p-sortIcon></th>
+							<th class="hidden lg:table-cell" pSortableColumn="supplierCount">מוצרים <p-sortIcon field="productCount"></p-sortIcon></th>
 							<th></th>
 						</tr>
 					</ng-template>
 
 					<ng-template #body let-account let-expanded="expanded">
 						<tr>
-							<td>
+							<td class="expand-table-toggle-cell">
 								<button type="button" pButton pRipple [pRowToggler]="account" icon="pi pi-chevron-left"
 									[pRowToggler]="account" size="small" [rounded]="true"
 									class="rotatable-icon"
@@ -55,7 +59,13 @@
 							</td>
 							<td>{{ account.name }}</td>
 							<td>{{ account.owner?.username || account.owner?.email }}</td>
-							<td><p-badge [value]="account.users?.length || 0"></p-badge></td>
+							<td>
+								<app-badge [enumValue]="account.tier" [dataArray]="AccountTierData"></app-badge>
+							</td>
+							<td><p-badge [value]="account.users?.length || 0" severity="secondary"></p-badge></td>
+							<td class="hidden sm:table-cell" ><p-badge [value]="account.supplierCount || 0" severity="secondary"></p-badge></td>
+							<td class="hidden md:table-cell" ><p-badge [value]="account.categoryCount || 0" severity="secondary"></p-badge></td>
+							<td class="hidden lg:table-cell"><p-badge [value]="account.productCount || 0" severity="secondary"></p-badge></td>
 							<td>
 								<div class="actions-cell">
 									<div class="actions-cell">
@@ -75,10 +85,23 @@
 					
 					<ng-template #expandedrow let-account>
 						<tr @rowExpansionTrigger>
-							<td colspan="5">
+							<td colspan="100%">
 								<div>
-									
-									<p-table [value]="account.users" dataKey="id" styleClass="expanded-table-content">
+									<div class="flex justify-end gap-4">
+										<div class="account-detail-item flex sm:hidden">
+											<label class="p-responsive">סה"כ ספקים</label>
+											<p-badge [value]="account.supplierCount || 0" severity="secondary"></p-badge>
+										</div>
+										<div class="account-detail-item flex md:hidden">
+											<label class="p-responsive">סה"כ קטגוריות</label>
+											<p-badge [value]="account.categoryCount || 0" severity="secondary"></p-badge>
+										</div>
+										<div class="account-detail-item flex lg:hidden">
+											<label class="p-responsive">סה"כ מוצרים</label>
+											<p-badge [value]="account.productCount || 0" severity="secondary"></p-badge>
+										</div>
+									</div>
+									<p-table [value]="account.users" dataKey="id" styleClass="expanded-table-content" size="small">
 										<ng-template #header>
 											<tr>
 												<th pSortableColumn="username">שם <p-sortIcon field="username"></p-sortIcon></th>
@@ -126,4 +149,8 @@
         }
     }
     <p-confirmdialog header="אישור מחיקה" icon="pi pi-exclamation-triangle" acceptLabel="מחק" rejectLabel="ביטול" acceptButtonStyleClass="p-button-danger" rejectButtonStyleClass="p-button-text"></p-confirmdialog>
+
+	<app-pricing-plans></app-pricing-plans>
+
 </div>
+

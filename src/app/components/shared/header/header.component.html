@@ -1,7 +1,7 @@
 <!-- in header.component.html -->
 
 <div class="header">
-  <div class="header-left">
+  <div class="header-right">
     <div [class.active]="isMobileMenuOpen()" (click)="toggleMobileMenu()" [ngClass]="{ opened: isMobileMenuOpen() }"
       aria-label="פתח/סגור תפריט" class="menu-btn">
       <span></span><span></span><span></span>
@@ -14,7 +14,7 @@
     </a>
   </div> -->
 
-  <div class="header-right">
+  <div class="header-left">
 
     <div class="flex gap-6">
       <!-- AI Insight -->
@@ -146,9 +146,15 @@
   <ng-template pTemplate="content">
     <div class="user-panel">
       <div class="account-info">
-        <span class="account-name">{{ user()?.account?.name }}</span>
-        <!-- <span class="account-role">{{ user()?.role | userRole }}</span>  -->
+        @if (userRole() === UserRoleEnum.SysAdmin) {
+          <span class="account-name">מנהל מערכת</span>
+          <span class="account-role">SysAdmin</span>
+        } @else {
+          <span class="account-name">{{ user()?.account?.name }}</span>
+          <span class="account-role">{{ user()?.account?.tier | accountTierLabel }}</span>
+        }
       </div>
+
       <div class="flex flex-col gap-1 p-1">
         <div class="action-item" (click)="userPopover.hide()">
           <i class="pi pi-user"></i>

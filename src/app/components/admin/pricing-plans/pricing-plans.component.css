@@ -1,0 +1,216 @@
+:host {
+    display: block;
+    background-color: var(--grey-10);
+    padding: 2rem 1rem;
+}
+
+.pricing-page {
+    max-width: 1200px;
+    margin: 0 auto;
+
+    .header {
+        text-align: center;
+        margin-bottom: 3rem;
+
+        .main-title {
+            font-size: 2.25rem;
+            font-weight: 600;
+            color: var(--grey-800);
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            font-size: 1.125rem;
+            color: var(--grey-600);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+    }
+
+    .plans-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 2rem;
+
+        @media (min-width: 1024px) {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+
+    .plan-card {
+        position: relative;
+        border-radius: 1rem;
+        transition: all 0.3s ease-in-out;
+        
+        &.popular {
+            transform: translateY(-1rem);
+        }
+
+        .popular-badge {
+            position: absolute;
+            top: -1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            
+            span {
+                background: linear-gradient(90deg, var(--yellow-400), var(--red-500));
+                color: white;
+                padding: 0.5rem 1.25rem;
+                border-radius: 999px;
+                font-size: 0.875rem;
+                font-weight: 600;
+                box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+            }
+        }
+
+        .plan-content {
+            padding: 2rem;
+            border-radius: 1rem;
+            border: 1px solid var(--grey-100);
+            background-color: white;
+            box-shadow: var(--box-shadow);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease-in-out;
+        }
+
+        &.selected .plan-content {
+            border-color: var(--primary-400);
+            box-shadow: 0 0 0 3px var(--primary-100), var(--box-shadow-hover);
+        }
+
+        &:hover:not(.selected) .plan-content {
+            transform: translateY(-4px);
+            box-shadow: var(--box-shadow-hover);
+        }
+
+        .plan-header {
+            text-align: center;
+            margin-bottom: 2rem;
+
+            .icon-wrapper {
+                width: 4rem;
+                height: 4rem;
+                border-radius: 50%;
+                margin: 0 auto 1rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+
+                i {
+                    font-size: 2.25rem;
+                }
+
+                &.icon-free { background-color: var(--grey-50); i { color: var(--grey-500); } }
+                &.icon-basic { background-color: var(--primary-50); i { color: var(--primary-500); } }
+                &.icon-pro { background-color: var(--secondary-50); i { color: var(--secondary-500); } }
+            }
+
+            .plan-name {
+                font-size: 1.5rem;
+                font-weight: 600;
+                color: var(--grey-800);
+                margin-bottom: 0.25rem;
+            }
+
+            .plan-audience {
+                font-size: 0.875rem;
+                color: var(--grey-500);
+                margin-bottom: 1rem;
+            }
+            
+            .plan-price {
+                .price-amount {
+                    font-size: 2.5rem;
+                    font-weight: 600;
+                    color: var(--grey-900);
+                }
+                .price-period {
+                    font-size: 1rem;
+                    color: var(--grey-600);
+                }
+            }
+        }
+
+        .features-list {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 2rem;
+
+            .feature-item {
+                display: flex;
+                align-items: flex-start;
+                gap: 0.75rem;
+
+                .feature-icon {
+                    width: 1.25rem;
+                    height: 1.25rem;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    flex-shrink: 0;
+                    margin-top: 2px;
+                    
+                    i {
+                        font-size: 0.8rem;
+                        font-weight: bold;
+                    }
+
+                    &.included {
+                        background-color: var(--primary-500);
+                        color: white;
+                    }
+
+                    &:not(.included) {
+                        background-color: var(--grey-100);
+                        color: var(--grey-400);
+                    }
+                }
+
+                .feature-text {
+                    color: var(--grey-700);
+                    .excluded {
+                        color: var(--grey-400);
+                        text-decoration: line-through;
+                    }
+                }
+                
+                .feature-note {
+                    font-size: 0.75rem;
+                    color: var(--grey-500);
+                    margin-top: 0.25rem;
+                }
+            }
+        }
+        
+        .select-button {
+            width: 100%;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+            
+            &.selected-button {
+                background: var(--primary-500);
+                color: white;
+                box-shadow: 0 4px 15px var(--primary-100);
+            }
+
+            &:not(.selected-button) {
+                background-color: var(--grey-70);
+                color: var(--grey-700);
+                &:hover {
+                    background-color: var(--grey-100);
+                }
+            }
+        }
+    }
+}

@@ -45,7 +45,7 @@ export class SideMenuComponent implements OnInit {
 	}
 
 	ngOnInit() {
-		this.authStore.loadUser();
+		// this.authStore.loadUser();
 
 		const url = this.router.url.split('?')[0];
 		const isSettingsPage = url.includes('settings');

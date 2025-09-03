@@ -51,10 +51,10 @@ export class UserDialogComponent {
 
 	private readonly authStore = inject(AuthStore);
 
-	readonly isCurrentUserAdmin = computed(() => this.authStore.user()?.role === UserRole.Admin);
+	readonly isCurrentUserSysAdmin = computed(() => this.authStore.user()?.role === UserRole.SysAdmin);
 
 	@ViewChild('emailRef') emailRef!: ElementRef;
-	@ViewChild('passwordInputComp') passwordInputComp!: PasswordInputComponent; 
+	@ViewChild('passwordInputComp') passwordInputComp!: PasswordInputComponent;
 
 	statusData = statusData;
 	Status = Status;
@@ -67,19 +67,7 @@ export class UserDialogComponent {
 	formSubmitted = signal<boolean>(false);
 	public readonly passwordLength = signal(8);
 
-	readonly isDisabled = computed(() => { return this.isCurrentUserAdmin() && this.id.value === 0; });
-
-	constructor() {
-		effect(() => {
-			// const disabled = this.isDisabled();
-			// if (disabled) {
-			// 	this.role.disable();
-			// } else {
-			// 	this.role.enable();
-			// }
-			this.role.disable()
-		});
-	}
+	readonly isDisabled = computed(() => { return this.isCurrentUserSysAdmin() });
 
 	userForm: FormGroup = this.fb.group({
 		id: [0],
@@ -119,26 +107,26 @@ export class UserDialogComponent {
 
 	ngOnInit() {
 		const userToEdit = this.config.data?.user;
+		const isSysAdmin = this.isCurrentUserSysAdmin();
 
-		if (userToEdit) { 
+		if (userToEdit) {
 			this.userForm.removeControl('password');
 			this.patchForm(userToEdit);
-		} 
-		else { 
+			isSysAdmin ? this.role.enable() : this.role.disable();
+		}
+		else {
 			this.status.disable();
-
-			// ✅ התיקון הקריטי כאן
-			if (this.isCurrentUserAdmin()) {
-				// אם המשתמש המחובר הוא Admin, קבע את התפקיד כ-User ונטרל את השדה
+			if (isSysAdmin) {
+				this.role.enable();
+			}
+			else {
 				this.role.setValue(UserRole.User);
 				this.role.disable();
 			}
 		}
 
 		setTimeout(() => {
-			if (this.emailRef) {
-				this.emailRef.nativeElement.focus();
-			}
+			if (this.emailRef) this.emailRef.nativeElement.focus();
 		});
 	}
 
@@ -240,7 +228,7 @@ export class UserDialogComponent {
 		if (this.password && this.passwordInputComp) {
 			this.passwordInputComp.markAsTouched();
 		}
-		
+
 		if (this.userForm.invalid) {
 			this.notificationService.toast({
 				severity: 'error',

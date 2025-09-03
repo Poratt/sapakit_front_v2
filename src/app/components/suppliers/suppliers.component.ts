@@ -34,6 +34,9 @@ import { fadeIn400, crossFade } from '../../common/const/animations';
 import { DialogConfig } from '../../common/const/dialog-config';
 import { PageStates } from '../../common/models/pageStates';
 import { Supplier } from '../../common/models/supplier';
+import { AuthStore } from '../../store/auth.store';
+import { AccountTier } from '../../common/enums/account-tier.enums';
+import { TierManagementService } from '../../services/tier-management.service';
 
 @Component({
 	selector: 'app-suppliers',
@@ -59,14 +62,17 @@ import { Supplier } from '../../common/models/supplier';
 	animations: [fadeIn400, crossFade],
 })
 export class SuppliersComponent implements OnInit {
-	// --- Services & Stores ---
-	// private readonly apiService = inject(ApiService);
 	private readonly notificationService = inject(NotificationService);
 	private readonly dialogService = inject(DialogService);
 	private readonly excelExportService = inject(ExcelExportService);
 	private readonly supplierStore = inject(SupplierStore);
+	private readonly authStore = inject(AuthStore);
+	private readonly tierService = inject(TierManagementService); 
 
-	// --- Page State ---
+	readonly searchQuery = signal('');
+
+	readonly AccountTier = AccountTier;
+
 	readonly PageStates = signal(PageStates);
 	readonly pageState = computed(() => {
 		if (this.supplierStore.isLoading()) return PageStates.Loading;
@@ -75,14 +81,17 @@ export class SuppliersComponent implements OnInit {
 		return PageStates.Ready;
 	});
 
-	// --- Enum data for template ---
 	readonly statusData = statusData;
 	readonly orderTypeData = orderTypeData;
 	readonly reminderTypeData = reminderTypeData;
 
-	// --- Data Signals ---
 	readonly suppliers = this.supplierStore.suppliers;
-	readonly searchQuery = signal('');
+    readonly suppliersCount = computed(() => this.suppliers().length);
+    readonly accountTier = computed(() => this.authStore.user()?.account?.tier); 
+	readonly supplierLimit = this.tierService.getLimitFor('suppliers');
+	readonly hasReachedSupplierLimit = this.tierService.hasReachedLimit('suppliers');
+    readonly tooltipMessage = this.tierService.getTooltipMessage('suppliers'); // <-- שימוש במתודה החדשה
+
 
 	// --- Computed Signals ---
 	readonly filteredSuppliers = computed(() => {

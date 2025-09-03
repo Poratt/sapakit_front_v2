@@ -10,8 +10,8 @@
 	white-space: nowrap;
 	text-align: center;
 
-	background-color: var(--grey-70);
-	color: #495057;
+	/* background-color: var(--grey-70);
+	color: #495057; */
 
 	/* box-shadow:
 		0 1px 2px 0 rgba(0, 0, 0, 0.06),

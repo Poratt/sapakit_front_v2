@@ -25,14 +25,19 @@ import { ButtonModule } from 'primeng/button';
 import { TableModule } from "primeng/table";
 import { TooltipModule } from 'primeng/tooltip';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
+import { OverlayBadgeModule } from 'primeng/overlaybadge';
+
 import { userRolePipe } from "../../../pipes/userRole.pipe";
 import { UserRole } from '../../../common/enums/userRole.enum';
+import { AccountTierPipe } from "../../../pipes/account-tier.pipe";
 
 
 @Component({
 	selector: 'app-header',
 	standalone: true,
-	imports: [CommonModule, RouterModule, BadgeModule, PopoverModule, ButtonModule, TooltipModule, TableModule, BadgeComponent, HebrewDatePipe, OrderStatusPipe, userRolePipe], // ✅ עדכון ה-imports
+	imports: [CommonModule, RouterModule, BadgeModule, PopoverModule,
+    ButtonModule, TooltipModule, TableModule, BadgeComponent,
+    HebrewDatePipe, OrderStatusPipe, userRolePipe, OverlayBadgeModule, AccountTierPipe],
 	providers: [DialogService],
 	templateUrl: './header.component.html',
 	styleUrl: './header.component.css',
@@ -57,6 +62,8 @@ export class HeaderComponent {
 	public readonly username = computed(() => this.user()?.username || this.user()?.email);
 	public readonly userRole = this.authStore.userRole;
 	public readonly stats = this.statsStore.stats;
+
+	UserRoleEnum = UserRole
 
 	public isMobileMenuOpen = this.menuService.isMobileMenuOpen;
 	// private isUserPopoverOpen = this.menuService.isUserPopoverOpen;

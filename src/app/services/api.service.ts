@@ -17,6 +17,7 @@ import { User } from '../common/models/user';
 import { CreateUserDto } from '../common/dto/user-create.dto';
 import { Account } from '../common/models/account';
 import { SystemKpis } from '../components/admin/admin-dashboard-component/admin-dashboard-component.component';
+import { AccountTier } from '../common/enums/account-tier.enums';
 
 export interface OrderSuggestion {
 	productId: number;
@@ -33,6 +34,10 @@ export class ApiService {
 		return this.http.get<ServiceResultContainer<Account[]>>(`${this.apiUrl}/accounts/with-users`);
 	}
 
+	updateAccount(accountId: number, payload: { tier: AccountTier }): Observable<ServiceResultContainer<Account>> {
+		return this.http.put<ServiceResultContainer<Account>>(`${this.apiUrl}/accounts/${accountId}`, payload);
+	}
+	
 	deleteAccount(accountId: number): Observable<ServiceResultContainer<void>> {
 		return this.http.delete<ServiceResultContainer<void>>(`${this.apiUrl}/accounts/${accountId}`);
 	}

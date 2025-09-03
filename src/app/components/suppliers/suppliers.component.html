@@ -27,7 +27,14 @@
     }
     @case(PageStates().Ready) {
     <div @fadeIn400 class="flex flex-col gap-4 w-full h-full">
-        <h1 class="main-title">ניהול ספקים</h1>
+        <div class="flex gap-1 items-center">
+            <h1 class="main-title">ניהול ספקים</h1>
+            @if (accountTier() !== AccountTier.Pro) {
+            <span class="text-sm tracking-tighter text-gray-500">
+                ({{  suppliersCount() }}/{{ supplierLimit }})
+            </span>
+            }
+        </div>
 
 
         <div class="actions-bar">
@@ -43,7 +50,8 @@
                     <span>ייצוא לאקסל</span>
                 </button>
 
-                <button type="button" (click)="addSupplier()" class="primary md">
+                <button type="button" (click)="addSupplier()" class="primary md" [disabled]="hasReachedSupplierLimit()"
+                    [pTooltip]="tooltipMessage()" tooltipPosition="top">
                     <span class="material-symbols-rounded">add</span>
                     <span>הוסף ספק</span>
                 </button>

@@ -3,7 +3,7 @@ import { ProductStore } from './product.store';
 import { CategoryStore } from './category.store';
 // src/app/store/auth.store.ts
 import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals';
-import { computed, inject } from '@angular/core';
+import { computed, effect, inject, untracked } from '@angular/core';
 import { AuthService } from '../services/auth.service';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { catchError, firstValueFrom, of, pipe, switchMap, tap } from 'rxjs';
@@ -90,6 +90,9 @@ export const AuthStore = signalStore(
 					try {
 						const user = await firstValueFrom(authService.getCurrentUser());
 						patchState(store, { user: user || null, isLoading: false });
+						if (user && user.role !== UserRole.SysAdmin) { // <<< התיקון כאן
+										statsStore.loadStats({});
+									}
 					} catch (error: any) {
 						// ✅ הוסף הצגת הודעה כאן
 						const errorMessage = error.message || 'Error restoring session.';
@@ -133,16 +136,22 @@ export const AuthStore = signalStore(
 						tap(() => patchState(store, { isLoading: true, error: null })),
 						switchMap((credentials) =>
 							authService.login(credentials).pipe(
-								tap({
-									next: (response) => {
-										if (response.success && response.result) {
-											// ✅ קוראים למתודה המקומית
-											loadUser();
-											// router.navigate(['/']);
-										} else {
-											throw new Error(response.message || 'Login failed');
-										}
-									},
+								switchMap((response) => {
+									if (response.success && response.result) {
+										// אחרי לוגין מוצלח, טען את פרטי המשתמש המלאים
+										return authService.getCurrentUser();
+									} else {
+										// זרוק שגיאה כדי שהיא תיתפס ב-catchError
+										throw new Error(response.message || 'Login failed');
+									}
+								}),
+								tap((user) => {
+									// אחרי שהמשתמש נטען, עדכן את ה-state
+									patchState(store, { user, isLoading: false });
+									// ואז טען את הסטטיסטיקות, בדיוק כמו ב-initialize
+									if (user && user.role !== UserRole.SysAdmin) { // <<< התיקון כאן
+										statsStore.loadStats({});
+									}
 								}),
 								catchError((err) => {
 									const errorMessage = err.error?.message || err.message || 'Invalid credentials';

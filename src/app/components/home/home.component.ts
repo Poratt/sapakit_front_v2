@@ -68,7 +68,7 @@ export class HomeComponent {
 
 	constructor() {
 		this.supplierStore.loadSuppliers({});
-		this.statsStore.loadStats({});
+		// this.statsStore.loadStats({});
 
 		// פשוט יותר - רק עוקב אחר השלמת הטעינה הראשונית
 		effect(() => {

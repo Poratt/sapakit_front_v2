@@ -1,24 +1,36 @@
 import { Component, computed, inject, signal, OnInit, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
+
+// PrimeNG Modules
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
-import { FormsModule } from '@angular/forms';
-import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { BadgeComponent } from '../shared/badge/badge.component';
 import { TooltipModule } from 'primeng/tooltip';
 import { DialogService } from 'primeng/dynamicdialog';
+
+// App Components & Services
 import { LoaderComponent } from '../shared/loader/loader.component';
+import { UserDialogComponent } from '../dialogs/user-dialog/user-dialog.component';
 import { NotificationService } from '../../services/notification.service';
+import { UserStore } from '../../store/user.store';
+import { AuthStore } from '../../store/auth.store'; // ייבוא AuthStore
+
+// Enums, Consts & Models
 import { userRoleData } from '../../common/enums/userRole.enum';
 import { DialogConfig } from '../../common/const/dialog-config';
-import { UserDialogComponent } from '../dialogs/user-dialog/user-dialog.component';
-import { environment } from '../../../environments/environment';
 import { fadeIn400 } from '../../common/const/animations';
 import { PageStates } from '../../common/models/pageStates';
 import { User } from '../../common/models/user';
-import { UserStore } from '../../store/user.store';
+import { environment } from '../../../environments/environment';
+import { AccountTier } from '../../common/enums/account-tier.enums';
+import { ConfirmationService } from 'primeng/api';
+import { TierManagementService } from '../../services/tier-management.service';
+
+
 
 @Component({
 	selector: 'app-users',
@@ -36,34 +48,36 @@ export class UsersComponent implements OnInit {
 	private readonly notificationService = inject(NotificationService);
 	private readonly dialogService = inject(DialogService);
 	private readonly userStore = inject(UserStore);
-	
+	private readonly authStore = inject(AuthStore);
+	private readonly tierService = inject(TierManagementService);
+
+	readonly searchQuery = signal('');
+
+	readonly AccountTier = AccountTier;
+
 	readonly PageStates = PageStates;
 	readonly pageState = signal(PageStates.Loading);
-	readonly userRoleData = userRoleData;
-	readonly searchQuery = signal('');
-	
-	readonly users = this.userStore.activeUsers;
 
-	readonly filteredUsers = computed(() => {
-		const allUsers = this.users();
-		const query = this.searchQuery().toLowerCase();
-		if (!query) return allUsers;
-		return allUsers.filter((u) =>
-			u.username?.toLowerCase().includes(query) ||
-			u.email?.toLowerCase().includes(query)
-		);
-	});
+	readonly userRoleData = userRoleData;
+
+	readonly users = this.userStore.activeUsers;
+	readonly usersCount = computed(() => this.users().length);
+	readonly accountTier = computed(() => this.authStore.user()?.account?.tier);
+	readonly userLimit = this.tierService.getLimitFor('users');
+	readonly hasReachedUserLimit = this.tierService.hasReachedLimit('users');
+	readonly tooltipMessage = this.tierService.getTooltipMessage('users');
+
 
 	constructor() {
 		effect(() => {
-            const isLoading = this.userStore.isLoading();
-            const error = this.userStore.error();
-            const users = this.userStore.users();
-            
-            if (isLoading) this.pageState.set(PageStates.Loading);
-            else if (error && users.length === 0) this.pageState.set(PageStates.Error);
-            else if (users.length > 0) this.pageState.set(PageStates.Ready);
-            else this.pageState.set(PageStates.Empty);
+			const isLoading = this.userStore.isLoading();
+			const error = this.userStore.error();
+			const users = this.userStore.users();
+
+			if (isLoading) this.pageState.set(PageStates.Loading);
+			else if (error && users.length === 0) this.pageState.set(PageStates.Error);
+			else if (this.users().length > 0) this.pageState.set(PageStates.Ready);
+			else this.pageState.set(PageStates.Empty);
 		});
 	}
 
@@ -71,11 +85,19 @@ export class UsersComponent implements OnInit {
 		this.userStore.loadUsers({});
 	}
 
-    public refreshData(): void {
-        this.userStore.loadUsers({ force: true });
-    }
+	public refreshData(): void {
+		this.userStore.loadUsers({ force: true });
+	}
 
 	public addUser(): void {
+		if (this.hasReachedUserLimit()) {
+			this.notificationService.toast({
+				severity: 'warn',
+				summary: 'מגבלה הושגה',
+				detail: 'לא ניתן להוסיף משתמשים נוספים בתוכנית הנוכחית.',
+			});
+			return;
+		}
 		const ref = this.dialogService.open(UserDialogComponent, {
 			...DialogConfig,
 			header: 'הוספת משתמש חדש',
@@ -120,4 +142,16 @@ export class UsersComponent implements OnInit {
 		if (!image) return 'assets/images/avatar.png';
 		return image.startsWith('http') ? image : `${environment.apiUrl}/${image}`;
 	}
+
+	// Computed property for filtering users based on search query
+	readonly filteredUsers = computed(() => {
+		const query = this.searchQuery().toLowerCase();
+		if (!query) {
+			return this.users();
+		}
+		return this.users().filter(user =>
+			user.username.toLowerCase().includes(query) ||
+			user.email.toLowerCase().includes(query)
+		);
+	});
 }
