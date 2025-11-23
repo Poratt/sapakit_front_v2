@@ -24,6 +24,12 @@ export const routes: Routes = [
 			{ path: 'suppliers/:supplierId', loadComponent: () => import('./components/suppliers/supplier/supplier.component').then((m) => m.SupplierComponent) },
 			{ path: 'users', loadComponent: () => import('./components/users/users.component').then((m) => m.UsersComponent) },
 			{ path: 'orders', loadComponent: () => import('./components/order-history/order-history.component').then((m) => m.OrderHistoryComponent) },
+
+
+			{
+				path: 'table',
+				loadComponent: () => import('./components/user-table/user-table.component').then(m => m.UserTableComponent)
+			},
 		],
 	},
 
@@ -50,6 +56,11 @@ export const routes: Routes = [
 				path: 'tiers', // נתיב: /admin/tiers
 				loadComponent: () => import('./components/admin/tiers/tiers.component').then(m => m.TiersComponent)
 			},
+
+
+
+
+
 		]
 	},
 

@@ -21,9 +21,9 @@ import { defaultCategories, IconCategory } from '../../../common/const/prime-ico
   ]
 })
 export class IconSelectorComponent implements ControlValueAccessor, OnInit {
-  @Input() size: 'small' | 'medium' | 'large' = 'medium';
+  @Input() size: 'small' | 'medium' | 'large' = 'small';
   @Input() showIconName = true;
-  @Input() showCategoryTabs = false;
+  @Input() showCategoryTabs = true;
   @Input() disabled = false;
   @Input() placeholder = 'בחר אייקון';
   @Input() categories: IconCategory[] = [];

@@ -109,9 +109,24 @@ a {
 
 /* Tabs */
 .mat-mdc-tab-group {
-	&.sm {
-		/* max-width: 400px; */
+	&.mat-mdc-tab-group-stretch-tabs > .mat-mdc-tab-header .mat-mdc-tab {
+		flex-grow: 0 !important;
 	}
+
+	&.small-tabs .mdc-tab {
+		min-width: 0 !important;
+		padding: 0 12px !important;
+
+		.icon {
+			font-size: 12px;
+		}
+
+		.label {
+			font-size: 10px;
+			font-weight: 400;
+		}
+	}
+
 	&.no-labels .mat-mdc-tab-header {
 		display: none !important;
 	}
@@ -162,12 +177,39 @@ button.mdc-evolution-chip__action.mat-mdc-chip-action.mdc-evolution-chip__action
 }
 
 /* primeNG */
-p-selectbutton.custom.sm .p-togglebutton-content {
-	padding: clamp(2px, 2vw, 8px);
-	.material-symbols-rounded {
-		font-size: 18px;
+p-selectbutton.custom.sm {
+	.p-togglebutton-content {
+		padding: clamp(2px, 2vw, 4px);
+		.material-symbols-rounded {
+			font-size: 18px;
+		}
+
+		.content {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			text-align: center;
+			gap: 2px;
+
+			.icon {
+			}
+			.label {
+				font-size: 10px;
+				line-height: 10px;
+				font-weight: 400;
+			}
+		}
 	}
 }
+
+/* .p-togglebutton,
+.p-togglebutton.p-togglebutton-checked {
+	background-color: transparent !important;
+	border: transparent !important;
+	box-shadow: none!important;
+} */
+
 p-button.p-button-xs {
 	span::before {
 		font-size: 12px !important;
@@ -243,7 +285,7 @@ p-tieredmenusub {
 
 	.p-dialog-header {
 		/* background: var(--primary-50); */
-		
+
 		color: var(--grey-800);
 		padding: 12px 20px;
 		.p-button-text.p-button-secondary {
@@ -323,7 +365,6 @@ p-tieredmenusub {
 
 .dialog-header {
 	white-space: nowrap;
-
 }
 /* button.p-button {
   display: flex;
@@ -514,9 +555,9 @@ tr[ng-reflect-animation-trigger='rowExpansionTrigger'] {
 	backface-visibility: hidden;
 	perspective: 1000px;
 
-	>td{
-		background-color: green!important;
-		border:1px solid  green!important;
+	> td {
+		background-color: green !important;
+		border: 1px solid green !important;
 	}
 }
 
@@ -526,7 +567,7 @@ tr[ng-reflect-animation-trigger='rowExpansionTrigger'] {
 	th {
 		background-color: var(--grey-40) !important;
 	}
-	>td {
+	> td {
 		padding: 0;
 		background-color: green !important;
 		border: 1px solid green !important;

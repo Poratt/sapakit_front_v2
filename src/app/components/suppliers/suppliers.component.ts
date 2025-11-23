@@ -37,25 +37,29 @@ import { Supplier } from '../../common/models/supplier';
 import { AuthStore } from '../../store/auth.store';
 // import { AccountTier } from '../../common/enums/account-tier.enums';
 import { TierManagementService } from '../../services/tier-management.service';
+import { ExcelImportComponent } from "../shared/excel-import/excel-import.component";
+import { ResponsiveColumnSettingsComponent } from "../shared/responsive-column-settings/responsive-column-settings.component";
 
 @Component({
 	selector: 'app-suppliers',
 	standalone: true,
 	imports: [
-		CommonModule,
-		RouterLink,
-		FormsModule,
-		TableModule,
-		ButtonModule,
-		InputTextModule,
-		ConfirmDialogModule,
-		BadgeComponent,
-		TooltipModule,
-		MessageModule,
-		LoaderComponent,
-		ChipModule,
-		HebrewDayPipe,
-	],
+    CommonModule,
+    RouterLink,
+    FormsModule,
+    TableModule,
+    ButtonModule,
+    InputTextModule,
+    ConfirmDialogModule,
+    BadgeComponent,
+    TooltipModule,
+    MessageModule,
+    LoaderComponent,
+    ChipModule,
+    HebrewDayPipe,
+    ExcelImportComponent,
+    ResponsiveColumnSettingsComponent
+],
 	templateUrl: './suppliers.component.html',
 	styleUrls: ['./suppliers.component.css'],
 	providers: [DialogService], // DialogService נדרש ל-SupplierDialogComponent

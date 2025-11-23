@@ -39,6 +39,12 @@ export const UserStore = signalStore(
 					users: [...state.users, user],
 				}));
 			},
+			addUsers(users: User[]): void {
+                if (!users || users.length === 0) return;
+                patchState(store, (state) => ({
+                    users: [...state.users, ...users],
+                }));
+            },
 			updateUser(updatedUser: Partial<User>): void {
 				patchState(store, (state) => ({
 					users: state.users.map(u => {

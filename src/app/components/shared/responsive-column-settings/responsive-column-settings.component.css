@@ -1,0 +1,235 @@
+::ng-deep .p-checkbox {
+	vertical-align: middle !important;
+	margin-bottom: 2px;
+	--p-checkbox-checked-background: var(--secondary-300);
+	--p-checkbox-checked-hover-background: var(--secondary-400);
+	--p-checkbox-checked-border-color: var(--secondary-500);
+	--p-checkbox-checked-hover-border-color: var(--secondary-600);
+}
+
+::ng-deep .p-divider-horizontal {
+	margin: 6px 0 !important;
+}
+
+
+::ng-deep p-divider.p-divider .p-divider-content {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+}
+::ng-deep p-divider.p-divider .p-divider-content .icon,
+::ng-deep p-divider.p-divider .p-divider-content .label {
+	font-size: 10px;
+	font-weight: 500;
+	color: var(--grey-500);
+}
+::ng-deep p-divider.p-divider .p-divider-content .icon {
+	font-size: 16px;
+}
+
+.column-settings-content {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	padding: 0.5rem;
+	width: 180px;
+
+	.settings-header {
+		text-align: right;
+		border-bottom: 1px solid var(--grey-200);
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 4px;
+
+		.header {
+			line-height: 12px;
+			padding-top: 4px;
+		}
+	}
+
+	.column-list {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+		padding: 0 4px;
+
+		.column-item {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			width: 100%;
+			padding: 2px 6px;
+			gap: 8px;
+			background-color: var(--secondary-50);
+			border: 1px solid var(--secondary-100);
+			border-radius: var(--border-radius);
+			transition: all 0.2s ease-in-out;
+			box-sizing: border-box;
+			user-select: none;
+			-webkit-user-select: none; /* Safari */
+			-moz-user-select: none; /* Firefox */
+			-ms-user-select: none; /* IE10+/Edge */
+			position: relative;
+
+			
+			&::before {
+				position: absolute;
+				content: '';
+				right: -4px;
+				top: -2px;
+				bottom: -2px;
+				width: 2px;
+				border-radius: 2px;
+				background-color: var(--secondary-300);
+			}
+
+			&.not-visible{
+				opacity: 0.6;
+			}
+			&.not-visible::before,
+			&.disabled::before {
+				background-color: var(--grey-100);
+				top: 4px;
+				bottom: 4px;
+			}
+
+			&:hover:not(.disabled) {
+				background-color: var(--secondary-50);
+				border: 1px solid var(--secondary-100);
+				opacity: 1;
+				/* box-shadow: var(--box-shadow); */
+
+				i,
+				label {
+					color: var(--secondary-700);
+				}
+
+				i {
+					background-color: var(--secondary-50);
+
+					border-radius: 4px;
+				}
+			}
+
+			.column-item-details {
+				display: flex;
+				align-items: center;
+				gap: 4px;
+				width: 100%;
+
+				label {
+					margin-bottom: 0;
+					padding-top: 2px;
+					white-space: nowrap;
+					font-size: 12px;
+					font-weight: 400;
+					width: 100%;
+					cursor: pointer;
+				}
+			}
+
+			.column-drag-handle {
+				transition: all 0.2s ease-out;
+				color: var(--grey-500);
+				cursor: move;
+				font-size: 14px;
+			}
+		}
+	}
+
+	.empty-message {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 0.5rem;
+		padding: 1.5rem 1rem;
+		text-align: center;
+		color: var(--grey-500);
+		.pi {
+			font-size: 1.5rem;
+			color: var(--grey-400);
+		}
+
+		p {
+			margin: 0;
+			font-size: 12px;
+			font-weight: 500;
+		}
+	}
+
+	.popover-footer {
+		border-top: 1px solid var(--grey-200);
+		padding-top: 0.5rem;
+		margin-top: 0.25rem;
+	}
+}
+
+.column-item.disabled {
+	opacity: 0.7;
+	background-color: var(--grey-30);
+
+	label {
+		cursor: default !important;
+	}
+}
+
+.cdk-drag-preview {
+	box-shadow: var(--box-shadow-hover);
+	opacity: 0.6;
+	border-radius: var(--border-radius);
+	z-index: 1000;
+	direction: rtl;
+	overflow: hidden;
+	background: var(--secondary-100);
+	border: 1px solid var(--secondary-300);
+	display: flex;
+	align-items: center;
+	padding: 2px 6px;
+
+	/* The core fix: Re-apply layout rules */
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	width: 180px;
+	&::before {
+		position: absolute;
+		content: '';
+		right: -5px;
+		top: -2px;
+		bottom: -2px;
+		width: 3px;
+		border-radius: 2px;
+		background-color: var(--secondary-500);
+	}
+	.column-item-details {
+		display: flex;
+		align-items: center;
+		gap: 4px;
+
+		::ng-deep .p-checkbox {
+			vertical-align: unset !important;
+		}
+		label {
+			margin-bottom: 0;
+			white-space: nowrap;
+			font-size: 12px;
+			font-weight: 400;
+		}
+	}
+
+	.column-drag-handle {
+		color: var(--secondary-700);
+		cursor: move;
+		font-size: 14px;
+	}
+}
+
+.cdk-drag-placeholder {
+	opacity: 0.8;
+	background: var(--secondary-100);
+	border: 4px dashed var(--secondary-300);
+	border-radius: var(--border-radius);
+}

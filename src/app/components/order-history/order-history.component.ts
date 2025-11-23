@@ -24,6 +24,8 @@ import { Order } from '../../common/models/order';
 import { PageStates } from '../../common/models/pageStates';
 import { Product } from '../../common/models/product';
 import { AuthStore } from '../../store/auth.store';
+import { finalize } from 'rxjs';
+import { BaseIcon } from "primeng/icons/baseicon";
 
 // Interfaces
 interface ProductSummary {
@@ -54,9 +56,10 @@ type ChartMetric = 'quantity' | 'cost' | 'price';
 	styleUrls: ['./order-history.component.css'],
 	animations: [fadeIn400],
 	imports: [
-		CommonModule, FormsModule, TableModule, SelectModule, ButtonModule, SelectButtonModule,
-		TooltipModule, LoaderComponent, ChartModule, MessageModule, MatTabsModule
-	],
+    CommonModule, FormsModule, TableModule, SelectModule, ButtonModule, SelectButtonModule,
+    TooltipModule, LoaderComponent, ChartModule, MessageModule, MatTabsModule,
+    BaseIcon
+],
 })
 export class OrderHistoryComponent implements OnInit, AfterViewInit {
 	private hebrewDayPipe = inject(HebrewDayPipe);
@@ -361,22 +364,19 @@ export class OrderHistoryComponent implements OnInit, AfterViewInit {
 	}
 
 
-
-	setInitialDateRange() {
-		// השתמש ב-startDate הקיים כבסיס, או ב"היום" אם הוא ריק (בטעינה ראשונה)
-		const baseDate = this.startDate() ? new Date(this.startDate()) : new Date();
+    // --- עדכן את המתודה הקיימת setInitialDateRange ---
+    setInitialDateRange(base: Date = new Date()) { // הוסף פרמטר אופציונלי
+        const baseDate = new Date(base);
 		baseDate.setHours(0, 0, 0, 0);
 
 		let start: Date, end: Date;
 
 		if (this.viewMode() === 'weekly') {
-			// מצא את יום ראשון של השבוע שמכיל את ה-baseDate
 			start = new Date(baseDate);
 			start.setDate(baseDate.getDate() - baseDate.getDay());
 			end = new Date(start);
 			end.setDate(start.getDate() + 6);
 		} else { // 'monthly'
-			// מצא את תחילת וסוף החודש שמכיל את ה-baseDate
 			start = new Date(baseDate.getFullYear(), baseDate.getMonth(), 1);
 			end = new Date(baseDate.getFullYear(), baseDate.getMonth() + 1, 0);
 		}
@@ -748,20 +748,23 @@ export class OrderHistoryComponent implements OnInit, AfterViewInit {
 		input.value = ''; // Reset input to allow re-selecting the same file
 	}
 
-	// --- Core Logic ---
+
 	private uploadFile(file: File, supplierId: number): void {
-		if (!file.name.endsWith('.txt')) {
+		if (!file.name.endsWith('.zip')) {
 			this.notificationService.toast({
 				severity: 'warn',
 				summary: 'קובץ לא נתמך',
-				detail: 'יש לבחור קובץ מסוג .txt בלבד.',
+				detail: 'יש לבחור קובץ מסוג .zip בלבד.',
 			});
 			return;
 		}
 
 		this.isUploading.set(true);
 
-		this.apiService.uploadTxtFile(file, supplierId).subscribe({
+		this.apiService.uploadZipFile(file, supplierId).pipe(
+            // 2. הוסף את finalize כאן
+            finalize(() => this.isUploading.set(false))
+        ).subscribe({
 			next: (response) => {
 				if (response.success) {
 					this.notificationService.toast({
@@ -783,9 +786,7 @@ export class OrderHistoryComponent implements OnInit, AfterViewInit {
 					detail: error.error?.message || error.message || 'לא ניתן היה להעלות את הקובץ.',
 				});
 			},
-			complete: () => {
-				this.isUploading.set(false);
-			}
+            // 3. אין צורך יותר ב-complete, finalize מטפל בזה
 		});
 	}
 
@@ -823,4 +824,26 @@ export class OrderHistoryComponent implements OnInit, AfterViewInit {
 		// Implement the logic to refresh the order list, for example:
 		this.fetchOrders();
 	}
+
+	
+ isCurrentPeriod(): boolean {
+        const today = new Date();
+        const start = new Date(this.startDate());
+        const end = new Date(this.endDate());
+
+        // הוספת שעה אחת להתחלה ושעה אחת לסוף כדי לטפל בבעיות אזור זמן פוטנציאליות
+        start.setHours(1, 0, 0, 0);
+        end.setHours(1, 0, 0, 0);
+        today.setHours(1, 0, 0, 0);
+
+        return today >= start && today <= end;
+    }
+
+    /**
+     * מאפס את טווח התאריכים לתקופה הנוכחית (שבוע/חודש נוכחי).
+     */
+    goToToday(): void {
+        this.setInitialDateRange(new Date()); // קורא למתודה הקיימת עם התאריך של היום
+    }
+
 }

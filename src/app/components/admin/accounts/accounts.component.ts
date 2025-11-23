@@ -192,27 +192,27 @@ export class AccountsComponent implements OnInit {
       },
     });
 
-ref.onClose.subscribe((updatedAccountFromServer: Account | undefined) => {
-			if (updatedAccountFromServer) {
-				this.accounts.update(currentAccounts => 
-					currentAccounts.map(existingAccount => {
-						if (existingAccount.id === updatedAccountFromServer.id) {
-							// --- התיקון המרכזי ---
-                            // צור עותק חדש של החשבון הקיים
-                            const newAccountState = { ...existingAccount };
-                            // עדכן רק את המאפיינים שהשתנו שהתקבלו מהשרת
-                            newAccountState.tier = updatedAccountFromServer.tier;
-                            newAccountState.tierId = updatedAccountFromServer.tierId;
-                            // אם השרת מחזיר שדות נוספים, עדכן גם אותם
-                            // newAccountState.updatedAt = updatedAccountFromServer.updatedAt; 
-							return newAccountState;
-						}
-						return existingAccount;
-					})
-				);
-			}
-		});
-	}
+    ref.onClose.subscribe((updatedAccountFromServer: Account | undefined) => {
+      if (updatedAccountFromServer) {
+        this.accounts.update(currentAccounts =>
+          currentAccounts.map(existingAccount => {
+            if (existingAccount.id === updatedAccountFromServer.id) {
+              // --- התיקון המרכזי ---
+              // צור עותק חדש של החשבון הקיים
+              const newAccountState = { ...existingAccount };
+              // עדכן רק את המאפיינים שהשתנו שהתקבלו מהשרת
+              newAccountState.tier = updatedAccountFromServer.tier;
+              newAccountState.tierId = updatedAccountFromServer.tierId;
+              // אם השרת מחזיר שדות נוספים, עדכן גם אותם
+              // newAccountState.updatedAt = updatedAccountFromServer.updatedAt; 
+              return newAccountState;
+            }
+            return existingAccount;
+          })
+        );
+      }
+    });
+  }
 
   public confirmDelete(item: User | Account): void {
     const isAccount = 'users' in item;

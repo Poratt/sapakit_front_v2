@@ -1,0 +1,96 @@
+<p-button tooltipPosition="top" pTooltip="ניהול עמודות" icon="pi pi-cog" (onClick)="op.toggle($event)" size="small"
+    [rounded]="true" severity="secondary"></p-button>
+
+<p-popover #op  (onShow)="onPopoverShow()">
+	<div class="column-settings-content">
+		<div class="settings-header">
+			<div class="flex flex-col">
+				<p class="header">ניהול עמודות</p>
+				<p class="text-grey-xs">בחר עמודות וסדר אותן</p>
+			</div>
+			<span class="pi pi-objects-column"></span>
+		</div>
+
+
+		<div class="filter-container">
+			<p-iconfield>
+				<input 
+					pInputText 
+					type="text" 
+					class="filter-input" 
+					placeholder="חיפוש עמודה..."
+					[(ngModel)]="filterText" />
+				<p-inputicon styleClass="pi pi-search" />
+			</p-iconfield>
+		</div>
+
+		@if (filteredColumns().length > 0) {
+			<div  cdkDropList (cdkDropListDropped)="drop($event)" class="column-list">
+				@for (col of filteredColumns(); track col.key; let i = $index) {
+				@for(bp of BREAK_POINTS; track bp) {
+					@if (i == bp.index) {
+						<p-divider layout="horizontal" align="center" >
+							<span class="icon" [ngClass]="bp.icon"></span>
+							<span class="label">{{ bp.label }}</span>
+						</p-divider>
+					}
+				}
+				<div 
+					cdkDrag
+					[cdkDragDisabled]="col.disabled || !col.visible"
+					class="column-item"
+					[attr.data-icon]="getBpIcon(i)"
+					[ngClass]="{
+						'not-visible': !col.visible,
+						'disabled': col.disabled
+					}"
+					[class.disabled]="!!col.disabled"
+					>
+					<div class="column-item-details">
+						<p-checkbox 
+							[disabled]="!!col.disabled" 
+							[ngModel]="col.visible"
+							(ngModelChange)="toggleColumnVisibility(col)" 
+							[binary]="true" 
+							[inputId]="col.key"
+							size="small">
+							<ng-template pTemplate="icon">
+								@if (col.disabled) {
+									<span class="pi pi-lock !text-[10px]"></span>
+								} @else {
+									@if (col.visible) {
+										<span class="pi pi-check !text-[10px]"></span>
+									} @else {
+										<span class="pi pi-minus !text-[10px]"></span>
+									}
+								}
+							</ng-template>
+						</p-checkbox>
+						<label [for]="col.key"> {{ col.header }} </label>
+					</div>
+					@if(col.visible && !col.disabled) {
+						<i  class="pi pi-bars column-drag-handle" cdkDragHandle></i>
+					}
+
+					
+				</div>
+
+				}
+				<div *cdkDragPlaceholder class="column-item-placeholder"></div>
+			</div>
+		} @else {
+			<!-- This is the empty message that shows when the list is empty -->
+			<div class="empty-message">
+				<span class="pi pi-info-circle"></span>
+				<p>לא נמצאו עמודות תואמות</p>
+			</div>
+		}
+
+		<div class="popover-footer">
+			<button class="secondary md w-full" (click)="onSave()">
+				<i class="pi pi-save"></i>
+				<span>שמור הגדרות</span>
+			</button>
+		</div>
+	</div>
+</p-popover>

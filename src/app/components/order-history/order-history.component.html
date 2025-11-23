@@ -45,8 +45,9 @@
         }
     </div>
     <div class="flex flex-col gap-2 h-full ">
-
+      
       <div class="actions-bar">
+
         <div class="desktop-row">
           <span class="supplier-select">
             <p-select id="supplierId" [ngModel]="supplierId()" (ngModelChange)="supplierId.set($event)"
@@ -54,59 +55,64 @@
               placeholder="בחר ספק" [appendTo]="'body'" [showClear]="true" [filter]="suppliers().length > 10">
             </p-select>
           </span>
-          <div class="flex gap-2 items-center select-buttons-desktop">
+          <div class="flex gap-4 items-center select-buttons-desktop">
             <p-selectButton class="custom sm" [options]="tabOptions" [ngModel]="selectedTab()"
-              (ngModelChange)="selectedTab.set($event)" optionLabel="label" optionValue="value" [allowEmpty]="false"
-              size="small">
+              (ngModelChange)="selectedTab.set($event)" optionLabel="label" optionValue="value" [allowEmpty]="false" size="small">
               <ng-template let-item pTemplate="item">
-                <div class="flex flex-col  items-center gap-0.5">
-                  <span class="material-symbols-rounded">{{ item.icon }}</span>
-                  <span class="text-[10px] leading-2 text-center">{{ item.label }}</span>
+                <div class="content">
+                  <span class="material-symbols-rounded icon">{{ item.icon }}</span>
+                  <span class="label">{{ item.label }}</span>
                 </div>
               </ng-template>
             </p-selectButton>
             <p-selectButton class="custom sm" [options]="chartMetricOptions" [ngModel]="selectedChartMetric()"
-              (ngModelChange)="selectedChartMetric.set($event)" optionLabel="label" optionValue="value"
-              [allowEmpty]="false" size="small">
+              (ngModelChange)="selectedChartMetric.set($event)" optionLabel="label" optionValue="value" [allowEmpty]="false" size="small">
               <ng-template let-item pTemplate="item">
-                <div class="flex flex-col  items-center gap-0.5">
-                  <span class="material-symbols-rounded">{{ item.icon }}</span>
-                  <span class="text-[10px] leading-2 text-center">{{ item.label }}</span>
+                <div class="content">
+                  <span class="material-symbols-rounded icon">{{ item.icon }}</span>
+                  <span class="label">{{ item.label }}</span>
                 </div>
               </ng-template>
             </p-selectButton>
             <p-selectButton class="custom sm" [options]="viewPropsOptions" [ngModel]="viewProps()"
-              (ngModelChange)="viewProps.set($event)" optionLabel="label" optionValue="value" [allowEmpty]="false">
+              (ngModelChange)="viewProps.set($event)" optionLabel="label" optionValue="value" [allowEmpty]="false" size="small">
               <ng-template let-item pTemplate="item">
-                <div class="flex flex-col  items-center gap-0.5">
-                  <span class="material-symbols-rounded">{{ item.icon }}</span>
-                  <span class="text-[10px] leading-2 text-center">{{ item.label }}</span>
+                <div class="content">
+                  <span class="material-symbols-rounded icon">{{ item.icon }}</span>
+                  <span class="label">{{ item.label }}</span>
                 </div>
               </ng-template>
             </p-selectButton>
             <p-selectButton class="custom sm" [options]="viewModeOptions" [ngModel]="viewMode()"
-              (ngModelChange)="viewMode.set($event)" optionLabel="label" optionValue="value" [allowEmpty]="false">
+              (ngModelChange)="viewMode.set($event)" optionLabel="label" optionValue="value" [allowEmpty]="false" size="small">
               <ng-template let-item pTemplate="item">
-                <div class="flex flex-col  items-center gap-0.5">
-                  <span class="material-symbols-rounded">{{ item.icon }}</span>
-                  <span class="text-[10px] leading-2 text-center">{{ item.label }}</span>
+                <div class="content">
+                  <span class="material-symbols-rounded icon">{{ item.icon }}</span>
+                  <span class="label">{{ item.label }}</span>
                 </div>
               </ng-template>
             </p-selectButton>
           </div>
 
-          <div class="flex gap-0.5 items-center justify-center pb-1">
-            <p-button icon="pi pi-chevron-right" class="p-button-xs" [rounded]="true" [text]="true" severity="secondary"
-              tooltipPosition="top" [pTooltip]="viewMode() === 'weekly' ? 'שבוע קודם' : 'חודש קודם'"
-              (onClick)="prevPeriod()" [disabled]="isFetching()">
+          <div class="flex items-center justify-center">
+            @if (!isCurrentPeriod()) {
+            <p-button icon="pi pi-calendar-clock" styleClass="p-button-sm" [rounded]="true" [text]="true"
+              severity="secondary" (click)="goToToday()" pTooltip="חזור להיום">
             </p-button>
-            <span class="text-xs pt-1 font-medium text-gray-600 whitespace-nowrap">
-              {{ formatDisplayDate(startDate()) }} - {{ formatDisplayDate(endDate()) }}
-            </span>
-            <p-button icon="pi pi-chevron-left" class="p-button-xs" [rounded]="true" [text]="true" severity="secondary"
-              tooltipPosition="top" [pTooltip]="viewMode() === 'weekly' ? 'שבוע הבא' : 'חודש הבא'"
-              (onClick)="nextPeriod()" [disabled]="isFetching()">
-            </p-button>
+            }
+            <div class="flex gap-0.5 items-center justify-center pb-1 min-[180px]">
+              <p-button icon="pi pi-chevron-right" class="p-button-xs" [rounded]="true" [text]="true" severity="secondary"
+                tooltipPosition="top" [pTooltip]="viewMode() === 'weekly' ? 'שבוע קודם' : 'חודש קודם'"
+                (onClick)="prevPeriod()" [disabled]="isFetching()">
+              </p-button>
+              <span class="text-xs pt-1 font-medium text-gray-600 whitespace-nowrap">
+                {{ formatDisplayDate(startDate()) }} - {{ formatDisplayDate(endDate()) }}
+              </span>
+              <p-button icon="pi pi-chevron-left" class="p-button-xs" [rounded]="true" [text]="true" severity="secondary"
+                tooltipPosition="top" [pTooltip]="viewMode() === 'weekly' ? 'שבוע הבא' : 'חודש הבא'"
+                (onClick)="nextPeriod()" [disabled]="isFetching()">
+              </p-button>
+            </div>
           </div>
         </div>
         <div class="mobile-row">
@@ -115,9 +121,9 @@
               (ngModelChange)="selectedTab.set($event)" optionLabel="label" optionValue="value" [allowEmpty]="false"
               size="small">
               <ng-template let-item pTemplate="item">
-                <div class="flex flex-col  items-center gap-0.5">
-                  <span class="material-symbols-rounded">{{ item.icon }}</span>
-                  <span class="text-[10px] leading-2 text-center">{{ item.label }}</span>
+                <div class="content">
+                  <span class="material-symbols-rounded icon">{{ item.icon }}</span>
+                  <span class="label">{{ item.label }}</span>
                 </div>
               </ng-template>
             </p-selectButton>
@@ -125,27 +131,27 @@
               (ngModelChange)="selectedChartMetric.set($event)" optionLabel="label" optionValue="value"
               [allowEmpty]="false" size="small">
               <ng-template let-item pTemplate="item">
-                <div class="flex flex-col  items-center gap-0.5">
-                  <span class="material-symbols-rounded">{{ item.icon }}</span>
-                  <span class="text-[10px] leading-2 text-center">{{ item.label }}</span>
+                <div class="content">
+                  <span class="material-symbols-rounded icon">{{ item.icon }}</span>
+                  <span class="label">{{ item.label }}</span>
                 </div>
               </ng-template>
             </p-selectButton>
             <p-selectButton class="custom sm" [options]="viewPropsOptions" [ngModel]="viewProps()"
               (ngModelChange)="viewProps.set($event)" optionLabel="label" optionValue="value" [allowEmpty]="false">
               <ng-template let-item pTemplate="item">
-                <div class="flex flex-col  items-center gap-0.5">
-                  <span class="material-symbols-rounded">{{ item.icon }}</span>
-                  <span class="text-[10px] leading-2 text-center">{{ item.label }}</span>
+                <div class="content">
+                  <span class="material-symbols-rounded icon">{{ item.icon }}</span>
+                  <span class="label">{{ item.label }}</span>
                 </div>
               </ng-template>
             </p-selectButton>
             <p-selectButton class="custom sm" [options]="viewModeOptions" [ngModel]="viewMode()"
               (ngModelChange)="viewMode.set($event)" optionLabel="label" optionValue="value" [allowEmpty]="false">
               <ng-template let-item pTemplate="item">
-                <div class="flex flex-col  items-center gap-0.5">
-                  <span class="material-symbols-rounded">{{ item.icon }}</span>
-                  <span class="text-[10px] leading-2 text-center">{{ item.label }}</span>
+                <div class="content">
+                  <span class="material-symbols-rounded icon">{{ item.icon }}</span>
+                  <span class="label">{{ item.label }}</span>
                 </div>
               </ng-template>
             </p-selectButton>
@@ -175,36 +181,7 @@
               <i class="pi pi-search text-3xl text-gray-400"></i>
               <p class="text-lg text-gray-600 mt-2">אין הזמנות להצגה עבור התקופה והספק הנבחרים.</p>
               <p class="text-sm text-gray-500">נסה לשנות תאריכים או לבחור ספק אחר.</p>
-              @if(isAdmin()){
-                <div class="upload-section">
-                
-                  @if (isUploading()) {
-                    <div class="loader-container">
-                      <app-loader></app-loader>
-                      <div class="flex flex-col">
-                        <span class="upload-status-text">מעבד את הקובץ...</span>
-                        <span class="upload-status-subtext">זה עשוי לקחת מספר שניות</span>
-                      </div>
-                    </div>
-                  }
-
-                  @if (!isUploading()) {
-                    <div class="file-dropzone fade-in" 
-                        [class.dragging-over]="isDraggingOver()"
-                        (dragover)="onDragOver($event)"
-                        (dragleave)="onDragLeave($event)" 
-                        (drop)="onDrop($event, supplierId()!)">
-                      
-                      <i class="pi pi-database upload-icon"></i>
-                      <p class="upload-text">גרור קובץ TXT לכאן או לחץ לבחירה</p>
-                      <p class="upload-hint">לייבוא הזמנות היסטוריות</p>
-                      
-                      <input type="file" id="txt" class="file-input" accept=".txt" 
-                            (change)="onFileSelect($event,supplierId()!)" />
-                    </div>
-                  }
-                </div>
-              }
+              <ng-template *ngTemplateOutlet="uploadZip"></ng-template>
             </div>
             }
             @else {
@@ -285,6 +262,8 @@
               <i class="pi pi-search text-3xl text-gray-400"></i>
               <p class="text-lg text-gray-600 mt-2">אין הזמנות להצגה עבור התקופה והספק הנבחרים.</p>
               <p class="text-sm text-gray-500">נסה לשנות תאריכים או לבחור ספק אחר.</p>
+              <ng-template *ngTemplateOutlet="uploadZip"></ng-template>
+
             </div>
             }
             @else if (data) {
@@ -294,7 +273,7 @@
                   (ngModelChange)="splitChartByProp.set($event)" optionLabel="label" optionValue="value"
                   [allowEmpty]="false">
                   <ng-template let-item pTemplate="item">
-                    <div class="flex flex-col  items-center gap-0.5">
+                    <div class="content">
                       <span class="material-symbols-rounded text-xs">{{ item.icon }}</span>
                       <span class="text-[10px] leading-2 text-center">{{ item.label }}</span>
                     </div>
@@ -305,10 +284,10 @@
                     [ngModel]="selectedChartType()" (ngModelChange)="onChartTypeChange($event)" optionLabel="label"
                     optionValue="value" optionDisabled="disabled" [allowEmpty]="false" size="small">
                     <ng-template let-item pTemplate="item">
-                      <div class="flex flex-col  items-center gap-0.5" [class.opacity-50]="item.disabled"
+                      <div class="content" [class.opacity-50]="item.disabled"
                         [pTooltip]="item.tooltip" [tooltipPosition]="'top'" [showDelay]="300">
-                        <span class="material-symbols-rounded">{{ item.icon }}</span>
-                        <span class="text-[10px] leading-2 text-center">{{ item.label }}</span>
+                        <span class="material-symbols-rounded icon">{{ item.icon }}</span>
+                        <span class="label">{{ item.label }}</span>
                       </div>
                     </ng-template>
                   </p-selectButton>
@@ -336,3 +315,41 @@
   }
   }
 </div>
+
+
+
+
+
+
+<ng-template #uploadZip>
+    @if(isAdmin()){
+      <div class="upload-section">
+      
+        @if (isUploading()) {
+          <div class="loader-container">
+            <app-loader></app-loader>
+            <div class="flex flex-col">
+              <span class="upload-status-text">מעבד את הקובץ...</span>
+              <span class="upload-status-subtext">זה עשוי לקחת מספר שניות</span>
+            </div>
+          </div>
+        }
+
+        @if (!isUploading()) {
+          <div class="file-dropzone fade-in" 
+            [class.dragging-over]="isDraggingOver()"
+            (dragover)="onDragOver($event)"
+            (dragleave)="onDragLeave($event)" 
+            (drop)="onDrop($event, supplierId()!)">
+          
+          <i class="pi pi-file-zip upload-icon"></i>
+          <p class="upload-text">גרור קובץ ZIP לכאן או לחץ לבחירה</p>
+          <p class="upload-hint">הקובץ חייב להכיל קובץ בשם _chat.txt</p>
+          
+          <input type="file" class="file-input" accept=".zip" 
+                (change)="onFileSelect($event,supplierId()!)" />
+        </div>
+        }
+      </div>
+    }
+</ng-template>

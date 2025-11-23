@@ -24,31 +24,29 @@ export class ExcelExportService {
 	 * @param options - Additional export options
 	 */
 	exportToExcel<T>(data: T[], columns: ExportColumn[], options: ExportOptions = {}): void {
-		if (!data || data.length === 0) {
-			console.warn('No data to export');
+		// The only requirement is to have column definitions.
+		if (!columns || columns.length === 0) {
+			console.error('Export failed: No columns defined.');
 			return;
 		}
 
 		try {
-			// Prepare data for export
-			const exportData = this.prepareDataForExport(data, columns);
+			let worksheet: XLSX.WorkSheet;
+			if (data && data.length > 0) {
+				const exportData = this.prepareDataForExport(data, columns);
+				worksheet = XLSX.utils.json_to_sheet(exportData);
+			} else {
+				const headers = [columns.map(c => c.header)];
+				worksheet = XLSX.utils.aoa_to_sheet(headers);
+			}
 
-			// Create worksheet
-			const worksheet = XLSX.utils.json_to_sheet(exportData);
-
-			// Set column widths
 			this.setColumnWidths(worksheet, columns);
-
-			// Create workbook
 			const workbook = XLSX.utils.book_new();
 			const sheetName = options.sheetName || 'Data';
 			XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
-
-			// Generate file name
 			const fileName = this.generateFileName(options.fileName, options.includeTimestamp);
-
-			// Save the file
 			XLSX.writeFile(workbook, fileName);
+
 		} catch (error) {
 			console.error('Error exporting to Excel:', error);
 			throw new Error('Failed to export data');
@@ -130,21 +128,21 @@ export class ExcelExportService {
 		// For dates
 		dateFormat:
 			(format: 'short' | 'long' = 'short') =>
-			(value: Date | string) => {
-				if (!value) return '';
-				const date = new Date(value);
-				return format === 'short'
-					? date.toLocaleDateString('he-IL')
-					: date.toLocaleString('he-IL');
-			},
+				(value: Date | string) => {
+					if (!value) return '';
+					const date = new Date(value);
+					return format === 'short'
+						? date.toLocaleDateString('he-IL')
+						: date.toLocaleString('he-IL');
+				},
 
 		// For numbers
 		numberFormat:
 			(decimals: number = 2) =>
-			(value: number) => {
-				if (typeof value !== 'number') return value;
-				return value.toFixed(decimals);
-			},
+				(value: number) => {
+					if (typeof value !== 'number') return value;
+					return value.toFixed(decimals);
+				},
 
 		// For booleans
 		booleanToHebrew: (value: boolean) => (value ? 'כן' : 'לא'),
@@ -152,9 +150,9 @@ export class ExcelExportService {
 		// For arrays
 		arrayToString:
 			(separator: string = ', ') =>
-			(value: any[]) => {
-				if (!Array.isArray(value)) return value;
-				return value.join(separator);
-			},
+				(value: any[]) => {
+					if (!Array.isArray(value)) return value;
+					return value.join(separator);
+				},
 	};
 }

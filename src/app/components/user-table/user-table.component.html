@@ -1,0 +1,59 @@
+<div class="user-table-container">
+	<div class="flex w-full mb-2 justify-end">
+
+		<p-button
+			pTooltip="ייצא לאקסל"
+			tooltipPosition="top"
+			icon="pi pi-file-excel"
+			severity="secondary"
+			size="small"
+			[rounded]="true"
+			(click)="exportTableToExcel()">
+		</p-button>
+
+		<app-excel-import 
+			[templateColumns]="columns()"
+			(dataImported)="onDataImported($event)">
+		</app-excel-import>
+				
+
+		<app-column-settings [(columns)]="columns" (save)="saveColumnSettings($event)"></app-column-settings>
+		<!-- <app-responsive-column-settings [(columns)]="columns" (save)="saveColumnSettings($event)"></app-responsive-column-settings> -->
+		
+		<!-- <app-column-select [(columns)]="columns" (save)="saveColumnSettings($event)"></app-column-select> -->
+	</div>
+
+	<!-- Dynamic user table -->
+	<div class="user-table-wrapper">
+		<p-table [value]="users()" >
+			<ng-template pTemplate="header">
+				<tr class="user-table-header">
+					@for (col of columns(); track col.key) {
+					@if (col.visible) {
+					<th class="user-table-header-cell">{{ col.header }}</th>
+					}
+					}
+				</tr>
+			</ng-template>
+			<ng-template pTemplate="body" let-user>
+				<tr class="user-table-body-row">
+					@for (col of columns(); track col.key) {
+					@if (col.visible) {
+					<td class="user-table-body-cell">
+						@if (col.key === 'isActive') {
+						@if (user[col.key]) {
+						<span class="status-active">פעיל</span>
+						} @else {
+						<span class="status-inactive">לא פעיל</span>
+						}
+						} @else {
+						{{ user[col.key] }}
+						}
+					</td>
+					}
+					}
+				</tr>
+			</ng-template>
+		</p-table>
+	</div>
+</div>

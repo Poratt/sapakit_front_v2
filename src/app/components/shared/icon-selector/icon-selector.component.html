@@ -1,54 +1,58 @@
 <div class="icon-selector-container" [class.disabled]="disabled">
 
-	<mat-tab-group 
-		*ngIf="showCategoryTabs && currentCategories.length > 1" 
-		dir="rtl"
-		class="sm soft-bg"
-		disableRipple="true"
-		[selectedIndex]="currentCategoryIndex"
-		(selectedIndexChange)="selectCategory($event)">
-		
-		<mat-tab *ngFor="let category of currentCategories; let i = index">
-			<ng-template mat-tab-label>
-				<div class="flex gap-1 items-center">
-					<span class="!text-sm" [ngClass]="category.icon"></span>
-					{{ category.label }}
-				</div>
-			</ng-template>
-		</mat-tab>
+    @if (showCategoryTabs && currentCategories.length > 1) {
+        <mat-tab-group 
+            dir="rtl"
+            class="small-tabs"
+            disableRipple="true"
+            [selectedIndex]="currentCategoryIndex"
+            (selectedIndexChange)="selectCategory($event)">
+            
+            @for (category of currentCategories; track category.name; let i = $index) {
+                <mat-tab>
+                    <ng-template mat-tab-label>
+                        <div class="flex flex-col gap-1 items-center">
+                            <span class="icon" [ngClass]="category.icon"></span>
+                            <span class="label">{{ category.label }}</span>
+                        </div>
+                    </ng-template>
+					<div class="icon-selector" [attr.data-size]="size">
+						<button type="button" class="icon-nav-btn" [disabled]="disabled" (click)="previousIcon()" title="אייקון קודם">
+							<i class="pi pi-chevron-right"></i>
+						</button>
+				
+						<div class="icon-display">
+							<div class="icon-wrapper">
+								<i class="pi" [ngClass]="currentIcon()" [attr.title]="currentIcon()"></i>
+							</div>
+							@if (showIconName) {
+								<span class="icon-name">{{ currentIcon() | slice : 3 }}</span>
+							}
+							<div class="icon-counter">
+								{{ currentIconIndex() + 1 }}/{{ availableIcons.length }}
+							</div>
+						</div>
+				
+						<button type="button" class="icon-nav-btn" [disabled]="disabled" (click)="nextIcon()" title="אייקון הבא">
+							<i class="pi pi-chevron-left"></i>
+						</button>
+					</div>
+				
+					<div class="flex flex-wrap gap-2 justify-center ">
+						@for (icon of availableIcons; track icon + $index; let i = $index) {
+							<button type="button" class="flex flex-col items-center p-2 rounded hover:bg-gray-100 cursor-pointer"
+								[class.bg-blue-100]="icon === currentIcon()" (click)="updateValue(icon)" [disabled]="disabled">
+								<i class="pi" [ngClass]="icon" [ngStyle]="{'font-size': size === 'small' ? '1rem' : size === 'medium' ? '1.25rem' : '1.5rem'}"></i>
+								@if (showIconName) {
+									<span class="text-xs text-gray-600">{{ icon | slice : 3}}</span>
+								}
+							</button>
+						}
+					</div>
+                </mat-tab>
+            }
+        </mat-tab-group>
+    }
 
-	</mat-tab-group>
-
-	<div class="icon-selector" [attr.data-size]="size">
-		<button type="button" class="icon-nav-btn" [disabled]="disabled" (click)="previousIcon()" title="אייקון קודם">
-			<i class="pi pi-chevron-right"></i>
-		</button>
-
-		<div class="icon-display">
-			<div class="icon-wrapper">
-				<i class="pi" [ngClass]="currentIcon()" [attr.title]="currentIcon()"></i>
-			</div>
-			<span *ngIf="showIconName" class="icon-name">{{ currentIcon() | slice : 6 }}</span>
-			<div class="icon-counter">
-				{{ currentIconIndex() + 1 }}/{{ availableIcons.length }}
-			</div>
-		</div>
-
-		<button type="button" class="icon-nav-btn" [disabled]="disabled" (click)="nextIcon()" title="אייקון הבא">
-			<i class="pi pi-chevron-left"></i>
-		</button>
-	</div>
-
-	<div class="flex flex-wrap gap-2 justify-center ">
-		@for (icon of availableIcons; track icon) {
-		<button type="button" class="flex flex-col items-center p-2 rounded hover:bg-gray-100 cursor-pointer"
-			[class.bg-blue-100]="icon === currentIcon()" (click)="updateValue(icon)" [disabled]="disabled">
-			<i class="pi" [ngClass]="icon" [ngStyle]="{'font-size': size === 'small' ? '1rem' : size === 'medium' ? '1.25rem' : '1.5rem'}"></i>
-			@if (showIconName) {
-			<span class="text-xs text-gray-600">{{ icon | slice : 6}}</span>
-			}
-		</button>
-		}
-	</div>
 
 </div>

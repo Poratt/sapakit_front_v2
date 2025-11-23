@@ -1,0 +1,59 @@
+<div class="column-settings-content">
+    
+
+    <p-multiSelect
+        [options]="draftColumns()"
+        optionLabel="header"
+        optionValue="field"
+        optionDisabled="disabled"
+        [(ngModel)]="selectedColumns"
+        (onChange)="onSelectionChange($event)"
+        (onPanelShow)="onPopoverShow()"
+        (onPanelHide)="onCancel()"
+        placeholder="בחר עמודות"
+        [filter]="true"
+        filterPlaceHolder="חפש עמודות"
+        [showToggleAll]="true"
+        [showHeader]="true"
+        [styleClass]="'w-full'"
+        [panelStyleClass]="'column-list'"
+        [appendTo]="'body'"
+        [resetFilterOnHide]="true"
+        [maxSelectedLabels]="3"
+        [selectedItemsLabel]="'{0} עמודות נבחרו'"
+        display="chip"
+    >
+
+		<ng-template pTemplate="header">
+			<div class="settings-header">
+				<div class="header">
+					<p class="text-lg font-semibold">ניהול עמודות</p>
+					<p class="text-sm text-gray-500">בחר עמודות וסדר אותן</p>
+				</div>
+				<i class="pi pi-cog text-gray-500"></i>
+			</div>
+		</ng-template>
+        <ng-template pTemplate="item" let-column let-i="index">
+            <div class="column-item" [ngClass]="{'disabled': column.disabled}" cdkDrag [cdkDragData]="column" (cdkDragDropped)="drop($event)">
+                <div class="column-item-details">
+                    <label>{{ column.header }}</label>
+                </div>
+                <i class="pi pi-bars column-drag-handle" *ngIf="column.visible && !column.disabled" cdkDragHandle></i>
+            </div>
+        </ng-template>
+        <ng-template pTemplate="selecteditems" let-selected>
+            <div class="selected-item-chip" *ngFor="let field of selected">
+                {{ getColumnHeader(field) }}
+            </div>
+        </ng-template>
+        <ng-template pTemplate="footer">
+            <div class="popover-footer">
+                <p-button
+                    label="שמור הגדרות"
+                    styleClass="p-button-sm p-button-success w-full"
+                    (onClick)="onSave()"
+                ></p-button>
+            </div>
+        </ng-template>
+    </p-multiSelect>
+</div>

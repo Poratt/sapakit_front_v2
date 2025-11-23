@@ -1,0 +1,57 @@
+<p-button
+	pTooltip="ייבא מאקסל"
+	tooltipPosition="top"
+	icon="pi pi-file-import"
+	severity="secondary"
+	size="small"
+	[rounded]="true"
+	(onClick)="op.show($event)">
+</p-button>
+
+<p-popover #op>
+	@if (isUploading()) {
+		<div class="loader-container">
+			<app-loader></app-loader>
+			<div class="flex flex-col">
+				<span class="upload-status-text">מעבד את הקובץ...</span>
+				<span class="upload-status-subtext">זה עשוי לקחת מספר שניות</span>
+			</div>
+		</div>
+	} @else {
+		<div class="import-container">
+			<div class="file-dropzone fade-in" 
+				[class.dragging-over]="isDraggingOver()"
+				(dragover)="onDragOver($event)"
+				(dragleave)="onDragLeave($event)" 
+				(drop)="onDrop($event)">
+				
+				<i class="pi pi-download upload-icon"></i>
+				<p class="upload-text">גרור קובץ לכאן או לחץ לבחירה</p>
+				<p class="upload-hint">תמיכה בקבצי .xlsx בלבד</p>
+				
+				<input type="file" class="file-input" accept=".xlsx, .xls" (change)="onFileSelect($event)"/>
+			</div>
+
+			<!-- This section is now fully dynamic and reads from the signal input -->
+			@if (templateColumns().length > 0) {
+			<div class="import-instructions">
+				<h4 class="instructions-title">מבנה קובץ נדרש</h4>
+				<p class="instructions-note">
+					השורה הראשונה בקובץ חייבת להכיל את שמות העמודות (Headers) הבאים:
+				</p>
+				
+				<div class="instructions-list">
+					@for (col of templateColumns(); track col.key) {
+						<code>{{ col.header }}</code>
+					}
+				</div>
+				
+				<a (click)="downloadTemplate()" class="template-link">
+					<i class="pi pi-download"></i>
+					<span class="label">הורד קובץ תבנית</span>
+				</a>
+			</div>
+			}
+		</div>
+	}
+</p-popover>

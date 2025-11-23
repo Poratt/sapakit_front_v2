@@ -12,14 +12,6 @@
 		</div>
 		<h2 class="month">{{ monthDisplay() }}</h2>
 		<div class="flex items-center justify-end gap-1">
-			@if (displayedDays() | hasHoliday) {
-			<div class="event holiday">
-				<span class="material-symbols-rounded icon-sm">celebration</span>
-				@for (part of (displayedDays() | findHoliday) | textSplit; track part) {
-				<span>{{ part }}</span>
-				}
-			</div>
-			}
 			@if (!isCurrentWeek()) {
 			<p-button icon="pi pi-calendar-clock" styleClass="p-button-sm" [rounded]="true" [text]="true"
 				severity="secondary" (click)="goToToday()" pTooltip="חזור להיום">
@@ -42,6 +34,15 @@
 		}">
 			<span class="day-letter">{{ day.letter }}</span>
 			<span class="day-date">{{ day.date }}</span>
+
+			@if (day.holiday && day.holiday !== day.fast) {
+						<div class="event holiday">
+							<span class="material-symbols-rounded icon-sm">celebration</span>
+							@for (part of day.holiday | textSplit; track part) {
+							<span>{{ part }}</span>
+							}
+						</div>
+						}
 
 
 

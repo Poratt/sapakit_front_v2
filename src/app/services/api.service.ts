@@ -69,6 +69,10 @@ export class ApiService {
 		return this.http.get<ServiceResultContainer<User[]>>(`${this.apiUrl}/users`);
 	}
 
+	bulkInsertUsers(users: Partial<User>[]): Observable<ServiceResultContainer<User[]>> {
+        return this.http.post<ServiceResultContainer<User[]>>(`${this.apiUrl}/users/bulk`, users);
+    }
+	
 	//New Account
 	register(newUser: CreateUserDto): Observable<ServiceResultContainer<User>> {
 		return this.http.post<ServiceResultContainer<User>>(`${this.apiUrl}/auth/register`, newUser);
@@ -208,19 +212,17 @@ export class ApiService {
 		);
 	}
 
-	uploadTxtFile(file: File, supplierId: number): Observable<ServiceResultContainer<any>> {
-		console.log('🚀 Uploading file:', file.name, 'for supplier:', supplierId);
-
+	uploadZipFile(file: File, supplierId: number): Observable<ServiceResultContainer<any>> { // שנה את שם המתודה
 		const formData = new FormData();
-		formData.append('txtFile', file);
+		formData.append('zipFile', file); // שנה את שם השדה
 
 		const params = new HttpParams()
 			.set('supplierId', supplierId.toString())
-			.set('minMatchThreshold', '70') // אופציונלי
-			.set('minMatchedRatio', '0.6');  // אופציונלי
+			.set('minMatchThreshold', '70')
+			.set('minMatchedRatio', '0.6');
 
-		return this.http.post<ServiceResultContainer<any>>(`${this.apiUrl}/orders/upload-txt`, formData, { params })
-
+		// שנה את הנתיב
+		return this.http.post<ServiceResultContainer<any>>(`${this.apiUrl}/orders/upload-zip`, formData, { params });
 	}
 
 	// API Service

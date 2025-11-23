@@ -1,0 +1,192 @@
+::ng-deep .p-multiselect {
+    width: 180px !important;
+    direction: rtl;
+}
+
+::ng-deep .p-multiselect-panel {
+    width: 180px !important;
+    direction: rtl;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+}
+
+::ng-deep .p-multiselect-header {
+    border-bottom: 1px solid var(--grey-200);
+    padding: 0.5rem;
+}
+
+::ng-deep .p-multiselect-filter-container {
+    width: 100%;
+}
+
+::ng-deep .p-multiselect-filter {
+    width: 100%;
+    direction: rtl;
+}
+
+::ng-deep .p-multiselect-items {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 0.5rem;
+}
+
+::ng-deep .p-multiselect-item {
+    display: none !important;
+}
+
+.column-settings-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    width: 180px;
+
+    .settings-header {
+        text-align: right;
+        border-bottom: 1px solid var(--grey-200);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 4px;
+
+        .header {
+            line-height: 12px;
+            padding-top: 4px;
+        }
+    }
+
+    .column-list {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+
+        .column-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            padding: 2px 6px;
+            gap: 8px;
+            background-color: var(--secondary-50);
+            border: 1px solid var(--secondary-100);
+            border-radius: var(--border-radius);
+            transition: all 0.2s ease-in-out;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+
+            i {
+                padding: 4px;
+                font-size: 14px;
+            }
+
+            &:hover:not(.disabled) {
+                background-color: var(--secondary-50);
+                border: 1px solid var(--secondary-100);
+
+                i,
+                label {
+                    color: var(--secondary-700);
+                }
+
+                i {
+                    background-color: var(--secondary-50);
+                    border-radius: 4px;
+                }
+            }
+
+            .column-item-details {
+                display: flex;
+                align-items: center;
+                gap: 4px;
+                width: 100%;
+
+                label {
+                    margin-bottom: 0;
+                    padding-top: 2px;
+                    white-space: nowrap;
+                    font-size: 12px;
+                    font-weight: 400;
+                    width: 100%;
+                    cursor: pointer;
+                }
+            }
+
+            .column-drag-handle {
+                transition: all 0.2s ease-out;
+                color: var(--grey-500);
+                cursor: move;
+                font-size: 14px;
+            }
+        }
+    }
+
+    .popover-footer {
+        border-top: 1px solid var(--grey-200);
+        padding-top: 0.5rem;
+        margin-top: 0.25rem;
+    }
+}
+
+.column-item.disabled {
+    opacity: 0.7;
+    background-color: var(--grey-30);
+
+    label {
+        cursor: default !important;
+    }
+}
+
+.cdk-drag-preview {
+    box-shadow: var(--box-shadow-hover);
+    opacity: 0.6;
+    border-radius: var(--border-radius);
+    z-index: 1000;
+    direction: rtl;
+    overflow: hidden;
+    background: var(--secondary-100);
+    border: 1px solid var(--secondary-300);
+    display: flex;
+    align-items: center;
+    padding: 2px 6px;
+    justify-content: space-between;
+    gap: 8px;
+    width: 180px;
+
+    .column-item-details {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+
+        label {
+            margin-bottom: 0;
+            white-space: nowrap;
+            font-size: 12px;
+            font-weight: 400;
+        }
+    }
+
+    .column-drag-handle {
+        color: var(--secondary-700);
+        cursor: move;
+        font-size: 14px;
+    }
+}
+
+.cdk-drag-placeholder {
+    opacity: 0.8;
+    background: var(--secondary-100);
+    border: 2px dashed var(--secondary-300);
+    border-radius: var(--border-radius);
+}
+
+.selected-item-chip {
+    background-color: var(--secondary-100);
+    border: 1px solid var(--secondary-300);
+    border-radius: var(--border-radius);
+    padding: 2px 6px;
+    font-size: 12px;
+}

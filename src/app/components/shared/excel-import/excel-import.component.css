@@ -1,0 +1,138 @@
+::ng-deep .p-popover .p-popover-content {
+	padding: 0 !important;
+}
+
+::ng-deep .p-popover :has(.file-dropzone.dragging-over) {
+	border-color: var(--primary-300);
+	background-color: var(--primary-20);
+}
+
+::ng-deep .p-popover:after,
+::ng-deep .p-popover:before {
+	display: none !important;
+}
+
+.loader-container,
+.import-container {
+	padding: 1rem;
+	max-width: 250px;
+	min-width: 240px;
+	min-height: 390px;
+}
+
+.file-dropzone {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	padding: 1rem;
+	border: 1px dashed var(--grey-300);
+	border-radius: var(--border-radius);
+	background-color: var(--grey-50);
+	cursor: pointer;
+	transition: all 0.2s ease-in-out;
+	position: relative;
+	min-height: 100px;
+	margin: 0 auto;
+
+	&:hover {
+		border-color: var(--primary-300);
+		background-color: var(--primary-50);
+	}
+
+	&.dragging-over {
+		border-color: var(--primary-500);
+		background-color: var(--primary-100);
+		transform: scale(1.01);
+	}
+
+	.upload-icon {
+		color: var(--grey-500);
+		font-size: 1.25rem;
+		margin-bottom: 0.25rem;
+	}
+
+	.upload-text {
+		color: var(--grey-600);
+		font-size: 0.75rem;
+		margin-bottom: 0.25rem;
+		text-align: center;
+		font-weight: 500;
+	}
+
+	.upload-hint {
+		color: var(--grey-400);
+		font-size: 0.7rem;
+		text-align: center;
+		margin: 0.1rem 0;
+	}
+
+	.file-input {
+		position: absolute;
+		width: 100%;
+		height: 100%;
+		top: 0;
+		left: 0;
+		opacity: 0;
+		cursor: pointer;
+	}
+}
+.import-instructions {
+	margin-top: 1rem;
+	padding-top: 1rem;
+	border-top: 1px solid var(--grey-200);
+
+	.instructions-title {
+		font-size: 0.8rem;
+		font-weight: 600;
+		color: var(--grey-700);
+		margin: 0 0 0.5rem 0;
+		text-align: right;
+	}
+
+	.instructions-note {
+		font-size: 0.75rem;
+		color: var(--grey-600);
+		margin: 0 0 0.75rem 0;
+		line-height: 1.4;
+		text-align: right;
+	}
+
+	.instructions-list {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		padding: 0;
+		margin: 0 0 1rem 0;
+		text-align: right;
+
+		code {
+			direction: ltr;
+			text-align: left;
+			background-color: var(--grey-100);
+			border: 1px solid var(--grey-200);
+			padding: 2px 5px;
+			border-radius: 4px;
+			font-size: 0.7rem;
+			white-space: nowrap;
+		}
+	}
+
+	.template-link {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.5rem;
+		font-size: 0.8rem;
+		font-weight: 500;
+		color: var(--primary-500);
+		cursor: pointer;
+		text-decoration: none;
+		transition: color 0.2s;
+
+		&:hover .label {
+			color: var(--primary-600);
+			text-decoration: underline;
+		}
+	}
+}
