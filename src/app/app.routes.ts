@@ -13,10 +13,9 @@ export const routes: Routes = [
 		loadComponent: () => import('./public/register/register.component').then((m) => m.RegisterComponent),
 	},
 
-	// --- נתיבים למשתמש רגיל / Admin ---
 	{
 		path: '',
-		component: DashboardComponent, // Layout ראשי
+		component: DashboardComponent, // Main Layout 
 		canActivate: [authGuard],
 		children: [
 			{ path: '', loadComponent: () => import('./components/home/home.component').then((m) => m.HomeComponent) },
@@ -33,10 +32,9 @@ export const routes: Routes = [
 		],
 	},
 
-	// --- ✅ נתיבים ייעודיים ל-SysAdmin (קבוצה נפרדת באותה רמה) ---
 	{
 		path: 'admin',
-		component: DashboardComponent, // משתמש באותו Layout
+		component: DashboardComponent, // Main Layout
 		canActivate: [authGuard, sysAdminGuard],
 		children: [
 			{
@@ -49,11 +47,11 @@ export const routes: Routes = [
 				loadComponent: () => import('./components/admin/admin-dashboard-component/admin-dashboard-component.component').then(m => m.AdminDashboardComponentComponent)
 			},
 			{
-				path: 'accounts', // נתיב: /admin/accounts
+				path: 'accounts', // /admin/accounts
 				loadComponent: () => import('./components/admin/accounts/accounts.component').then(m => m.AccountsComponent)
 			},
 			{
-				path: 'tiers', // נתיב: /admin/tiers
+				path: 'tiers', // /admin/tiers
 				loadComponent: () => import('./components/admin/tiers/tiers.component').then(m => m.TiersComponent)
 			},
 
