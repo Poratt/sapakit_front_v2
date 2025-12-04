@@ -1,0 +1,7 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Rounded square background using the brand's primary blue color -->
+  <rect width="512" height="512" rx="900" fill="#ffffff00"/>
+  <!-- Simplified, bold 'S' shape in white for high contrast -->
+<path fill="none" stroke="#FFFFFF" stroke-width="50" stroke-linecap="round" stroke-linejoin="round" 
+d="M 352,128 C 200,128 200,256 256,256 C 312,256 312,384 160,384" />
+</svg>
