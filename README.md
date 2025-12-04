@@ -30,10 +30,7 @@ Sapakit is a smart B2B order management system designed to streamline and simpli
 
 | Main Dashboard | Supplier Product Management | History DB
 | :---: | :---: | :---: |
-| <img width="542" height="566" alt="image" src="https://github.com/user-attachments/assets/0e80b167-604c-4683-a96e-78e1fb865b05" />
-| <img width="733" height="569" alt="image" src="https://github.com/user-attachments/assets/10c1289e-83e5-492b-91c6-2a537374589f" />
- | <img width="737" height="573" alt="image" src="https://github.com/user-attachments/assets/7cca0916-b740-424c-8c60-364b9f5aa3ca" />
- |
+| <img width="542" height="566" alt="image" src="https://github.com/user-attachments/assets/0e80b167-604c-4683-a96e-78e1fb865b05" /> | <img width="733" height="569" alt="image" src="https://github.com/user-attachments/assets/10c1289e-83e5-492b-91c6-2a537374589f" /> | <img width="737" height="573" alt="image" src="https://github.com/user-attachments/assets/7cca0916-b740-424c-8c60-364b9f5aa3ca" /> |
 
 ### 🚀 Getting Started
 
